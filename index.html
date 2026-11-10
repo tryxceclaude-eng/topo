@@ -203,6 +203,38 @@ form.ans input:focus{outline:none;border-color:var(--blue)}
 .rmapbox{height:min(22vh,180px);border-radius:12px;overflow:hidden;border:1px solid rgba(255,213,154,.35);box-shadow:0 8px 20px rgba(0,0,0,.35)}
 #rMap{width:100%;height:100%;display:block}
 .rmapbox.play{height:min(26vh,210px)}
+.rstrip{display:flex;align-items:center;gap:8px;margin:6px 0 2px;font:600 12px var(--head);color:#e3cfae}
+.rsbar{position:relative;flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.rsbar i{display:block;height:100%;background:linear-gradient(90deg,#f76707,#ffd59a);transition:width .2s linear}
+.rsbar em{position:absolute;right:4px;top:-3px;font-style:normal;font-size:11px}
+.rleft{font:600 13px var(--head);color:#ffd59a;margin:2px 0 6px;min-height:18px}
+.board{position:relative;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,213,154,.25);overflow:hidden}
+.brow{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:8px;padding:0 8px;border-bottom:1px solid rgba(255,255,255,.06);border-left:4px solid var(--c);transition:transform .45s cubic-bezier(.3,.8,.3,1),background .3s}
+.brow.mine{background:rgba(255,224,102,.1)}
+.brow.flag{background:rgba(155,93,229,.2)}
+.brow.glow{animation:glow 2s ease-out}
+@keyframes glow{0%,40%{box-shadow:inset 0 0 0 2px #ffe066,0 0 16px #9b5de5;background:rgba(155,93,229,.45)}}
+.bpos{width:18px;font:800 16px var(--head);color:#ffd59a;text-align:center}
+.bmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.bname{display:flex;gap:6px;align-items:baseline;white-space:nowrap;overflow:hidden}
+.bname b{font:700 13.5px var(--head)}.bname small{font-size:10.5px;color:#e3cfae;overflow:hidden;text-overflow:ellipsis}
+.bname .bmine{color:#ffe066;font-weight:700}
+.blane{position:relative;height:10px;border-radius:6px;background:rgba(255,255,255,.08);margin:4px 12px 0 0}
+.bfill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--c);opacity:.55}
+.bhorse{position:absolute;top:-6px;font-size:18px;line-height:1;transform:scaleX(-1);filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.bsta{position:absolute;left:0;bottom:-4px;height:2px;background:#8ce99a;border-radius:2px}.bsta.low{background:#ff6b6b}
+.bright{width:86px;display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.bgap{font:700 12px var(--head);color:#fff;font-variant-numeric:tabular-nums}
+.bst{font-size:10.5px;color:#d0bfff;white-space:nowrap}
+.cdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 64px var(--head);color:#ffd59a;background:rgba(0,0,0,.45);text-shadow:0 4px 0 #5c3d1e}
+.ticker div{border-left:3px solid transparent;padding-left:6px}
+.gcard{margin:8px 0;padding:8px 12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,213,154,.25);border-radius:12px;font-size:13.5px}
+.gcard summary{font:700 14px var(--head);color:#ffd59a;cursor:pointer}
+.gline{padding:6px 0;border-top:1px solid rgba(255,255,255,.07)}
+.gline:first-of-type{margin-top:6px}
+.gt{color:#ffd59a;font-weight:600;margin-left:4px}
+.gs{color:#e3cfae;font-size:12.5px;margin:2px 0 0 16px}
+
 .rland{fill:#efe2c4;stroke:#b9aa8b;stroke-width:.6}
 .rroute{fill:none;stroke:#8a5a2b;stroke-width:2;stroke-dasharray:4 4;opacity:.6}
 .rroute.done{stroke:#5c3d1e;stroke-dasharray:none;opacity:.8}
@@ -279,12 +311,13 @@ form.ans input:focus{outline:none;border-color:var(--blue)}
 @keyframes tbc{from{transform:skewX(-12deg) translateX(120px);opacity:0}}
 .a4{display:flex;align-items:center;gap:10px;margin:8px 0;color:#ffe066;font-weight:700}
 .gpop{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;overflow:hidden}
-.gpop.on{animation:gpbg 1.7s ease-out forwards}
-@keyframes gpbg{0%{background:rgba(40,0,60,0)}15%{background:rgba(40,0,60,.55)}75%{background:rgba(40,0,60,.45)}100%{background:rgba(40,0,60,0)}}
-.gpn{font:800 clamp(26px,8vw,52px)/1.05 var(--head);color:#fff;text-shadow:0 0 0 #000,3px 3px 0 var(--c),-2px -2px 0 #000;letter-spacing:.02em;text-align:center;padding:0 10px;animation:gpn 1.7s ease-out forwards}
-.gpr{font:600 15px var(--head);color:#ffd59a;margin-top:6px;animation:gpn 1.7s ease-out forwards}
+.gpop.on{animation:gpbg 2.3s ease-out forwards}
+@keyframes gpbg{0%{background:rgba(40,0,60,0)}12%{background:rgba(40,0,60,.6)}80%{background:rgba(40,0,60,.5)}100%{background:rgba(40,0,60,0)}}
+.gpn{font:800 clamp(26px,8vw,52px)/1.05 var(--head);color:#fff;text-shadow:0 0 0 #000,3px 3px 0 var(--c),-2px -2px 0 #000;letter-spacing:.02em;text-align:center;padding:0 10px;animation:gpn 2.3s ease-out forwards}
+.gpr{font:600 15px var(--head);color:#ffd59a;margin-top:6px;animation:gpn 2.3s ease-out forwards}
+.gpw{max-width:min(86vw,460px);margin-top:12px;padding:8px 14px;border-radius:12px;background:rgba(0,0,0,.6);color:#fff;font:600 16px/1.35 var(--body);text-align:center;animation:gpn 2.3s ease-out forwards}
 @keyframes gpn{0%{transform:scale(2.2) skewX(-10deg);opacity:0}12%{transform:scale(1) skewX(-10deg);opacity:1}80%{opacity:1}100%{opacity:0;transform:scale(.96) skewX(-10deg)}}
-.gg{position:absolute;font:900 54px var(--head);color:#9b5de5;text-shadow:3px 3px 0 #1a0028;opacity:0;animation:gg 1.7s ease-out forwards}
+.gg{position:absolute;font:900 54px var(--head);color:#9b5de5;text-shadow:3px 3px 0 #1a0028;opacity:0;animation:gg 2.3s ease-out forwards}
 .gg.g1{left:8%;top:18%}.gg.g2{left:20%;top:62%;animation-delay:.12s;font-size:40px}.gg.g3{right:10%;top:22%;animation-delay:.2s}.gg.g4{right:20%;top:66%;animation-delay:.3s;font-size:38px}
 @keyframes gg{0%{opacity:0;transform:translateY(10px) scale(.6)}20%{opacity:.95;transform:translateY(0) scale(1)}60%{transform:translateY(-6px) scale(1.05)}100%{opacity:0;transform:translateY(-14px)}}
 .spiral{position:absolute;width:min(70vw,360px);aspect-ratio:1;border-radius:50%;background:conic-gradient(from 0deg,#ffe066,transparent 25%,#e8a90c 50%,transparent 75%,#ffe066);-webkit-mask:radial-gradient(circle,transparent 18%,#000 19%,#000 22%,transparent 23%,transparent 38%,#000 39%,#000 42%,transparent 43%,transparent 60%,#000 61%,#000 64%,transparent 65%);mask:radial-gradient(circle,transparent 18%,#000 19%,#000 22%,transparent 23%,transparent 38%,#000 39%,#000 42%,transparent 43%,transparent 60%,#000 61%,#000 64%,transparent 65%);animation:spin 1.6s linear;opacity:.85;z-index:-1}
@@ -529,7 +562,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261111-001540";
+<script>const BUILD="20261111-002807";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -1945,17 +1978,17 @@ const TAC = {voor: "Voorop", volg: "Volger", eind: "Eindsprinter"};
 // Kracht, Snelheid, Bereik, Duurzaamheid, Precisie, Potentieel
 const STATNM = ["Kracht", "Snelheid", "Bereik", "Duurzaamheid", "Precisie", "Potentieel"];
 const GIFTS = {
-  timeafter: {nm: "Time After Time", st: "DCABAE", d: "Gaat er iets mis? Dan spoelt hij de hele race 6 seconden terug en ontwijkt het. Max 2× per etappe."},
-  parallel: {nm: "Parallel Lines", st: "ABAAAA", d: "Haalt een uitgeruste versie van zichzelf uit een andere wereld als hij moe wordt. Vanaf etappe 7 wordt het Love Train: pech die hem treft gaat naar het paard waar het meeste geld op staat."},
-  primitive: {nm: "Primitive", st: "BACACB", d: "Wordt om de zoveel tijd oerinstinct: sneller op rots, berg en zand, en jaagt op paarden die in zijn buurt sprinten."},
-  raindance: {nm: "Rain Dance", st: "CACABC", d: "In de regen onstuitbaar: sneller, glijdt niet uit en springt vooruit. Zonder regen net iets trager."},
-  magnetic: {nm: "Magnetic", st: "BCBBDC", d: "Trekt het paard vlak voor hem terug en profiteert zelf. Sterker in de stad."},
-  standstill: {nm: "Standstill", st: "EEEAEE", d: "Onkwetsbaar voor pech, maar staat dan 2 seconden stokstijf stil."},
-  goodvibes: {nm: "Good Vibrations", st: "EEEEEE", d: "Doet helemaal niks. Moedigt alleen aan. Toch opvallend vaak geluk…"},
-  oldbefore: {nm: "Old Before I Die", st: "BCDBAA", d: "Laat paarden in de buurt verouderen: die raken sneller moe. Eén keer per etappe een gouden spiraal-sprint."},
-  undermyskin: {nm: "Under My Skin", st: "CCCABC", d: "Geneest blessures meteen en vult één keer per etappe haar energie bij."},
-  silence: {nm: "Sound of Silence", st: "BBACBB", d: "Loopt te voet. Laat één keer per etappe een geluidsgolf los die de koploper laat schrikken."},
-  leanon: {nm: "Lean on Me", st: "CCBCCB", d: "Gooit zijn lasso om het paard voor hem: rijdt goedkoop mee in de slipstream en trekt zich één keer per etappe naar voren."},
+  timeafter: {ic: "↺", sh: "Krijgt hij pech? Dan gaat de hele race 6 seconden terug en ontwijkt hij het.", nm: "Time After Time", st: "DCABAE", d: "Gaat er iets mis? Dan spoelt hij de hele race 6 seconden terug en ontwijkt het. Max 2× per etappe."},
+  parallel: {ic: "🚪", sh: "Is hij moe, dan wisselt hij met een uitgeruste versie van zichzelf. Vanaf etappe 7 gaat zijn pech naar het paard met jouw inzet.", nm: "Parallel Lines", st: "ABAAAA", d: "Haalt een uitgeruste versie van zichzelf uit een andere wereld als hij moe wordt. Vanaf etappe 7 wordt het Love Train: pech die hem treft gaat naar het paard waar het meeste geld op staat."},
+  primitive: {ic: "🦖", sh: "Wordt af en toe een jager: sneller, en paarden die vlak bij hem sprinten struikelen.", nm: "Primitive", st: "BACACB", d: "Wordt om de zoveel tijd oerinstinct: sneller op rots, berg en zand, en jaagt op paarden die in zijn buurt sprinten."},
+  raindance: {ic: "🌧️", sh: "Regent het? Dan is hij veel sneller en springt hij vooruit. Anders net iets trager.", nm: "Rain Dance", st: "CACABC", d: "In de regen onstuitbaar: sneller, glijdt niet uit en springt vooruit. Zonder regen net iets trager."},
+  magnetic: {ic: "🧲", sh: "Trekt af en toe het paard vlak voor hem terug en schiet zelf vooruit.", nm: "Magnetic", st: "BCBBDC", d: "Trekt het paard vlak voor hem terug en profiteert zelf. Sterker in de stad."},
+  standstill: {ic: "🛡️", sh: "Pech raakt hem niet, maar dan staat hij wel 2 seconden stil.", nm: "Standstill", st: "EEEAEE", d: "Onkwetsbaar voor pech, maar staat dan 2 seconden stokstijf stil."},
+  goodvibes: {ic: "📣", sh: "Doet niks behalve aanmoedigen. Maar pech slaat hem vaak over.", nm: "Good Vibrations", st: "EEEEEE", d: "Doet helemaal niks. Moedigt alleen aan. Toch opvallend vaak geluk…"},
+  oldbefore: {ic: "⏳", sh: "Maakt paarden vlak bij hem sneller moe. Eén keer per etappe een gouden sprint.", nm: "Old Before I Die", st: "BCDBAA", d: "Laat paarden in de buurt verouderen: die raken sneller moe. Eén keer per etappe een gouden spiraal-sprint."},
+  undermyskin: {ic: "💧", sh: "Geneest blessures meteen en krijgt één keer extra energie als die bijna op is.", nm: "Under My Skin", st: "CCCABC", d: "Geneest blessures meteen en vult één keer per etappe haar energie bij."},
+  silence: {ic: "🔊", sh: "Loopt te voet (veel uithouding). Laat één keer per etappe de koploper schrikken.", nm: "Sound of Silence", st: "BBACBB", d: "Loopt te voet. Laat één keer per etappe een geluidsgolf los die de koploper laat schrikken."},
+  leanon: {ic: "🪢", sh: "Hangt met zijn lasso achter het paard voor hem: kost bijna geen energie. Trekt zich één keer naar voren.", nm: "Lean on Me", st: "CCBCCB", d: "Gooit zijn lasso om het paard voor hem: rijdt goedkoop mee in de slipstream en trekt zich één keer per etappe naar voren."},
 };
 const RIDERS = [
   {id: "jonas", nm: "Jonas Sterling", horse: "Slow Dancer", gift: null, tac: "eind"},
@@ -2439,6 +2472,7 @@ function renderRace() {
   if (R.done) return renderFinal();
   const st = STAGES[R.si], a = myAct();
   $("#rTitle").textContent = `Etappe ${R.si + 1}/9 · ${st.nm}`;
+  const giftCard = `<details class="gcard" ${R.si === 0 ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = H.gift && GIFTS[H.gift]; return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> ${G ? `<span class="gt">${G.ic} ${G.nm}</span><div class="gs">${G.sh}</div>` : `<span class="gt">geen gave</span><div class="gs">Gewoon een goed paard dat traag start en sterk eindigt.</div>`}</div>`; }).join("")}<p class="qs">Gaven gaan vanzelf af. Jij rijdt niet mee, jij wedt alleen.</p></details>`;
   const tabs = `<div class="rtabs">${[["stage", "Etappe"], ["class", "Klassement"], ["overall", "Eindwinnaar"]].map(([k, l]) => `<button type="button" data-tab="${k}" class="${race.view === k ? "on" : ""}">${l}</button>`).join("")}</div>`;
   const wx = WX[R.wx];
   const info = `<div class="sinfo"><div><b>${TERRIC[st.t]} ${TERRNM[st.t]}</b> · ${wx[0]} ${wx[1]} · ${st.km} km</div><div class="qs">${esc(st.a)} → ${esc(st.b)}</div>
@@ -2462,7 +2496,7 @@ function renderRace() {
       ${R.ob.length ? `<p class="qs">Lopende eindwinnaar-inzetten: ${R.ob.map(b => `${esc(R.ent[b.h].nm)} ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}`).join(" · ")}</p>` : ""}`;
   }
   const slipTot = race.slip.reduce((x, b) => x + b.amt, 0);
-  $("#rMain").innerHTML = `<div class="rmapbox" id="rMapBox"><svg id="rMap"></svg></div>${info}${tabs}${body}
+  $("#rMain").innerHTML = `<div class="rmapbox" id="rMapBox"><svg id="rMap"></svg></div>${info}${giftCard}${tabs}${body}
     <div class="rslip">
       ${!race.slip.length && race.lastSlip && race.lastSlip.length ? `<button type="button" class="clink rep" id="rRep">↻ Zelfde inzet als vorige etappe</button>` : ""}
       ${race.slip.length ? `<div class="slipl">${race.slip.map((b, k) => `<span class="sb">${betLabel(b)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)} <button type="button" data-rm="${k}">×</button></span>`).join("")}</div>` : ""}
@@ -2604,60 +2638,75 @@ function settleLive(quiet) {
   return res;
 }
 
+const FLAGTXT = [[1, "💫 staat stil"], [32, "😱 geschrokken"], [2, "🦖 jaagt"], [16, "🚪 andere wereld"], [4, "🌀 sprint"], [8, "🪢 lasso"], [64, "🧲 trekt"]];
+const SPEEDS = [[1.2, "1×"], [2.4, "2×"], [5, "4×"]];
 function playStage(P) {
   race.running = true; race.psi = P.si;
   const R = S.race, el = $("#rMain");
   $("#rTitle").textContent = `Etappe ${P.si + 1}/9 · ${STAGES[P.si].nm}`;
-  const a = myAct();
-  const L = R.live;
-  const hasBets = L.bets.length > 0;
-  el.innerHTML = `<div class="rmapbox play" id="rMapBox"><svg id="rMap"></svg></div>
-    <div class="track" id="rTrack">${R.ent.map((H, i) => `<div class="lane ${L.bets.some(b => b.h === i || b.o === i) ? "mine" : ""}"><span class="ln" style="color:${H.col}">${esc(H.nm.split(" ").slice(-1)[0])}</span><div class="lbar"><i class="hm" id="hm${i}" style="background:${H.col}"><em id="hf${i}"></em></i>${a >= 1 ? `<s class="stam" id="hs${i}"></s>` : ""}</div><span class="lpos" id="hp${i}"></span></div>`).join("")}</div>
+  const a = myAct(), L = R.live, hasBets = L.bets.length > 0, st0 = STAGES[P.si];
+  const mineSet = new Set(); L.bets.forEach(b => { mineSet.add(b.h); if (b.o != null) mineSet.add(b.o); });
+  const RH = 46;
+  el.innerHTML = `<div class="rstrip"><span>${esc(st0.a)}</span><div class="rsbar"><i id="rsLead"></i><em>${TERRIC[st0.t]} ${WX[P.base.wx][0]}</em></div><span>${esc(st0.b)} 🏁</span></div>
+    <div class="rleft" id="rLeft"></div>
+    <div class="board" id="rBoard" style="height:${R.ent.length * RH}px">${R.ent.map((H, i) => {
+      const G = H.gift && GIFTS[H.gift];
+      return `<div class="brow ${mineSet.has(i) ? "mine" : ""}" id="br${i}" style="--c:${H.col}">
+        <span class="bpos" id="bp${i}"></span>
+        <div class="bmid"><div class="bname"><b>${esc(H.nm)}</b>${G ? `<small>${G.ic} ${G.nm}</small>` : ""}${mineSet.has(i) ? `<small class="bmine">jouw inzet</small>` : ""}</div>
+          <div class="blane"><i class="bfill" id="bf${i}"></i><span class="bhorse" id="bh${i}">🏇</span>${a >= 1 ? `<s class="bsta" id="bs${i}"></s>` : ""}</div></div>
+        <div class="bright"><span class="bgap" id="bg${i}"></span><span class="bst" id="bt${i}"></span></div>
+      </div>`; }).join("")}<div class="cdown" id="rCd" hidden></div></div>
     <div class="ticker" id="rTick"></div>
     <div class="rctl" id="rCtl">
       <button type="button" class="cact" id="rSpd">1×</button>
       ${hasBets ? `<button type="button" class="cashb" id="rCash">Cash out</button>` : ""}
       ${a >= 3 && !R.swap && L.bets.some(b => b.k === "w") ? `<button type="button" class="cact" id="rSwap">Wissel</button>` : ""}
-      <button type="button" class="cact" id="rSkip">⏭</button>
+      <button type="button" class="cact" id="rSkip" title="Naar de uitslag">⏭</button>
     </div>
     <div class="cconf" id="rConf" hidden></div>
     <div class="mybets" id="rMy"></div>`;
-  drawRmap();
-  const st = {t: 0, spd: 2, li: 0, last: performance.now(), done: false, paused: false};
+  const st = {t: 0, si: 0, li: 0, last: performance.now(), done: false, paused: false, cd: 3.2, slowUntil: 0, popUntil: 0, popQ: []};
+  const spd = () => SPEEDS[st.si][0];
   race.play = st;
   const F = P.frames, T = F[F.length - 1].t;
   const tick = $("#rTick");
-  const addTick = (txt) => { const d = document.createElement("div"); d.textContent = txt; tick.prepend(d); while (tick.children.length > 4) tick.lastChild.remove(); };
+  const addTick = (e) => {
+    const d = document.createElement("div");
+    const H = e.who != null ? R.ent[e.who] : null;
+    if (H) d.style.borderLeftColor = H.col;
+    d.textContent = e.txt; tick.prepend(d);
+    while (tick.children.length > 3) tick.lastChild.remove();
+  };
   const myBets = () => { $("#rMy").innerHTML = hasBets ? L.bets.map(b => `<span class="sb">${betLabel(b)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.cash != null ? " · cash " + fmtMoney(b.cash) : ""}</span>`).join("") : "<span class='qs'>Je kijkt zonder inzet.</span>"; };
   myBets();
-  addTick(`${WX[P.base.wx][0]} Start in ${STAGES[P.si].a}! ${STAGES[P.si].km} km naar ${STAGES[P.si].b}.`);
+  addTick({txt: `${WX[P.base.wx][0]} ${WX[P.base.wx][1]} · ${TERRNM[st0.t]} · ${st0.km} km naar ${st0.b}`});
   const leadNow = () => Math.max(...frameAt(F, st.t).x) / P.D;
   const updCtl = () => {
-    const cb = $("#rCash"), lead = leadNow();
+    const cb = $("#rCash"), lead = leadNow(), fast = st.si === 2;
     if (cb) {
       const open = L.bets.some(b => b.cash == null) && lead > 0.03 && lead < 0.93 && st.t < T;
-      cb.disabled = !open || st.spd > 2 || st.paused;
-      cb.textContent = !L.bets.some(b => b.cash == null) ? "Uitbetaald ✓" : lead >= 0.93 ? "Cash out gesloten" : st.spd > 2 ? "Cash out (niet op 3×)" : "Cash out";
+      cb.disabled = !open || fast || st.paused;
+      cb.textContent = !L.bets.some(b => b.cash == null) ? "Uitbetaald ✓" : lead >= 0.93 ? "Cash out gesloten" : fast ? "Cash out (niet op 4×)" : "Cash out";
     }
     const sw = $("#rSwap"); if (sw && (lead >= 0.5 || R.swap)) sw.remove();
   };
-  // live kansen vanaf de stand van nu; vaste seed per moment, dus opnieuw klikken geeft dezelfde prijs
   const liveMC = (N) => {
     const sn = [...P.snaps].reverse().find(x => x.t <= st.t) || P.snaps[0];
     return {mc: mcFrom(sn, P.base, N, hseed(R.cs, P.si, sn.tick, "live")), N};
   };
   const conf = (html) => { const c = $("#rConf"); c.innerHTML = html; c.hidden = !html; };
-  $("#rSpd").onclick = () => { st.spd = st.spd === 2 ? 6 : st.spd === 6 ? 1 : 2; $("#rSpd").textContent = st.spd === 1 ? "½×" : (st.spd / 2) + "×"; updCtl(); };
-  $("#rSkip").onclick = () => { if (!st.paused) st.t = T; };
+  $("#rSpd").onclick = () => { st.si = (st.si + 1) % SPEEDS.length; $("#rSpd").textContent = SPEEDS[st.si][1]; updCtl(); };
+  $("#rSkip").onclick = () => { if (!st.paused) { st.cd = 0; st.t = T; } };
   if ($("#rCash")) $("#rCash").onclick = () => {
-    if (st.paused || st.spd > 2) return;
+    if (st.paused || st.si === 2) return;
     st.paused = true; updCtl();
     const {mc, N} = liveMC(160);
     const offer = new Map();
     L.bets.forEach(b => { if (b.cash == null) offer.set(b, Math.min(MAXPAY, Math.floor(b.amt * b.odds * betProb(b, mc, N) * 0.88))); });
     let tot = 0; offer.forEach(v => tot += v);
-    conf(`<div>⏸ Race gepauzeerd. Cash out voor <b>💰 ${fmtMoney(tot)}</b>?</div><div class="row"><button class="primary" id="cfY">Ja, uitbetalen</button><button class="ghost" id="cfN">Nee, doorrijden</button></div>`);
-    $("#cfY").onclick = () => { offer.forEach((v, b) => { b.cash = v; }); save(); addTick(`💰 Je cashte uit voor ${fmtMoney(tot)}.`); conf(""); st.paused = false; myBets(); updCtl(); };
+    conf(`<div>⏸ Race gepauzeerd. Je inzet nu verkopen voor <b>💰 ${fmtMoney(tot)}</b>?</div><div class="row"><button class="primary" id="cfY">Ja, uitbetalen</button><button class="ghost" id="cfN">Nee, doorrijden</button></div>`);
+    $("#cfY").onclick = () => { offer.forEach((v, b) => { b.cash = v; }); save(); addTick({txt: `💰 Je cashte uit voor ${fmtMoney(tot)}.`}); conf(""); st.paused = false; myBets(); updCtl(); };
     $("#cfN").onclick = () => { conf(""); st.paused = false; updCtl(); };
   };
   if ($("#rSwap")) $("#rSwap").onclick = () => {
@@ -2676,35 +2725,60 @@ function playStage(P) {
       wb.amt -= mv; if (!wb.amt) L.bets.splice(L.bets.indexOf(wb), 1);
       L.bets.push({k: "w", h: i, amt: mv, odds: lo[i], sw: 1});
       R.swap = true; save();
-      addTick(`🔁 Wissel: ${fmtMoney(mv)} naar ${R.ent[i].nm} @ ${fmtOdds(lo[i])}.`);
+      addTick({txt: `🔁 Wissel: ${fmtMoney(mv)} naar ${R.ent[i].nm} @ ${fmtOdds(lo[i])}.`, who: i});
       conf(""); st.paused = false; myBets(); updCtl();
     });
     $("#cfN").onclick = () => { conf(""); st.paused = false; updCtl(); };
   };
-  let lastCtl = 0;
+  // alleen wat ertoe doet in de ticker: gebeurtenissen, de eerste keer dat een gave afgaat, en alles rond jouw paarden
+  const showTick = e => e.k === "ev" || e.pop || e.rw || e.love || e.spiral || mineSet.has(e.who);
+  let lastCtl = 0, lastRank = [];
+  const cd = $("#rCd");
   const frame = now => {
     if (st.done) return;
     const dt = Math.min(0.1, (now - st.last) / 1000); st.last = now;
-    if (!st.paused) st.t = Math.min(T, st.t + dt * st.spd);
+    if (st.cd > 0) {
+      st.cd -= dt;
+      cd.hidden = st.cd <= 0; cd.textContent = st.cd > 2.2 ? "3" : st.cd > 1.2 ? "2" : st.cd > 0.3 ? "1" : "GO!";
+    } else if (!st.paused) st.t = Math.min(T, st.t + dt * spd() * (now < st.slowUntil ? 0.15 : 1));
     const fr = frameAt(F, st.t);
-    drawDots(fr.x, P.D);
-    const rank = fr.x.map((x, i) => i).sort((p, q) => fr.x[q] - fr.x[p]);
+    const rank = fr.x.map((x, i) => i).sort((p, q) => {
+      const fp = fr.x[p] >= P.D, fq = fr.x[q] >= P.D;
+      if (fp && fq) return P.order.indexOf(p) - P.order.indexOf(q);
+      return fr.x[q] - fr.x[p];
+    });
+    const lx = fr.x[rank[0]];
+    $("#rsLead").style.width = (lx / P.D * 100).toFixed(1) + "%";
+    $("#rLeft").textContent = lx >= P.D ? "Finish!" : st.cd > 0 ? "Klaar voor de start…" : `Nog ${Math.max(0, Math.round((P.D - lx) / P.D * st0.km))} km · kop: ${R.ent[rank[0]].nm}`;
     R.ent.forEach((H, i) => {
-      const m = $("#hm" + i); if (!m) return;
-      m.style.left = `calc(${(fr.x[i] / P.D * 100).toFixed(2)}% - 7px)`;
-      const fl = fr.f[i];
-      $("#hf" + i).textContent = fl & 1 ? "💫" : fl & 32 ? "😱" : fl & 2 ? "🦖" : fl & 4 ? "🌀" : fl & 16 ? "🚪" : fl & 8 ? "🪢" : fl & 64 ? "🧲" : "";
-      if (a >= 1) { const sEl = $("#hs" + i); sEl.style.width = fr.s[i] + "%"; sEl.classList.toggle("low", fr.s[i] < 15); }
-      $("#hp" + i).textContent = fr.x[i] >= P.D ? (P.order.indexOf(i) + 1) + "e" : (rank.indexOf(i) + 1);
+      const pos = rank.indexOf(i);
+      const row = $("#br" + i); if (!row) return;
+      if (lastRank[i] !== pos) row.style.transform = `translateY(${pos * RH}px)`;
+      const pr = fr.x[i] / P.D * 100;
+      $("#bf" + i).style.width = pr.toFixed(2) + "%";
+      $("#bh" + i).style.left = `calc(${pr.toFixed(2)}% - 11px)`;
+      const fin = fr.x[i] >= P.D;
+      $("#bp" + i).textContent = fin ? (P.order.indexOf(i) + 1) : pos + 1;
+      $("#bg" + i).textContent = fin ? (P.order.indexOf(i) === 0 ? "🏆" : "🏁") : pos === 0 ? "kop" : "+" + ((lx - fr.x[i]) / BASEV).toFixed(1).replace(".", ",") + "s";
+      const ft = FLAGTXT.find(([b]) => fr.f[i] & b);
+      $("#bt" + i).textContent = fin ? "" : ft ? ft[1] : "";
+      row.classList.toggle("flag", !!ft && !fin);
+      if (a >= 1) { const sEl = $("#bs" + i); sEl.style.width = fr.s[i] + "%"; sEl.classList.toggle("low", fr.s[i] < 15); }
+      lastRank[i] = pos;
     });
     while (st.li < P.log.length && P.log[st.li].t <= st.t) {
       const e = P.log[st.li++];
-      addTick(e.txt);
-      if (e.pop && st.spd <= 2 && st.t < T - 0.5) giftPop(e);
+      if (showTick(e)) addTick(e);
+      if (e.pop && st.si < 2 && st.t < T - 1) { st.popQ.push(e); if (st.popQ.length > 2) st.popQ.splice(st.popQ.findIndex(x => !x.rw && !x.love), 1); }
       if (e.rw) flashRewind();
     }
+    if (st.popQ.length && now > st.popUntil + 350 && !st.paused) {
+      const e = st.popQ.shift();
+      giftPop(e); st.popUntil = now + 2300; st.slowUntil = now + 2000;
+      const row = $("#br" + e.who); if (row) { row.classList.remove("glow"); void row.offsetWidth; row.classList.add("glow"); }
+    }
     if (now - lastCtl > 300) { lastCtl = now; updCtl(); }
-    if (st.t >= T) { st.done = true; conf(""); return finishStage(P); }
+    if (st.t >= T && st.cd <= 0) { st.done = true; conf(""); return setTimeout(() => finishStage(P), 900); }
     requestAnimationFrame(frame);
   };
   updCtl();
@@ -2723,9 +2797,10 @@ function giftPop(e) {
   const p = $("#gPop"); if (!p) return;
   const H = S.race.ent[e.who], G = GIFTS[e.g] || {nm: ""};
   const nm = e.love ? "Love Train" : G.nm;
-  p.innerHTML = `<div class="gg g1">ゴ</div><div class="gg g2">ゴ</div><div class="gg g3">ゴ</div><div class="gg g4">ゴ</div><div class="gpn" style="--c:${H ? H.col : "#fff"}">「${esc(nm)}」</div><div class="gpr">${H ? esc(H.nm) : ""}</div>${e.spiral ? '<div class="spiral"></div>' : ""}`;
+  const what = e.txt.replace(/^\S+\s/, "");
+  p.innerHTML = `<div class="gg g1">ゴ</div><div class="gg g2">ゴ</div><div class="gg g3">ゴ</div><div class="gg g4">ゴ</div><div class="gpn" style="--c:${H ? H.col : "#fff"}">「${esc(nm)}」</div><div class="gpr">${H ? esc(H.nm) : ""}</div><div class="gpw">${esc(what)}</div>${e.spiral ? '<div class="spiral"></div>' : ""}`;
   p.hidden = false; p.classList.remove("on"); void p.offsetWidth; p.classList.add("on");
-  clearTimeout(giftPop.t); giftPop.t = setTimeout(() => { p.hidden = true; }, 1700);
+  clearTimeout(giftPop.t); giftPop.t = setTimeout(() => { p.hidden = true; }, 2300);
 }
 function flashRewind() { const t = $("#rTrack"); if (!t) return; t.classList.remove("rw"); void t.offsetWidth; t.classList.add("rw"); }
 function finishStage(P) {
