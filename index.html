@@ -563,7 +563,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261111-004121";
+<script>const BUILD="20261111-004350";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2477,12 +2477,25 @@ const ACTTXT = [
   "Act 4: één keer per dag krijg je je grootste verloren inzet terug (max 1000, alleen bij odds tot 6). Gouden spiraal.",
 ];
 
+// Oude opgeslagen races omzetten naar de huidige versie
+const RACEV = 2;
+const NOGIFT = {ic: "–", nm: "geen gave", st: "EEEEEE", sh: "", rules: []};
+const giftOf = H => GIFTS[H.gift] || NOGIFT;
+function migrateRace(R) {
+  if (!R || !Array.isArray(R.ent)) return;
+  R.ent.forEach(H => { if (H.rid === "jonas" && !GIFTS[H.gift]) H.gift = "chain"; if (H.gift && !GIFTS[H.gift]) H.gift = null; });
+  if (!Array.isArray(R.luck)) R.luck = R.ent.map(() => 0);
+  if (!Array.isArray(R.seen)) R.seen = [];
+  if (!Array.isArray(R.ob)) R.ob = [];
+  if (!Array.isArray(R.hist)) R.hist = [];
+  if (R.v !== RACEV) { R.v = RACEV; R.odds = null; R.prevW = null; } // odds opnieuw berekenen met de nieuwe gaven
+}
 const race = {view: "stage", running: false, slip: [], chip: 25, duelA: null, busy: false, play: null, built: false};
 function R_() { return S.race; }
 function newCrossing() {
   const cs = rseed();
   const ent = makeField(cs);
-  S.race = {cs, ent, si: 0, pts: ent.map(() => 0), tt: ent.map(() => 0), fat: ent.map(() => 0), inj: ent.map(() => 1), luck: ent.map(() => 0), hist: [], ob: [], live: null, swap: false, a4: "", odds: null, wx: null, sched: null, done: false};
+  S.race = {v: RACEV, cs, ent, si: 0, pts: ent.map(() => 0), tt: ent.map(() => 0), fat: ent.map(() => 0), inj: ent.map(() => 1), luck: ent.map(() => 0), hist: [], ob: [], live: null, swap: false, a4: "", odds: null, wx: null, sched: null, done: false};
   prepStage();
   save();
 }
@@ -2521,6 +2534,7 @@ function computeOdds(cb) {
 function openRace() {
   view = "race";
   $("#home").hidden = true; $("#play").hidden = true; $("#casino").hidden = true; $("#race").hidden = false;
+  if (S.race) migrateRace(S.race);
   if (S.race && S.race.live) settleLive(true);
   if (!S.race) newCrossing();
   race.view = "stage"; race.slip = []; race.duelA = null;
@@ -2545,7 +2559,7 @@ function giftRules(H, si) {
   return G.rules.map((t, k) => k < 4 ? (k + 1 <= A ? `<b>${t}</b>` : `<span class="locked">${t}</span>`) : t);
 }
 function showRider(i) {
-  const R = S.race, H = R.ent[i], G = GIFTS[H.gift], a = myAct();
+  const R = S.race, H = R.ent[i], G = giftOf(H), a = myAct();
   const aff = TERR.map((t, k) => `<span class="aff">${TERRIC[t]} ${H.aff[k] > 0 ? "▲".repeat(H.aff[k]) : H.aff[k] < 0 ? "▼".repeat(-H.aff[k]) : "–"}</span>`).join("");
   modal(`<h3 style="color:${H.col}">${esc(H.nm)}</h3>
     <p class="qs" style="margin:2px 0 8px">🐎 ${esc(H.horse)} · ${TAC[H.tac]} · ${R.pts[i]} punten</p>
@@ -2645,7 +2659,7 @@ function renderRace() {
   if (R.done) return renderFinal();
   const st = STAGES[R.si], a = myAct();
   $("#rTitle").textContent = `Etappe ${R.si + 1}/9 · ${st.nm}`;
-  const giftCard = `<details class="gcard" ${R.si === 0 ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = H.gift && GIFTS[H.gift]; return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> <span class="gt">${G.ic} ${G.nm}${H.gift === "chain" ? ` · <span class="act">ACT ${R.si < 2 ? 1 : R.si < 4 ? 2 : R.si < 7 ? 3 : 4}</span>` : ""}</span><ul class="gs">${giftRules(H, R.si).map(t => `<li>${t}</li>`).join("")}</ul></div>`; }).join("")}<p class="qs">Gaven gaan vanzelf af en werken op elkaar in. Jij rijdt niet mee, jij wedt alleen. Tik op een ruiter voor zijn paard en statistieken.</p></details>`;
+  const giftCard = `<details class="gcard" ${R.si === 0 ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = giftOf(H); return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> <span class="gt">${G.ic} ${G.nm}${H.gift === "chain" ? ` · <span class="act">ACT ${R.si < 2 ? 1 : R.si < 4 ? 2 : R.si < 7 ? 3 : 4}</span>` : ""}</span><ul class="gs">${giftRules(H, R.si).map(t => `<li>${t}</li>`).join("")}</ul></div>`; }).join("")}<p class="qs">Gaven gaan vanzelf af en werken op elkaar in. Jij rijdt niet mee, jij wedt alleen. Tik op een ruiter voor zijn paard en statistieken.</p></details>`;
   const tabs = `<div class="rtabs">${[["stage", "Etappe"], ["class", "Klassement"], ["overall", "Eindwinnaar"]].map(([k, l]) => `<button type="button" data-tab="${k}" class="${race.view === k ? "on" : ""}">${l}</button>`).join("")}</div>`;
   const wx = WX[R.wx];
   const info = `<div class="sinfo"><div><b>${TERRIC[st.t]} ${TERRNM[st.t]}</b> · ${wx[0]} ${wx[1]} · ${st.km} km</div><div class="qs">${esc(st.a)} → ${esc(st.b)}</div>
@@ -2690,7 +2704,7 @@ function moveArrow(R, i) {
   return r < 0.85 ? `<i class="mv dn" title="odds gedaald">▼</i>` : r > 1.18 ? `<i class="mv up" title="odds gestegen">▲</i>` : "";
 }
 function rowHTML(i) {
-  const R = S.race, H = R.ent[i], G = GIFTS[H.gift], a = myAct(), af = H.aff[TERR.indexOf(STAGES[R.si].t)];
+  const R = S.race, H = R.ent[i], G = giftOf(H), a = myAct(), af = H.aff[TERR.indexOf(STAGES[R.si].t)];
   const fm = formOf(R, i);
   const sel = race.duelA === i;
   return `<div class="rrow ${sel ? "sel" : ""}" style="--c:${H.col}">
@@ -2824,7 +2838,7 @@ function playStage(P) {
   el.innerHTML = `<div class="rstrip"><span>${esc(st0.a)}</span><div class="rsbar"><i id="rsLead"></i><em>${TERRIC[st0.t]} ${WX[P.base.wx][0]}</em></div><span>${esc(st0.b)} 🏁</span></div>
     <div class="rleft" id="rLeft"></div>
     <div class="board" id="rBoard" style="height:${R.ent.length * RH}px">${R.ent.map((H, i) => {
-      const G = H.gift && GIFTS[H.gift];
+      const G = giftOf(H);
       return `<div class="brow ${mineSet.has(i) ? "mine" : ""}" id="br${i}" style="--c:${H.col}">
         <span class="bpos" id="bp${i}"></span>
         <div class="bmid"><div class="bname"><b>${esc(H.nm)}</b>${G ? `<small>${G.ic} ${G.nm}</small>` : ""}${mineSet.has(i) ? `<small class="bmine">jouw inzet</small>` : ""}</div>
@@ -3025,6 +3039,7 @@ function renderFinal() {
 }
 window.addEventListener("resize", () => { if (view === "race" && !$("#race").hidden) { drawRmap(); } });
 
+if (S.race) migrateRace(S.race);
 if (S.race && S.race.live) settleLive(true);
 
 /* ================= website: updates, app-installatie, voortgang meenemen ================= */
