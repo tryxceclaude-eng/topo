@@ -501,7 +501,7 @@ const LANDEN = [
  [5,"Colombia",[],"170","Bogotá",[],[-74.07,4.71],3,"Het enige Zuid-Amerikaanse land met een kust aan twee oceanen. Bogotá ligt hoog in de Andes."],
  [6,"Brazilië",[],"076","Brasília",[],[-47.88,-15.79],3,"Niet Rio! Brasília is in 1960 nieuw gebouwd in het binnenland. Bras-ília zit letterlijk in Bras-ilië."],
  [7,"Peru",[],"604","Lima",[],[-77.04,-12.05],3,"Lima ligt aan de kust van de Grote Oceaan."],
- [8,"Bolivia",[],"068","La Paz",["lapaz"],[-68.15,-16.50],3,"Bolivia heeft geen kust. La Paz is de regeringsstad (hoogste ter wereld, ±3600 m); officieel is Sucre de grondwettelijke hoofdstad. Je lijst wil La Paz."],
+ [8,"Bolivia",[],"068","La Paz / Sucre",[],[-68.15,-16.50],3,"Bolivia heeft geen kust en twee hoofdsteden: La Paz is de regeringsstad (hoogste ter wereld, ±3600 m), Sucre de grondwettelijke hoofdstad. Ezelsbruggetje: de Paz (vrede) regeert, de Sucre (suiker) staat in de wet."],
  [9,"Chili",["chile"],"152","Santiago",["santiago de chile"],[-70.67,-33.45],3,"Het lange smalle land langs de westkust."],
  [10,"Argentinië",[],"032","Buenos Aires",[],[-58.38,-34.60],3,"Buenos Aires ligt aan de Atlantische kant, tegenover Uruguay."],
  [11,"Marokko",[],"504","Rabat",[],[-6.84,34.02],4,"Niet Casablanca (die staat bij je steden). Hoofdstad = Rabat, een stukje noordelijker langs de kust."],
@@ -611,7 +611,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261111-135458";
+<script>const BUILD="20261111-162503";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -816,21 +816,22 @@ function checkAnswer(input, main, alts) {
   return {ok: false, exact: false};
 }
 function checkCapital(it, input) {
-  if (it.id === "L29") { // Zuid-Afrika: alle drie
-    const need = ["kaapstad", "pretoria", "bloemfontein"];
-    const toks = String(input).split(/[\/,;&+]|\ben\b|\s+/).map(norm).filter(Boolean);
+  if (it.id === "L29" || it.id === "L8") { // meerdere hoofdsteden: allemaal nodig
+    const need = it.id === "L29" ? ["kaapstad", "pretoria", "bloemfontein"] : ["lapaz", "sucre"];
+    const nice = {kaapstad: "Kaapstad", pretoria: "Pretoria", bloemfontein: "Bloemfontein", lapaz: "La Paz", sucre: "Sucre"};
+    const toks0 = String(input).split(/[\/,;&+]|\ben\b|\s+/).map(norm).filter(Boolean);
+    const toks = [...toks0, ...toks0.slice(1).map((t, i) => toks0[i] + t)]; // "la pas" telt ook als één woord
     const have = need.filter(n => toks.some(t => t === n || lev(t, n) <= tolFor(n.length) || (n === "kaapstad" && t === "capetown")));
     const joined = norm(input);
     need.forEach(n => { if (!have.includes(n) && joined.includes(n)) have.push(n); });
-    if (have.length === 3) return {ok: true};
-    if (have.length) return {ok: false, note: "Zuid-Afrika heeft er drie. Je mist: <b>" + need.filter(n => !have.includes(n)).map(n => n[0].toUpperCase() + n.slice(1)).join(", ") + "</b>"};
+    if (have.length === need.length) return {ok: true};
+    if (have.length) return {ok: false, note: `${esc(it.name)} heeft er ${need.length === 3 ? "drie" : "twee"}. Je mist: <b>` + need.filter(n => !have.includes(n)).map(n => nice[n]).join(", ") + "</b>"};
     return {ok: false};
   }
-  if (it.id === "L43" || it.id === "L8") {
+  if (it.id === "L43") {
     const toks = String(input).split(/[\/,;&+]|\ben\b/).map(t => t.trim()).filter(Boolean);
     if (toks.some(t => checkAnswer(t, it.cap, it.capAlts).ok)) return {ok: true};
     if (it.id === "L43" && /naypyi?daw|naypyitaw|nay pyi/i.test(input)) return {ok: false, note: "Klopt in het echt, maar je lijst (en dus de toets) wil <b>Rangoon</b>. Schrijf allebei op als je wilt: Rangoon/Naypyidaw."};
-    if (it.id === "L8" && toks.some(t => norm(t) === "sucre")) return {ok: false, note: "Sucre is de grondwettelijke hoofdstad, maar je lijst wil <b>La Paz</b>. Allebei mag: La Paz/Sucre."};
   }
   return checkAnswer(input, it.cap, it.capAlts);
 }
@@ -1287,7 +1288,7 @@ function askCard(c) {
   else fns.push(() => drawItem(it, "hl"));
   setDecor(fns); countryClass(ccls);
   const q = c.type === "cap" ? `Hoofdstad van <em>${esc(it.name)}</em>?` : CAT[it.cat].q;
-  const sub = c.type === "cap" ? (it.id === "L29" ? "Let op: dit land heeft er drie. Scheid ze met /" : "") : it.cat === "land" ? "" : "";
+  const sub = c.type === "cap" ? (it.id === "L29" ? "Let op: dit land heeft er drie. Scheid ze met /" : it.id === "L8" ? "Let op: dit land heeft er twee. Scheid ze met /" : "") : it.cat === "land" ? "" : "";
   $("#panel").innerHTML = head + `<div class="qt">${q}</div>${sub ? `<p class="qs">${sub}</p>` : ""}
     <form class="ans" id="fAns" autocomplete="off"><input id="inp" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Typ je antwoord"><button class="okb">OK</button></form>
     <div class="row"><button class="ghost" id="bNo" type="button">Weet ik niet</button></div>`;
