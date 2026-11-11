@@ -208,6 +208,10 @@ form.ans input:focus{outline:none;border-color:var(--blue)}
 .lerr{color:var(--bad);font-size:14px;min-height:18px}
 .live.off{color:var(--dim);animation:none}
 /* ---------- paardenrace ---------- */
+.conts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.cont{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--rule);background:var(--card)}
+.cont .ci{font-size:20px;line-height:1}.cont .cn{font:600 14px var(--head)}.cont .bar{width:100%;height:6px}.cont small{font-size:11.5px;color:var(--dim)}
+.cont:last-child:nth-child(odd){grid-column:1/-1}
 .btn.race{width:100%;margin-top:8px;background:linear-gradient(135deg,#5c3d1e,#a0522d 60%,#d4a14a);color:#fff;border:0}
 .btn.race small{color:#ffe8c2}
 .actb{display:inline-block;font:700 9px/1 var(--head);letter-spacing:.06em;color:#2b1d00;background:linear-gradient(#ffe066,#e8a90c);border-radius:4px;padding:3px 4px;vertical-align:2px}
@@ -605,7 +609,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261111-134603";
+<script>const BUILD="20261111-135009";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -1056,21 +1060,30 @@ function goRegion(reg, dur = 650) { lastReg = reg; requestAnimationFrame(() => {
 
 /* ================= session ================= */
 let sess = null, curTimer = null;
-function counts() {
+// Werelddelen = groepen pakketten. In een focus-sessie komt alleen dat gebied langs (nieuw én herhalen).
+const CONTS = [
+  {k: "na", nm: "Noord-Amerika", ic: "🌎", packs: [1, 2]},
+  {k: "sa", nm: "Zuid-Amerika", ic: "🌎", packs: [3]},
+  {k: "af", nm: "Afrika", ic: "🌍", packs: [4, 5, 6]},
+  {k: "as", nm: "Azië & Rusland", ic: "🌏", packs: [7, 8, 9, 10]},
+  {k: "oc", nm: "Oceanië & Antarctica", ic: "🌏", packs: [11]},
+];
+const inScope = (c, packs) => !packs || packs.includes(c.item.pack);
+function counts(packs) {
   const now = NOW();
   let due = 0, next = Infinity, learning = 0;
-  CARDS.forEach(c => { const s = cst(c); if (!s) return; if (s.d <= now) due++; else next = Math.min(next, s.d); if (s.b <= 2) learning++; });
+  CARDS.forEach(c => { if (!inScope(c, packs)) return; const s = cst(c); if (!s) return; if (s.d <= now) due++; else next = Math.min(next, s.d); if (s.b <= 2) learning++; });
   return {due, next, learning};
 }
-function nextNewItem(pack) {
-  const packs = pack ? [pack] : PACKS.map(p => p.n);
-  for (const n of packs) { const it = PACKITEMS[n].find(i => !introduced(i)); if (it) return it; }
+function nextNewItem(packs) {
+  if (typeof packs === "number") packs = [packs];
+  for (const n of packs || PACKS.map(p => p.n)) { const it = PACKITEMS[n].find(i => !introduced(i)); if (it) return it; }
   return null;
 }
 function pickNext() {
   const now = NOW(), s = sess;
   const gapOk = c => (s.gap[c.id] || 0) <= s.step;
-  const due = CARDS.filter(c => { const st = cst(c); return st && st.d <= now && gapOk(c); });
+  const due = CARDS.filter(c => { const st = cst(c); return st && st.d <= now && gapOk(c) && inScope(c, s.packs); });
   let pool = due.filter(c => c.item.id !== s.lastItem);
   if (!pool.length) pool = due;
   if (pool.length) {
@@ -1079,18 +1092,20 @@ function pickNext() {
     return top.find(c => c.type !== s.lastType && c.item.cat !== s.lastCat) || top.find(c => c.type !== s.lastType) || top[0];
   }
   if (s.mode !== "review") {
-    if (counts().learning < 24) { const it = nextNewItem(s.pack); if (it) return {intro: it}; }
+    if (counts(s.packs).learning < (s.packs ? 16 : 24)) { const it = nextNewItem(s.packs); if (it) return {intro: it}; }
   }
-  const learn = CARDS.filter(c => { const st = cst(c); return st && st.b <= 2; }).sort((a, b) => cst(a).d - cst(b).d);
+  const learn = CARDS.filter(c => { const st = cst(c); return st && st.b <= 2 && inScope(c, s.packs); }).sort((a, b) => cst(a).d - cst(b).d);
   const soon = learn.find(c => gapOk(c) && c.item.id !== s.lastItem) || learn.find(c => c.item.id !== s.lastItem) || learn[0];
   if (soon && (s.mode !== "review" || cst(soon).d - now < 20 * MIN)) return soon;
   return null;
 }
-function startSession(mode, pack) {
-  sess = {mode, pack: pack || null, step: 0, start: NOW(), ok: 0, bad: 0, n: 0, gap: {}, lastItem: null, lastType: null, lastCat: null, breakShown: false};
+function startSession(mode, pack, cont) {
+  const C = cont ? CONTS.find(x => x.k === cont) : null;
+  const packs = C ? C.packs : pack ? [pack] : null;
+  sess = {mode, pack: pack || null, cont: C ? C.k : null, packs, step: 0, start: NOW(), ok: 0, bad: 0, n: 0, gap: {}, lastItem: null, lastType: null, lastCat: null, breakShown: false};
   show("play");
   $("#tapnote").hidden = true;
-  $("#topTitle").textContent = mode === "review" ? "Herhalen" : pack ? "Pakket " + pack + " · " + PACKS[pack - 1].name : "Leersessie";
+  $("#topTitle").textContent = C ? C.ic + " " + C.nm : mode === "review" ? "Herhalen" : pack ? "Pakket " + pack + " · " + PACKS[pack - 1].name : "Leersessie";
   clearInterval(curTimer);
   curTimer = setInterval(updTop, 1000);
   requestAnimationFrame(() => { layout(); nextQ(); });
@@ -1129,14 +1144,19 @@ function breakScreen() {
 }
 function doneScreen() {
   setDecor([]); countryClass({});
-  const c = counts();
-  const more = nextNewItem(sess && sess.pack);
-  $("#panel").innerHTML = `<div class="qt">Klaar voor nu ✓</div>
-  <p class="qs" style="margin:0 0 10px">${sess.mode === "review" ? "Alles wat nu herhaald moest worden is gedaan." : more ? "" : "Alle plekken zijn geïntroduceerd."}
-  ${c.next < Infinity ? " Volgende herhaling over <b>" + fmtDur(c.next - NOW()) + "</b>." : ""} Juist dat wachten maakt het blijvend: herhalen vlak voordat je het vergeet werkt het best.</p>
-  <div class="row"><button class="primary" id="bHome">Naar overzicht</button>${sess.mode === "review" && more ? '<button class="ghost" id="bNew">Nieuwe plekken leren</button>' : ""}</div>`;
+  const c = counts(sess.packs), all = counts();
+  const more = nextNewItem(sess && sess.packs);
+  const C = sess.cont && CONTS.find(x => x.k === sess.cont);
+  const area = C ? C.nm : sess.pack ? "pakket " + sess.pack : "";
+  const elsewhere = sess.packs ? all.due : 0;
+  $("#panel").innerHTML = `<div class="qt">${area ? `${esc(area)}: klaar voor nu ✓` : "Klaar voor nu ✓"}</div>
+  <p class="qs" style="margin:0 0 10px">${sess.mode === "review" ? "Alles wat nu herhaald moest worden is gedaan." : more ? (sess.packs ? "Je hebt hier nu genoeg nieuwe plekken tegelijk. Eerst moeten die een keer terugkomen, anders gaat het door elkaar lopen." : "") : area ? `Alle plekken van ${esc(area)} heb je gehad.` : "Alle plekken zijn geïntroduceerd."}
+  ${c.next < Infinity ? " Volgende herhaling hier over <b>" + fmtDur(c.next - NOW()) + "</b>." : ""} Juist dat wachten maakt het blijvend.
+  ${elsewhere ? ` Buiten dit gebied staan <b>${elsewhere}</b> kaart${elsewhere === 1 ? "" : "en"} klaar om te herhalen.` : ""}</p>
+  <div class="row"><button class="primary" id="bHome">Naar overzicht</button>${elsewhere ? '<button class="ghost" id="bAll">Doorgaan met alles</button>' : sess.mode === "review" && more ? '<button class="ghost" id="bNew">Nieuwe plekken leren</button>' : ""}</div>`;
   $("#bHome").onclick = stopSession;
   if ($("#bNew")) $("#bNew").onclick = () => startSession("mix");
+  if ($("#bAll")) $("#bAll").onclick = () => startSession("mix");
 }
 
 function infoHTML(it, opts = {}) {
@@ -1470,13 +1490,18 @@ function renderHome() {
     <div class="legend"><span style="--c:var(--good)">zit erin (${mast})</span><span style="--c:#ffc078">aan het leren (${good + lrn})</span><span style="--c:#e9ecef">nog nieuw (${tot - mast - good - lrn})</span></div>
     <div class="cats">${catRows}</div>
     <div class="cta">
-      <button class="btn" id="bStart">Start sessie (±20 min)<small>${sub}</small></button>
+      <button class="btn" id="bStart">Start sessie: alles (±20 min)<small>${sub} · de beste volgorde, alle gebieden door elkaar</small></button>
       <div class="grid2">
         <button class="btn alt sm" id="bRev" ${c.due ? "" : "disabled"}>Alleen herhalen</button>
         <button class="btn alt sm" id="bExam">Toetsoefening</button>
         <button class="btn alt sm" id="bAtlas">Atlas</button>
         <button class="btn alt sm" id="bCasino">🎰 Roulette</button>
       </div>
+      <div class="sec" style="margin-top:14px">Per werelddeel <span class="qs" style="text-transform:none;letter-spacing:0">alleen dat gebied, nieuw + herhalen</span></div>
+      <div class="conts">${CONTS.map(C => {
+        const its = C.packs.flatMap(n => PACKITEMS[n]), lv = its.map(itemLevel), m = lv.filter(x => x === 3).length, intro = lv.filter(x => x > 0).length, due = counts(C.packs).due;
+        return `<button class="cont" data-cont="${C.k}"><span class="ci">${C.ic}</span><span class="cn">${esc(C.nm)}</span><span class="bar"><i class="m" style="width:${m / its.length * 100}%"></i><i class="l" style="width:${(intro - m) / its.length * 100}%"></i></span><small>${m}/${its.length} erin${due ? ` · <b>${due}</b> herhalen` : ""}</small></button>`;
+      }).join("")}</div>
       <button class="btn race" id="bRace">🐎 De Grote Oversteek<small>${S.race && !S.race.done ? `Etappe ${S.race.si + 1}/9 · ` : ""}paardenrace · jouw gave: ${myAct() ? "Act " + myAct() : "nog geen Act"}</small></button>
     </div>
     <p class="qs" style="margin:6px 0 0">Vandaag: ${dToday.a} antwoorden${dToday.a ? `, ${Math.round(dToday.ok / dToday.a * 100)}% goed` : ""}${lastEx ? ` · laatste toetsoefening: ${lastEx.p}/${lastEx.m}` : ""}</p>
@@ -1513,6 +1538,7 @@ function renderHome() {
     $("#mNo").onclick = closeModal;
   });
   $("#home").querySelectorAll("[data-p]").forEach(b => b.onclick = () => startSession("pack", +b.dataset.p));
+  $("#home").querySelectorAll("[data-cont]").forEach(b => b.onclick = () => startSession("cont", null, b.dataset.cont));
 }
 function examPicker() {
   const opts = [["all", "Alles (106 plekken)"], ...CATORDER.map(k => [k, CAT[k].pl + " (" + ITEMS.filter(i => i.cat === k).length + ")"])];
