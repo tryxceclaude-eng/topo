@@ -579,7 +579,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261111-005634";
+<script>const BUILD="20261111-010221";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -3050,17 +3050,22 @@ function playStage(P) {
       const big = e.rw || e.love || e.spiral || /Act 3|Act 4|verouderd|laat \d+ opgeslagen/.test(e.txt);
       const fresh = e.g && !R.seen.includes(e.g);
       if (e.pop && (big || fresh || e.sp || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.5) {
-        if (e.g && fresh) R.seen.push(e.g);
         e.lv = e.lvl || (big ? 2 : 1);
+        e.fresh = fresh; e.qt = now;
+        if (e.g && fresh) R.seen.push(e.g);
         st.popQ.push(e);
         // te veel tegelijk? dan valt het minst belangrijke af
         if (st.popQ.length > 3) { let lo = 0; st.popQ.forEach((x, k) => { if (x.lv < st.popQ[lo].lv) lo = k; }); st.popQ.splice(lo, 1); }
       }
       if (e.rw) flashRewind();
     }
-    if (st.popQ.length && now > st.popUntil + 400 && !st.paused) {
-      let bi = 0; st.popQ.forEach((x, k) => { if (x.lv > st.popQ[bi].lv) bi = k; });
+    // wat te lang wacht (gewone uitleg) vervalt; dan komt die gave een volgende keer opnieuw in beeld
+    st.popQ = st.popQ.filter(x => { if (x.lv <= 1 && now - x.qt > 6000) { if (x.fresh) R.seen = R.seen.filter(g => g !== x.g); return false; } return true; });
+    const gapFor = lv => lv >= 3 ? 600 : lv === 2 ? 2500 : 5000;
+    let bi = -1; st.popQ.forEach((x, k) => { if ((bi < 0 || x.lv > st.popQ[bi].lv) && !(x.lv <= 1 && st.n1 >= 3)) bi = k; });
+    if (bi >= 0 && now > st.popUntil + gapFor(st.popQ[bi].lv) && !st.paused) {
       const e = st.popQ.splice(bi, 1)[0];
+      if (e.lv <= 1) st.n1 = (st.n1 || 0) + 1;
       // leestijd: belangrijker en langer = langer in beeld, en de race gaat trager
       const dur = [0, 3200, 4300, 5800, 9500][e.lv] + Math.min(3000, e.txt.length * 30);
       st.popUntil = now + dur; st.slowUntil = now + dur - 300; st.slowF = [1, 0.15, 0.08, 0.03, 0][e.lv];
