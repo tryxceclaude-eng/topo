@@ -365,6 +365,12 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 .rsbar .rdot{position:absolute;top:2px;width:10px;height:10px;margin-left:-5px;border-radius:50%;border:1px solid rgba(0,0,0,.5)}
 .camlbl{font-size:11px;color:#c9b48f;margin:0 0 4px}
 .sb.fbb.open{animation:fbp 1.2s ease-in-out infinite}@keyframes fbp{50%{box-shadow:0 0 10px #ffe066}}
+.rmini{position:fixed;top:calc(env(safe-area-inset-top,0px) + 104px);left:8px;z-index:60;width:150px;padding:5px 8px 6px;opacity:.93;border-radius:12px;background:rgba(36,22,10,.94);border:1px solid rgba(255,213,154,.45);color:#ffd59a;font:600 11.5px var(--head);box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;overflow:hidden}
+.rmini b{color:#ff8787;letter-spacing:.04em}.rmini span{float:right;color:#fff}
+.rmini div{color:#fff;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rmini .mm{color:#ffe066}
+.rmini i{display:block;height:3px;margin-top:5px;border-radius:2px;background:linear-gradient(90deg,#f76707,#ffd59a)}
+.rmini small{display:block;margin-top:2px;color:#c9b48f;font-weight:500;font-size:10px}
+.rmini.done{border-color:#ffe066;animation:fbp 1.2s ease-in-out infinite}.rmini.done b{color:#ffe066}
 .tgbar{min-height:0;display:flex;flex-direction:column;gap:4px;margin:0 0 6px}
 .tgbar .tg{position:relative;overflow:hidden;padding:5px 9px;border-radius:9px;background:rgba(255,107,107,.16);border:1px solid rgba(255,107,107,.55);font:600 12.5px var(--head);color:#ffd8d8;animation:tgIn .25s ease-out}
 .tgbar .tg i{position:absolute;left:0;bottom:0;height:3px;background:#ff6b6b}
@@ -515,6 +521,7 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 </div>
 <div id="casino" class="view" hidden></div>
 <div id="race" class="view" hidden></div>
+<div id="raceMini" class="rmini" hidden></div>
 <div id="modal" class="modal" hidden></div>
 <script>bootP(8, "Kaartsoftware laden…")</script>
 <script>// https://d3js.org v7.9.2 Copyright 2010-2026 Mike Bostock
@@ -665,7 +672,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-192522";
+<script>const BUILD="20261112-193138";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2247,8 +2254,8 @@ const TAC = {voor: "Voorop", volg: "Volger", eind: "Eindsprinter"};
 // Kracht, Snelheid, Bereik, Duurzaamheid, Precisie, Potentieel
 const STATNM = ["Kracht", "Snelheid", "Bereik", "Duurzaamheid", "Precisie", "Potentieel"];
 const GIFTS = {
-  chain: {ic: "🔩", nm: "The Chain", st: "BBBAAA", sh: "Groeit door raak te schieten. Act 4 gaat pas open als hij de perfecte spiraal ziet.",
-    rules: ["Mikt eerst (je ziet het aankomen), dan schiet hij een draaiende spijker op het paard vóór hem. Raak = dat paard vertraagt én er blijft een gat in de baan liggen.", "Act 2 (na 2× raak): het gat jaagt zijn doelwit achterna en kan overspringen naar wie vlak erachter rijdt.", "Act 3 (na 4× raak): duikt in zijn eigen gat, verdwijnt van het bord en duikt op in iemands slipstream. Die slipstream steelt hij.", "Act 4: alleen als hij Giorgio's perfecte gouden spiraal heeft gezien. Oneindige rotatie op de koploper: die draait leeg tot Jonas hem inhaalt.", "Duo met Giorgio: samen vlak bij elkaar sneller."]},
+  chain: {ic: "🔩", nm: "The Chain", st: "BBBAAA", sh: "Spijkers uit zijn vingers, gaten in de wereld, en uiteindelijk oneindige rotatie.",
+    rules: ["Heeft 10 vingerspijkers (🔩 op het bord) die langzaam teruggroeien. Schiet salvo's van 1 tot 3 spijkers op de paarden vóór hem. Hoeveel er raken? Wedbaar.", "Raak = dat paard vertraagt en er blijft een gat in de baan liggen. Elke stalen bal van Giorgio vlak bij hem leert hem harder draaien (🌀, max 3): zijn spijkers worden sterker.", "Act 2 (na 2× raak): het gat jaagt zijn doelwit achterna, en hij schiet gaten in de grond vlak voor de koploper.", "Act 3 (na 4× raak): duikt door zijn gat en duikt op in iemands slipstream (gestolen). Aanvallen op hem kan hij ontwijken door even in zijn gat te duiken.", "Act 4 (pas als hij Giorgio's perfecte spiraal heeft gezien): Oneindige rotatie op de koploper, en aanvallen op hem draaien terug naar de schutter. Hij rijdt zelf ook sneller.", "Duo met Giorgio: samen vlak bij elkaar sneller."]},
   timeafter: {ic: "↺", nm: "Time After Time", st: "DCABAE", sh: "Windt zijn horloge op en spoelt de tijd terug als het lot hem raakt.",
     rules: ["Zijn horloge laadt langzaam op (⌚ op het bord).", "Opgeladen en getroffen door pech? De race gaat 3 tot 9 seconden terug. Je ziet nog even de spookposities van de oude tijdlijn.", "De pech komt opnieuw, maar moet nu iemand anders raken. Wie? Daar kun je op wedden.", "Opgeladen en in de laatste 12% ingehaald? Dan kan hij terugspoelen en het opnieuw proberen."]},
   parallel: {ic: "🚪", nm: "Parallel Lines", st: "ABAAAA", sh: "Haalt dingen uit andere werelden, ook kopieën van anderen.",
@@ -2350,7 +2357,7 @@ function makeField(cs) {
 }
 // vaste karaktertrekken (en balans) per ruiter
 const RIDER_ADJ = {
-  jonas: {spd: 0.014, tank: 0.1}, giorgio: {spd: 0.019, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.004, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
+  jonas: {spd: -0.002, tank: 0.1}, giorgio: {spd: 0.019, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.004, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
   sandor: {spd: -0.04, tank: 0.16, aff: a => { a.splice(0, 8, 0, 2, 2, 1, 0, -1, 1, -1); }}, paco: {spd: 0.011}, magenta: {spd: -0.017}, boomer: {spd: 0.031}, valentin: {spd: 0.024},
   hettie: {spd: 0.022, tank: 0.04}, bergman: {spd: 0.011}, blackwood: {spd: 0.007}, ringwald: {spd: 0.0},
 };
@@ -2391,7 +2398,7 @@ function newSim(R, RC, sched, r, opts = {}) {
   if (R.ent.some(H => H.gift === "parallel") && R.ent.some(H => H.rid === "dario") && r() < AU_P) s.auAt = 0.5 + r() * 0.3;
   e.forEach(E => {
     const g = R.ent[E.i].gift;
-    if (g === "chain") { E.g.act = 1; E.g.hits = 0; E.nx.nail = between(r, 3, 8); }
+    if (g === "chain") { E.g.act = 1; E.g.hits = 0; E.g.nails = 5; E.g.spinS = 0; E.nx.nail = between(r, 3, 8); E.nx.trap = 0; }
     else if (g === "primitive") E.g.dm = 0.2 + r() * 0.3;
     else if (g === "magnetic") E.nx.field = between(r, 14, 24);
     else if (g === "oldbefore") E.nx.ball = between(r, 4, 9);
@@ -2449,12 +2456,14 @@ function tele(s, o) {
   o.opts.forEach(x => { x.p = x.p / tot; });
   let x = s.r(), res = o.opts[o.opts.length - 1].k;
   for (const op of o.opts) { x -= op.p; if (x <= 0) { res = op.k; break; } }
+  if (o.forceRes != null) res = o.forceRes;
   const T = {id: ++s.tgid, t0: s.t, t1: s.t + o.dur, ...o, res};
   if (o.dur > 0) s.tg.push(T);
   logE(s, {k: "tg", id: T.id, who: o.src, tgt: o.tgt, t1: T.t1, kind: o.kind, ic: o.ic, txt: o.txt, fb: o.fb ? 1 : 0, opts: o.opts.map(z => ({k: z.k, nm: z.nm, p: Math.round(z.p * 1000) / 1000})), res, g: o.g});
   return T;
 }
 // verdedigingen van het doelwit (en van wie er vlakbij rijdt) nemen eerst hun deel van de kans
+function rollOpts(s, opts) { let x = s.r(); for (const o of opts) { x -= o.p; if (x <= 0) return o.k; } return opts[opts.length - 1].k; }
 function withDef(s, src, tgt, base, steel) {
   const R = s.R, out = []; let rem = 1;
   const add = (k, nm, p) => { const q = rem * p; if (q > 0.001) { out.push({k, nm, p: q}); rem -= q; } };
@@ -2463,6 +2472,8 @@ function withDef(s, src, tgt, base, steel) {
   if (tg === "parallel" && loveOn(s, tgt)) add("love", "Love Train stuurt het door", 0.85);
   if (tg === "standstill") { const lim = tgt.g.relic ? 2 : 3; if ((tgt.g.ch || 0) >= lim) add("ref", "Teruggekaatst ×2", 0.75); add("abs", "Standstill houdt het tegen", 0.85); }
   if (tg === "leanon" && !tgt.u.split) add("split", "Splitst zich langs zijn touw", tgt.g.relic ? 1 : 0.45);
+  if (tg === "chain" && tgt.g.act >= 4) add("spin", "Rotatie draait het terug", 0.5);
+  if (tg === "chain" && tgt.g.act >= 3) add("hide", "Duikt in zijn eigen gat", 0.35);
   const paco = s.e.find(o => R.ent[o.i].gift === "goodvibes" && !o.done && o !== src);
   if (paco && Math.abs(paco.x - tgt.x) < 10) add("warn", "Paco: 'Pas op, links!'", paco === tgt ? 0.35 : 0.25);
   if (steel) { const b = s.e.find(o => R.ent[o.i].gift === "magnetic" && !o.done && o !== tgt && o !== src); if (b && Math.abs(b.x - tgt.x) < 14) add("mag", `Buigt af naar ${short_(s, b.i)}`, 0.2); }
@@ -2495,6 +2506,8 @@ function resolveAtk(s, T, what, onHit) {
       L({who: tgt.i, pop: true, lvl: own ? 3 : 2, sp: own ? 1 : 0, sid: own ? "eigengat" : "", fly: [tgt.i, src.i], txt: own ? `✦ ${nm_(s, tgt.i)} kaatst de spijker dubbel terug: ${nm_(s, src.i)} rijdt in zijn eigen gat!` : `🛡️ ${nm_(s, tgt.i)} kaatst ${what} dubbel zo hard terug: ${nm_(s, src.i)} staat stil!`});
       return null;
     }
+    case "spin": src.frz = Math.max(src.frz, 1.5); L({who: tgt.i, pop: true, lvl: 2, fly: [tgt.i, src.i], txt: `♾️ ${what} raakt ${nm_(s, tgt.i)}… en de rotatie draait het terug. ${nm_(s, src.i)} tolt even stil.`}); return null;
+    case "hide": tgt.g.van = 1.2; L({who: tgt.i, txt: `🕳️ ${nm_(s, tgt.i)} duikt even in zijn eigen gat: ${what} schiet erover.`}); return null;
     case "split": tgt.u.split = 1; L({who: tgt.i, txt: `🪢 ${nm_(s, tgt.i)} splitst zich langs zijn touw: ${what} gaat erdoorheen.`}); return null;
     case "warn": {
       const paco = s.e.find(o => R.ent[o.i].gift === "goodvibes"); tgt.x += 3;
@@ -2629,6 +2642,18 @@ function resolveTg(s, T) {
   const L = o => logE(s, {k: "tr", id: T.id, kind: T.kind, ...o});
   const H = R.ent[T.src];
   switch (T.kind) {
+    case "volley": {
+      const A = src.g.act, got = [];
+      for (const x of T.sub) {
+        const h = resolveAtk(s, {id: T.id, src: T.src, tgt: x.tgt, res: x.res, kind: "nail"}, "De spijker", (o, m) => {
+          o.mk.nail = 1.8 * m * (1 + 0.2 * src.g.spinS); addHaz(s, "gat", o.x - 1, 12, src.i);
+          if (A >= 2) o.mk.hole = 6;
+        });
+        if (h) { got.push(h); if (h !== src && R.ent[h.i].rid !== "jonas") src.g.hits++; logE(s, {k: "gift", g: "chain", who: src.i, fly: [src.i, h.i], kind: "nail", txt: `🔩 Raak: ${nm_(s, h.i)}.`}); }
+      }
+      L({who: src.i, pop: T.sub.length >= 2 && got.length >= 2, lvl: got.length === 3 ? 2 : 1, txt: T.sub.length === 1 ? (got.length ? `🔩 Raak! ${nm_(s, got[0].i)} krijgt een draaiende spijker${A >= 2 ? " en het gat jaagt hem achterna" : ""}.` : `🔩 De spijker mist.`) : `🔩 Spijkersalvo: ${got.length} van ${T.sub.length} raak${got.length ? ` (${got.map(o => short_(s, o.i)).join(", ")})` : ""}.`});
+      return;
+    }
     case "nail": {
       const A = src.g.act;
       const got = resolveAtk(s, T, "De spijker", (x, m) => {
@@ -2672,6 +2697,8 @@ function resolveTg(s, T) {
       });
       if (got) L({who: src.i, fly: [src.i, got.i], pop: got.mk.old && !got.u.oldp, lvl: 2, txt: got.mk.old ? `⏳ Derde stalen bal: ${nm_(s, got.i)} is verouderd en de rest van de race trager.` : `⏳ Raak: ${nm_(s, got.i)} wordt ouder (${got.mk.age}/3), minder energie.`});
       if (got && got.mk.old) got.u.oldp = 1;
+      const jo = s.e.find(o => R.ent[o.i].rid === "jonas");
+      if (got && jo && !jo.done && jo !== got && jo.g.spinS < 3 && Math.abs(jo.x - src.x) < 40) { jo.g.spinS++; logE(s, {k: "gift", g: "chain", who: jo.i, pop: jo.g.spinS === 1, lvl: 1, txt: `🌀 ${nm_(s, jo.i)} kijkt hoe ${H.nm} zijn bal laat draaien en leert ervan: zijn spijkers draaien harder (${jo.g.spinS}/3).`}); }
       return;
     }
     case "spiral": {
@@ -2817,14 +2844,38 @@ function stepSim(s) {
         logE(s, {k: "gift", g, who: E.i, pop: true, lvl: want === 4 ? 3 : 2, actup: want, txt: `🔩 ${H.nm} groeit: Act ${want}!${want === 2 ? " Zijn spijkergaten jagen hun doelwit nu achterna." : want === 3 ? " Hij kan nu in zijn eigen gat duiken." : " Oneindige rotatie is ontgrendeld."}`});
       }
       const A = E.g.act;
-      c = `Act ${A}` + (A < 3 ? ` · ${E.g.hits}/${A === 1 ? 2 : 4} raak` : A === 3 && !s.spin ? " · zoekt de spiraal" : "");
-      if (s.t >= E.nx.nail && !busy(E)) {
-        E.nx.nail = s.t + between(r, 11, 19);
-        let tgt = null; for (const o of act) if (o !== E && o.x > E.x && o.x - E.x < 45 && !(o.g.van > 0) && (!tgt || o.x < tgt.x)) tgt = o;
-        if (tgt && R.ent[tgt.i].gift === "parallel" && tgt.g.dbl > 0 && !E.u.spdb && r() < 0.5) {
-          E.u.spdb = 1; tgt.g.dbl = 0;
-          logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "spijkerdubbel", txt: `✦ De spijker van ${H.nm} raakt de dubbelganger van ${nm_(s, tgt.i)}: die lost op in het niets. Geen slipstream meer.`});
-        } else if (tgt) tele(s, {src: E.i, tgt: tgt.i, kind: "nail", dur: 2.5, fb: A >= 2, g, ic: "🔩", txt: `🔩 ${H.nm} mikt een draaiende spijker op ${nm_(s, tgt.i)}`, opts: withDef(s, E, tgt, [{k: "hit", nm: "Raak", p: 0.68}, {k: "mis", nm: "Mis", p: 0.32}], true)});
+      E.g.nails = Math.min(10, E.g.nails + DT / (E.g.relic ? 2.5 : 5));
+      c = `Act ${A} · 🔩×${Math.floor(E.g.nails)}` + (A < 3 ? ` · ${E.g.hits}/${A === 1 ? 2 : 4} raak` : A === 3 && !s.spin ? " · zoekt de spiraal" : "") + (E.g.spinS ? ` · 🌀${E.g.spinS}` : "");
+      if (A >= 4) v *= 1.01;
+      // spijkersalvo: 1 tot 3 spijkers tegelijk, elk op een ander paard vóór hem
+      if (s.t >= E.nx.nail && !busy(E) && E.g.nails >= 1) {
+        E.nx.nail = s.t + between(r, 9, 15);
+        const tgs = act.filter(o => o !== E && o.x > E.x && o.x - E.x < 50 && !(o.g.van > 0)).sort((a, b) => a.x - b.x);
+        const first = tgs[0];
+        if (first && R.ent[first.i].gift === "parallel" && first.g.dbl > 0 && !E.u.spdb && r() < 0.5) {
+          E.u.spdb = 1; first.g.dbl = 0; E.g.nails -= 1;
+          logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "spijkerdubbel", txt: `✦ De spijker van ${H.nm} raakt de dubbelganger van ${nm_(s, first.i)}: die lost op in het niets. Geen slipstream meer.`});
+        } else {
+          const n = Math.min(tgs.length, Math.floor(E.g.nails), 1 + Math.floor(r() * (A >= 2 ? 3 : 2)));
+          if (n > 0) {
+            E.g.nails -= n;
+            const hp = 0.62 + 0.06 * E.g.spinS;
+            const sub = tgs.slice(0, n).map(o => { const op = withDef(s, E, o, [{k: "hit", nm: "Raak", p: hp}, {k: "mis", nm: "Mis", p: 1 - hp}], true); return {tgt: o.i, opts: op, res: rollOpts(s, op)}; });
+            let dist = [1];
+            sub.forEach(x => { const p = x.opts.filter(o => o.k === "hit").reduce((a, b) => a + b.p, 0); const nd = new Array(dist.length + 1).fill(0); dist.forEach((q, k) => { nd[k] += q * (1 - p); nd[k + 1] += q * p; }); dist = nd; });
+            const cnt = sub.filter(x => x.res === "hit").length;
+            const names = sub.map(x => short_(s, x.tgt)).join(", ");
+            tele(s, {src: E.i, tgt: sub[0].tgt, kind: "volley", dur: 2.5, fb: n >= 2 || A >= 2, g, ic: "🔩", sub, forceRes: String(cnt),
+              txt: n === 1 ? `🔩 ${H.nm} richt een vinger op ${nm_(s, sub[0].tgt)}… draaiende spijker` : `🔩 ${H.nm} richt ${n} vingers: een spijkersalvo op ${names}. Hoeveel raken er?`,
+              opts: dist.map((p, k) => ({k: String(k), nm: k === 0 ? (n === 1 ? "Mis" : "Allemaal mis") : n === 1 ? "Raak" : `${k} van ${n} raak`, p}))});
+          }
+        }
+      }
+      // Act 2: een gat in de grond vlak voor de koploper
+      if (A >= 2 && s.t >= E.nx.trap && E.g.nails >= 2 && ldr && ldr !== E && prog < 0.95 && !busy(E)) {
+        E.nx.trap = s.t + between(r, 18, 30); E.g.nails -= 2;
+        addHaz(s, "gat", ldr.x + 12, 12, E.i);
+        logE(s, {k: "gift", g, who: E.i, fly: [E.i, ldr.i], pop: !E.u.trapp, txt: `🔩 ${H.nm} schiet twee spijkers in de grond, vlak voor koploper ${nm_(s, ldr.i)}: een gat waar hij zo overheen moet.`}); E.u.trapp = 1;
       }
       if (A >= 3 && !E.u.worm && !busy(E) && prog > 0.15 && prog < 0.95 && r() < 0.03) {
         let tgt = null; for (const o of act) if (o !== E && o.x - E.x > 15 && o.x - E.x < 90 && (!tgt || o.x < tgt.x)) tgt = o;
@@ -3226,7 +3277,28 @@ function computeOdds(cb) {
   setTimeout(run, 30);
 }
 
+// ---------- race klein in de hoek: verder leren terwijl hij loopt ----------
+function restoreView() {
+  const r = race.ret || "home";
+  if (r === "play") show("play");
+  else if (r === "casino") { view = "casino"; $("#home").hidden = true; $("#play").hidden = true; $("#casino").hidden = false; }
+  else { show("home"); renderHome(); }
+}
+function raceMinimize() {
+  race.mini = true;
+  $("#race").hidden = true;
+  restoreView();
+  const m = $("#raceMini"); if (m) { m.hidden = false; if (!m.innerHTML) m.innerHTML = "<b>🐎 LIVE</b>"; }
+}
+function raceRestore() {
+  if (view !== "race") race.ret = view;
+  race.mini = false;
+  $("#home").hidden = true; $("#play").hidden = true; $("#casino").hidden = true; $("#race").hidden = false; view = "race";
+  $("#raceMini").hidden = true;
+}
 function openRace() {
+  if (race.running || race.mini) return raceRestore();
+  if (view !== "race") race.ret = view;
   view = "race";
   $("#home").hidden = true; $("#play").hidden = true; $("#casino").hidden = true; $("#race").hidden = false;
   migrateRace();
@@ -3236,7 +3308,11 @@ function openRace() {
   renderRace();
   if (!S.race.odds) computeOdds();
 }
-function closeRace() { if (race.running) return; $("#race").hidden = true; show("home"); renderHome(); }
+function closeRace() {
+  if (race.running) return raceMinimize();
+  race.mini = false; $("#raceMini").hidden = true;
+  $("#race").hidden = true; restoreView();
+}
 
 function hexSVG(st, col) {
   const L = st.split(""), val = c => ({A: 1, B: .8, C: .6, D: .4, E: .2})[c] || .1;
@@ -3469,7 +3545,7 @@ function settleLive(quiet) {
 
 const FLAGTXT = [[65536, "⏸ tijd staat stil"], [262144, "🕳️ verdwenen"], [512, "♾️ rotatie"], [1, "💫 staat stil"], [32, "😱 geschrokken"], [256, "🔩 spijker"], [8192, "🕳️ gat jaagt hem"], [16384, "💧 bespoten"], [4194304, "🌀 slipstream gestolen"], [2, "🦖 jaagt"], [128, "🦖 raptor"], [1048576, "🍀 geluksgolf"], [16, "🚪 dubbelganger"], [4, "🌀 sprint"], [4096, "🛡️ laat los"], [131072, "🔥 eindsprint"], [64, "🧲 in de klont"], [524288, "🪢 vast"], [2097152, "🌧️ danst"], [8, "🪢 lasso"], [32768, "🤝 duo"], [1024, "⏳ verouderd"], [2048, "💘 Love Train"]];
 const SPEEDS = [[1.2, "1×"], [2.4, "2×"], [5, "4×"]];
-const FLY_IC = {nail: "🔩", ball: "⚪", wave: "🔊", spray: "💧", tie: "🪢", clone: "🚪", inf: "♾️", chain: "🕳️", primitive: "🦖", magnetic: "🧲", standstill: "🛡️", undermyskin: "💧"};
+const FLY_IC = {volley: "🔩", nail: "🔩", ball: "⚪", wave: "🔊", spray: "💧", tie: "🪢", clone: "🚪", inf: "♾️", chain: "🕳️", primitive: "🦖", magnetic: "🧲", standstill: "🛡️", undermyskin: "💧"};
 const HAZ_IC = {gat: "🕳️", muur: "🧊", BOOM: "BOOM", ZZZ: "ZZZ", WHOOSH: "WHOOSH"};
 function playRace(P) {
   race.running = true;
@@ -3499,6 +3575,7 @@ function playRace(P) {
       <button type="button" class="cact" id="rSpd">1×</button>
       ${hasBets && L.bets.some(b => b.k !== "pr") ? `<button type="button" class="cashb" id="rCash">Cash out</button>` : ""}
       ${a >= 1 && !R.swap && L.bets.some(b => b.k === "w") ? `<button type="button" class="cact" id="rSwap">Wissel</button>` : ""}
+      <button type="button" class="cact" id="rMin" title="Race klein maken en verder leren">📚</button>
       <button type="button" class="cact" id="rSkip" title="Naar de uitslag">⏭</button>
     </div>
     <div class="cconf" id="rConf" hidden></div>
@@ -3541,6 +3618,8 @@ function playRace(P) {
   const conf = (html) => { const c = $("#rConf"); c.innerHTML = html; c.hidden = !html; };
   $("#rSpd").onclick = () => { st.si = (st.si + 1) % SPEEDS.length; $("#rSpd").textContent = SPEEDS[st.si][1]; updCtl(); };
   $("#rSkip").onclick = () => { if (!st.paused) { st.cd = 0; st.t = T; } };
+  $("#rMin").onclick = () => { if (!st.flash) raceMinimize(); };
+  $("#raceMini").classList.remove("done");
   if ($("#rCash")) $("#rCash").onclick = () => {
     if (st.paused || st.si === 2) return;
     st.paused = true; updCtl();
@@ -3641,7 +3720,7 @@ function playRace(P) {
   };
   const BIGK = ["inf", "worm", "fate", "flip", "spiral", "dino", "wave"];
   const wantFlash = (e) => {
-    if (!e.fb || st.si === 2 || st.t >= T - 1) return false;
+    if (!e.fb || race.mini || st.si === 2 || st.t >= T - 1) return false;
     if (a < 1) { if (!st.hint0) { st.hint0 = true; addTick({txt: "⚡ Hier had je live kunnen wedden. Leer 2 pakketten goed voor Act 1."}); } return false; }
     if (st.flashN >= 6 || S.money < 10) return false;
     const mine = mineSet.has(e.who) || mineSet.has(e.tgt) || L.mark === e.tgt;
@@ -3758,7 +3837,7 @@ function playRace(P) {
       if (e.gx) st.ghost = {gx: e.gx, until: st.t + 5};
       const big = e.rw || e.love || e.spiral || e.late || e.photo || e.ext || e.actup || /Act 3|Act 4|verouderd|laat \d+ opgeslagen|OMPOLEN|Ompolen/.test(e.txt);
       const fresh = e.g && !R.seen.includes(e.g);
-      if (e.pop && (big || fresh || e.sp || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.3) {
+      if (e.pop && !race.mini && (big || fresh || e.sp || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.3) {
         e.lv = e.lvl || (big ? 2 : 1);
         e.fresh = fresh; e.qt = now;
         if (e.g && fresh) R.seen.push(e.g);
@@ -3780,7 +3859,15 @@ function playRace(P) {
       giftPop(e, dur, () => { st.popUntil = performance.now(); st.slowUntil = 0; });
       const row = $("#br" + e.who); if (row) { row.classList.remove("glow"); void row.offsetWidth; row.classList.add("glow"); }
     }
-    if (now - lastCtl > 300) { lastCtl = now; updCtl(); }
+    if (now - lastCtl > 300) {
+      lastCtl = now; updCtl();
+      if (race.mini) {
+        const sn = i => esc(R.ent[i].nm.split(" ").slice(-1)[0]), my = [...mineSet][0];
+        $("#raceMini").innerHTML = `<b>🐎 LIVE</b> <span>${lx >= P.D ? "finish!" : Math.max(0, Math.round((P.D - lx) / P.D * KM_TOTAL)).toLocaleString("nl-NL") + " km"}</span>
+          <div>1. ${sn(rank[0])}${rank[1] != null ? ` · 2. ${sn(rank[1])}` : ""}</div>${my != null ? `<div class="mm">jij: ${sn(my)} · ${rank.indexOf(my) + 1}e</div>` : ""}
+          <i style="width:${(lx / P.D * 100).toFixed(1)}%"></i><small>tik om te kijken</small>`;
+      }
+    }
     if (st.t >= T && st.cd <= 0 && !st.flash) { st.done = true; conf(""); return setTimeout(() => finishRace(P), 900); }
     requestAnimationFrame(frame);
   };
@@ -3814,6 +3901,7 @@ function flashRewind() { const t = $("#rBoard"); if (!t) return; t.classList.rem
 function finishRace(P) {
   race.running = false; race.play = null;
   showResult(P, settleLive(false));
+  if (race.mini) { const m = $("#raceMini"); m.innerHTML = `<b>🏁 Finish!</b><div>${esc(S.race.ent[P.order[0]].nm)} wint</div><small>tik voor de uitslag</small>`; m.classList.add("done"); }
 }
 function showResult(P, res) {
   const R = S.race, ord = P.order, el = $("#rMain");
@@ -3845,6 +3933,7 @@ window.addEventListener("resize", () => { if (view === "race" && !$("#race").hid
 
 migrateRace();
 if (S.race && S.race.live) settleLive(true);
+$("#raceMini").onclick = raceRestore;
 
 /* ================= website: updates, app-installatie, voortgang meenemen ================= */
 const ONLINE_SITE = STANDALONE && /^https?:$/.test(location.protocol);
