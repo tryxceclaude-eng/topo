@@ -227,8 +227,8 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 .rsbar i{display:block;height:100%;background:linear-gradient(90deg,#f76707,#ffd59a);transition:width .2s linear}
 .rsbar em{position:absolute;right:4px;top:-3px;font-style:normal;font-size:11px}
 .rleft{font:600 13px var(--head);color:#ffd59a;margin:2px 0 6px;min-height:18px}
-.board{position:relative;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(255,213,154,.25);overflow:hidden}
-.brow{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:8px;padding:0 8px;border-bottom:1px solid rgba(255,255,255,.06);border-left:4px solid var(--c);transition:transform .45s cubic-bezier(.3,.8,.3,1),background .3s}
+.board{position:relative;border-radius:12px;background-image:linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25));background-size:100% 18px;background-repeat:no-repeat;background:rgba(0,0,0,.28);border:1px solid rgba(255,213,154,.25);overflow:hidden}
+.brow{position:absolute;left:0;right:0;top:0;height:50px;display:flex;align-items:center;gap:8px;padding:0 8px;border-bottom:1px solid rgba(255,255,255,.06);border-left:4px solid var(--c);transition:transform .45s cubic-bezier(.3,.8,.3,1),background .3s}
 .brow.mine{background:rgba(255,224,102,.1)}
 .brow.flag{background:rgba(155,93,229,.2)}
 .brow.glow{animation:glow 2s ease-out}
@@ -362,6 +362,49 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 .hlist small{display:block;color:#e3cfae;font-size:12px;margin-top:2px}
 .ticker div.late{color:#ffd43b;font-weight:700}
 .board.zw{animation:zw 2.2s ease-out}
+.rsbar .rdot{position:absolute;top:1px;width:8px;height:8px;margin-left:-4px;border-radius:50%;border:1px solid rgba(0,0,0,.5)}
+.tgbar{min-height:0;display:flex;flex-direction:column;gap:4px;margin:0 0 6px}
+.tgbar .tg{position:relative;overflow:hidden;padding:5px 9px;border-radius:9px;background:rgba(255,107,107,.16);border:1px solid rgba(255,107,107,.55);font:600 12.5px var(--head);color:#ffd8d8;animation:tgIn .25s ease-out}
+.tgbar .tg i{position:absolute;left:0;bottom:0;height:3px;background:#ff6b6b}
+@keyframes tgIn{from{transform:translateY(-6px);opacity:0}}
+.brow.aimed{box-shadow:inset 0 0 0 2px #ff6b6b}.brow.aimed .bpos::after{content:"🎯";position:absolute;margin:-6px 0 0 -4px;font-size:12px}
+.brow.aiming{background:rgba(255,107,107,.14)}
+.brow.disg .bname b{font-style:italic;opacity:.85}
+.brow.marked .bpos{color:#ffe066}
+.bfx{position:absolute;inset:0;pointer-events:none;z-index:3}
+.haz{position:absolute;top:0;bottom:0;z-index:0;width:0;border-left:2px dashed rgba(255,255,255,.35)}
+.haz span{position:absolute;top:1px;left:0;transform:translateX(-50%);font:800 9.5px var(--head);padding:1px 4px;border-radius:6px;background:#2b1a0e;color:#ffd59a;white-space:nowrap;border:1px solid rgba(255,213,154,.4)}
+.haz.hz-gat{border-color:rgba(160,160,160,.6)}.haz.hz-muur{border-left:4px solid rgba(165,216,255,.75)}.haz.hz-muur span{background:#123048;color:#a5d8ff}
+.haz.hz-BOOM span{background:#5c1a1a;color:#ffa8a8}.haz.hz-ZZZ span{background:#2e2559;color:#d0bfff}.haz.hz-WHOOSH span{background:#173f2a;color:#8ce99a}
+.flyer{position:absolute;left:0;top:0;margin:-10px 0 0 -10px;font-size:20px;transition:transform .6s cubic-bezier(.4,.1,.6,1);filter:drop-shadow(0 0 6px #fff)}
+.flyer.hit{transition:transform .3s,opacity .5s;opacity:0;transform-origin:center}
+.bghost{position:absolute;top:-6px;font-size:18px;line-height:1;transform:scaleX(-1);opacity:.28;filter:grayscale(1) drop-shadow(0 0 4px #9b5de5)}
+.bclone{position:absolute;top:-6px;font-size:16px;line-height:1;transform:scaleX(-1);opacity:.55;filter:hue-rotate(250deg) drop-shadow(0 0 5px #9b5de5)}
+.bhorse.van{opacity:.08}
+.bhorse.spin{animation:hspin .7s linear infinite}
+@keyframes hspin{from{transform:scaleX(-1) rotate(0)}to{transform:scaleX(-1) rotate(360deg)}}
+.bhorse.rap{font-size:14px;top:-3px;filter:hue-rotate(60deg) drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.bhorse.ts{filter:grayscale(1) brightness(1.4)}
+.board.ext{animation:ext 1.6s ease-out}
+@keyframes ext{0%,20%{box-shadow:inset 0 0 60px #2f9e44;filter:sepia(.6) hue-rotate(40deg)}100%{box-shadow:none;filter:none}}
+.flash{margin:8px 0;padding:10px 12px;border-radius:14px;background:linear-gradient(160deg,#3b1d5e,#1b0f2e);border:2px solid #ffe066;box-shadow:0 0 24px rgba(255,224,102,.35);animation:fIn .3s ease-out}
+@keyframes fIn{from{transform:scale(.94);opacity:0}}
+.flash .fhead{display:flex;justify-content:space-between;align-items:center;font:900 15px var(--head);color:#ffe066;letter-spacing:.06em}
+.flash .fhead span{font:700 13px var(--head);color:#fff}
+.flash .ftxt{margin:6px 0 8px;font-size:13.5px;color:#f3e9ff;line-height:1.4}
+.flash .fopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.flash .fopts button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:10px;border:1px solid rgba(255,224,102,.5);background:rgba(255,255,255,.08);color:#fff;font:600 12.5px var(--head);cursor:pointer}
+.flash .fopts button b{font:800 16px var(--head);color:#ffe066}
+.flash .fopts button:disabled{opacity:.45}
+.flash .fchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
+.flash .fchips button{padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font:700 12px var(--head);cursor:pointer}
+.flash .fchips button.sel{background:#ffe066;color:#2b1a0e;border-color:#ffe066}
+.flash .fchips .ghost{margin-left:auto}
+.sinfo .fc.proph{color:#c3fae8}.fc.proph .prb{display:flex;gap:6px;margin-top:6px}.fc.proph .ob{flex:1}
+.rrow .mark{flex:0 0 auto;align-self:center;width:34px;height:34px;border-radius:50%;border:1px dashed rgba(255,255,255,.35);background:transparent;font-size:16px;cursor:pointer;opacity:.5}
+.rrow .mark.on{opacity:1;border:2px solid #ffe066;background:rgba(255,224,102,.18)}
+.sb.fbb{border-color:#ffe066}.a4i{color:#ffe066;font-weight:700}
+.ticker div.fwin{color:#ffe066;font-weight:700}
 @keyframes zw{0%{filter:grayscale(1) invert(.85) hue-rotate(180deg)}15%{filter:grayscale(1) invert(.85) hue-rotate(180deg)}70%{filter:grayscale(1) brightness(.7)}100%{filter:none}}
 .gpop.zwp.on{animation-name:gpzw}
 @keyframes gpzw{0%{background:rgba(0,0,0,0);backdrop-filter:grayscale(0)}8%{background:rgba(10,10,30,.8);backdrop-filter:grayscale(1)}90%{background:rgba(10,10,30,.75);backdrop-filter:grayscale(1)}100%{background:rgba(0,0,0,0);backdrop-filter:grayscale(0)}}.gg.g6{left:6%;top:80%;font-size:44px;animation-delay:.45s}
@@ -620,7 +663,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-175002";
+<script>const BUILD="20261112-183837";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2096,32 +2139,32 @@ const TAC = {voor: "Voorop", volg: "Volger", eind: "Eindsprinter"};
 // Kracht, Snelheid, Bereik, Duurzaamheid, Precisie, Potentieel
 const STATNM = ["Kracht", "Snelheid", "Bereik", "Duurzaamheid", "Precisie", "Potentieel"];
 const GIFTS = {
-  chain: {ic: "🔩", nm: "The Chain", st: "BBBAAA", sh: "Groeit tijdens de race van Act 1 naar Act 4: hoe verder, hoe gevaarlijker.",
-    rules: ["Wanneer hij een nieuwe Act bereikt is geluk. Act 4 kan heel vroeg komen… of helemaal niet.", "Act 1: schiet om de 5–16 seconden een draaiende spijker op het paard vóór hem (1 op 4 mist).", "Act 2: het spijkergat reist mee en raakt meestal 2–5 seconden later nóg een keer.", "Act 3: kan ineens door zijn eigen spijkergat kruipen, 8 tot 45 lengtes vooruit.", "Act 4: Oneindige rotatie, op een willekeurig moment. De koploper wordt steeds trager tot Jonas hem inhaalt; hoe hard verschilt per keer. Niets houdt dit tegen: geen terugspoelen, geen schild, geen Love Train.", "Rijdt hij vlak bij Giorgio Zeppi, dan worden ze allebei sneller (duo)."]},
-  timeafter: {ic: "↺", nm: "Time After Time", st: "DCABAE", sh: "Spoelt de race 6 seconden terug als het lot tegenzit.",
-    rules: ["Krijgt hij pech? Dan gaat de race (meestal) 3 tot 9 seconden terug. De pech komt opnieuw, maar raakt nu iemand anders.", "Wordt hij in de laatste 12% ingehaald, dan spoelt hij misschien één keer terug en rijdt hij die seconden opnieuw, iets sneller, want hij weet wat er komt.", "Elke keer terugspoelen kost hem energie. Max 2× per derde van de race."]},
-  parallel: {ic: "🚪", nm: "Parallel Lines", st: "ABAAAA", sh: "Haalt versies van zichzelf uit andere werelden.",
-    rules: ["Zit hij ingeklemd tussen twee paarden, dan stapt hij een andere wereld in en haalt een dubbelganger die 3 tot 9 seconden vóór hem rijdt (slipstream).", "Soms ruilt hij daarbij met een uitgeruste versie van zichzelf (hoe uitgerust is geluk).", "In het laatste derde – Love Train: pech die hem treft gaat naar het paard met jouw grootste inzet, en aanvallen van andere gaven raken hem niet meer (behalve Act 4)."]},
-  primitive: {ic: "🦖", nm: "Primitive", st: "BACACB", sh: "Laadt op tot hij een jager wordt, en zijn prooi wordt ook een jager.",
-    rules: ["Zijn oermeter loopt vol, sneller in iemands slipstream en op rots, berg en zand.", "Vol? Dan is hij een paar seconden een jager (2 tot 12, geluk): sneller, en paarden in de buurt die sprinten worden gegrepen.", "Wie gegrepen wordt, is 4 seconden besmet: die jaagt dan zelf ook op sprinters vlak bij hem. Kettingreacties dus.", "Een paard dat stilstaat ziet hij niet."]},
-  raindance: {ic: "🌧️", nm: "Rain Dance", st: "CACABC", sh: "Loopt op regendruppels.",
-    rules: ["In de regen: veel sneller, en zo nu en dan springt hij vooruit over de druppels (2 tot 16 lengtes).", "Bij elke sprong snijden de druppels door paarden vlak achter hem: die vertragen.", "In mist half zo sterk. Droog? Net iets trager."]},
-  magnetic: {ic: "🧲", nm: "Magnetic", st: "BCBBDC", sh: "Magnetiseert paarden en trekt ze dan naar zich toe.",
-    rules: ["Elk paard dat vlak langs hem komt krijgt ijzer (max 3).", "Om de 6–15 seconden een puls van wisselende kracht: paarden met ijzer vóór hem worden teruggetrokken, paarden achter hem naar hem toe getrokken. Meer ijzer = harder.", "Trekt hij iemand terug, dan schiet hij zelf vooruit.", "In de woestijn (ijzerzand) veel sterker."]},
-  standstill: {ic: "🛡️", nm: "Standstill", st: "EEEAEE", sh: "Absolute verdediging die energie opslaat.",
-    rules: ["Pech en aanvallen van andere gaven raken hem niet. Wel staat hij dan even stil.", "Elke tegengehouden klap slaat hij op (max 5).", "In de laatste 15% laat hij alles los: hoe meer opgeslagen, hoe sneller (en een beetje geluk).", "Tegen Act 4 kan hij niets."]},
-  goodvibes: {ic: "📣", nm: "Good Vibrations", st: "EEEEEE", sh: "Doet niks. Maar het geluk stapelt zich op.",
-    rules: ["Moedigt alleen aan. Echt waar.", "Pech slaat hem vaak over, en elk stuk van de race zonder pech maakt hem nóg gelukkiger (geluksreeks).", "Hoe langer de reeks, hoe groter de kans op een hoefijzer onderweg (+5 tot +28). Soms vindt hij er gewoon eentje.", "Wordt hij toch geraakt, dan begint de reeks opnieuw."]},
-  oldbefore: {ic: "⏳", nm: "Old Before I Die", st: "BCDBAA", sh: "Gooit stalen ballen die paarden laten verouderen.",
-    rules: ["Gooit om de 6–15 seconden een stalen bal naar het dichtstbijzijnde paard (1 op 4 mist): dat wordt ouder en raakt sneller moe (stapelt tot 3, een kritieke worp telt dubbel).", "Drie keer geraakt? Dan is dat paard voor de rest van de race verouderd en trager.", "Gouden spiraal: kán één keer per derde van de race een perfecte sprint geven (2,5 tot 6,5 seconden), maar alleen als de afstand tot de koploper tussen 5 en 21 lengtes ligt (Fibonacci).", "Raakt nooit Jonas. Samen vlak bij elkaar rijden ze sneller (duo)."]},
-  undermyskin: {ic: "💧", nm: "Under My Skin", st: "CCCABC", sh: "Een spuitbus vlees: genezen of aanvallen.",
-    rules: ["Heeft 3 ladingen, en krijgt er elk derde van de race 3 bij (max 5).", "Blessure? Kost 1 lading en is meteen genezen. Energie bijna op? 1 lading voor extra energie.", "Na de helft spuit ze het paard vlak voor haar onder (1 lading): dat vertraagt een paar seconden (hoe lang is geluk).", "Slim: ze bewaart altijd 1 lading voor noodgevallen."]},
-  silence: {ic: "🔊", nm: "Sound of Silence", st: "BBACBB", sh: "Legt geluid op de grond als val.",
-    rules: ["Loopt te voet: minder snel, maar veel uithouding.", "Om de 8–21 seconden legt hij een geluidswoord op de grond, het ene harder dan het andere. Wie er binnen 10 seconden overheen rijdt, schrikt even.", "Hij straft dus vooral paarden die achter hem rijden.", "Eén keer per derde van de race een geluidsgolf die de koploper laat schrikken."]},
+  chain: {ic: "🔩", nm: "The Chain", st: "BBBAAA", sh: "Groeit door raak te schieten. Act 4 gaat pas open als hij de perfecte spiraal ziet.",
+    rules: ["Mikt eerst (je ziet het aankomen), dan schiet hij een draaiende spijker op het paard vóór hem. Raak = dat paard vertraagt én er blijft een gat in de baan liggen.", "Act 2 (na 2× raak): het gat jaagt zijn doelwit achterna en kan overspringen naar wie vlak erachter rijdt.", "Act 3 (na 4× raak): duikt in zijn eigen gat, verdwijnt van het bord en duikt op in iemands slipstream. Die slipstream steelt hij.", "Act 4: alleen als hij Giorgio's perfecte gouden spiraal heeft gezien. Oneindige rotatie op de koploper: die draait leeg tot Jonas hem inhaalt.", "Duo met Giorgio: samen vlak bij elkaar sneller."]},
+  timeafter: {ic: "↺", nm: "Time After Time", st: "DCABAE", sh: "Windt zijn horloge op en spoelt de tijd terug als het lot hem raakt.",
+    rules: ["Zijn horloge laadt langzaam op (⌚ op het bord).", "Opgeladen en getroffen door pech? De race gaat 3 tot 9 seconden terug. Je ziet nog even de spookposities van de oude tijdlijn.", "De pech komt opnieuw, maar moet nu iemand anders raken. Wie? Daar kun je op wedden.", "Opgeladen en in de laatste 12% ingehaald? Dan kan hij terugspoelen en het opnieuw proberen."]},
+  parallel: {ic: "🚪", nm: "Parallel Lines", st: "ABAAAA", sh: "Haalt dingen uit andere werelden, ook kopieën van anderen.",
+    rules: ["Haalt de kopie van een rivaal uit een andere wereld en duwt die tegen het origineel: ze heffen elkaar op. De rivaal verdwijnt 2 seconden van het bord.", "Of de kopie wordt een dubbelganger van hemzelf (slipstream). Of hij lost gewoon op.", "Laatste derde, Love Train: aanvallen en pech die hem raken gaan naar het paard met jouw grootste inzet."]},
+  primitive: {ic: "🦖", nm: "Primitive", st: "BACACB", sh: "Wordt een dinosaurus en bouwt een roedel.",
+    rules: ["Zijn oermeter loopt vol, sneller in iemands slipstream en op rots, berg en zand.", "Vol? Hij wordt een 🦖. Hoeveel prooien hij gaat pakken ligt meteen vast (wedbaar).", "Elke prooi wordt een raptor in zijn roedel. Roedel van 3? UITSTERVING: alles in de buurt bevriest.", "Wie stilstaat (Standstill) ziet hij niet."]},
+  raindance: {ic: "🌧️", nm: "Rain Dance", st: "CACABC", sh: "Bevriest regendruppels tot muren.",
+    rules: ["In de regen: sneller, springt over de druppels en zet een muur van bevroren druppels achter zich. Wie ertegenaan rijdt, staat even stil.", "Droog? Dan wacht hij op een regenwolk. Komt de regen of waait de wolk over? (wedbaar)", "Een raptor die door zijn muur rijdt, raakt zijn besmetting kwijt."]},
+  magnetic: {ic: "🧲", nm: "Magnetic", st: "BCBBDC", sh: "Trekt het veld samen tot één klont en blaast het dan uit elkaar.",
+    rules: ["Wie vlak langs hem komt, krijgt ijzer.", "Magnetisch veld: paarden met ijzer worden naar hem toe getrokken. Alles in de klont rijdt in elkaars slipstream.", "Laat in de race: ompolen. De klont explodeert. Hoe hard? Wedbaar.", "Stalen spijkers en ballen kunnen naar hem afbuigen."]},
+  standstill: {ic: "🛡️", nm: "Standstill", st: "EEEAEE", sh: "Absolute verdediging die klappen opslaat en terugkaatst.",
+    rules: ["Aanvallen en pech raken hem niet: hij staat even stil en slaat de klap op (max 5).", "3 klappen opgeslagen? Dan kaatst hij de volgende aanval dubbel zo hard terug naar de schutter.", "In de laatste 15% laat hij de rest los als sprint.", "Act 4 breekt door alles heen."]},
+  goodvibes: {ic: "📣", nm: "Good Vibrations", st: "EEEEEE", sh: "Doet niks. Maar hij ziet de toekomst.",
+    rules: ["Voor de start doet hij een profetie over iets op de route. Komt die uit? Daar kun je vooraf op wedden.", "Profetie uitgekomen: geluksgolf. 20 seconden sneller en niets raakt hem.", "Roept 'Pas op, links!' naar paarden vlak bij hem: soms ontwijken die een aanval.", "Pech slaat hem vaak over. Soms vindt hij gewoon een hoefijzer."]},
+  oldbefore: {ic: "⏳", nm: "Old Before I Die", st: "BCDBAA", sh: "Stalen ballen en de gulden snede.",
+    rules: ["Gooit stalen ballen (je ziet hem mikken). Raak = dat paard veroudert: minder energie en sneller moe. Drie keer = verouderd.", "Gouden spiraal: staan zijn afstand tot de koploper en tot het paard achter hem in de gulden snede (φ ≈ 1,62), dan sprint hij perfect. De φ staat op het bord.", "Ziet Jonas die spiraal, dan begrijpt hij de rotatie: zijn Act 4 gaat open.", "Raakt Jonas nooit. Duo: samen sneller."]},
+  undermyskin: {ic: "💧", nm: "Under My Skin", st: "CCCABC", sh: "Vleesspray: genezen, aanvallen en vermommen.",
+    rules: ["Vermomt zich als een ander paard: haar rij op het bord krijgt diens naam en kleur. Aanvallen kunnen dan het verkeerde paard raken.", "Spuit het paard vlak voor haar onder: dat vertraagt.", "Haar ladingen genezen blessures, besmetting en veroudering."]},
+  silence: {ic: "🔊", nm: "Sound of Silence", st: "BBACBB", sh: "Schrijft geluid op de baan.",
+    rules: ["Schrijft woorden op de baan, die je ziet liggen: BOOM (schrik), ZZZ (moe), WHOOSH (lanceert wie erop komt, vaak hijzelf).", "Een paard dat hetzelfde woord twee keer heeft gehad, springt er voortaan overheen.", "Geluidsgolf op de koploper (wedbaar).", "Loopt te voet: traag maar taai."]},
   timestands: {ic: "⏸", nm: "Time Stands Still", st: "AACABB", sh: "Een Dario uit een andere wereld, met een andere gave: hij zet de tijd stil.",
-    rules: ["Alleen te krijgen als F. Valentin een deur naar een andere wereld opent (zeldzaam, ergens na de helft van de race).", "Om de 14–32 seconden staat de tijd 1 tot 3,5 seconden stil: alle andere paarden bevriezen, alleen hij rijdt door. Max 3× per race.", "Niets houdt de stilstaande tijd tegen. Ook terugspoelen niet.", "Hij is geen jager meer: Primitive is weg."]},
-  leanon: {ic: "🪢", nm: "Lean on Me", st: "CCBCCB", sh: "Hangt aan zijn touw en kan zich erlangs opsplitsen.",
-    rules: ["Rijdt hij vlak achter iemand, dan hangt hij aan zijn lasso: kost bijna geen energie.", "Eén keer per derde van de race kán hij zich langs het touw naar voren trekken (2 tot 12 lengtes).", "Eén keer per derde van de race kan hij zich langs het touw opsplitsen en zo pech of een aanval ontwijken (50% kans)."]},
+    rules: ["Alleen te krijgen als F. Valentin een deur naar een andere wereld opent (zeldzaam, ergens na de helft van de race).", "Om de 14 tot 32 seconden staat de tijd 1 tot 3,5 seconden stil: alle andere paarden bevriezen, alleen hij rijdt door. Max 3× per race.", "Niets houdt de stilstaande tijd tegen.", "Hij is geen jager meer: Primitive is weg."]},
+  leanon: {ic: "🪢", nm: "Lean on Me", st: "CCBCCB", sh: "Lasso en opsplitsen.",
+    rules: ["Hangt achter iemand aan zijn lasso: kost bijna geen energie.", "Gooit zijn lasso om een paard vóór hem: 10 seconden vast. Wat dat paard overkomt, overkomt hem ook.", "Splitst zich door een groep heen, of om een aanval te ontwijken."]},
 };
 const RIDERS = [
   {id: "jonas", nm: "Jonas Sterling", horse: "Slow Dancer", gift: "chain", tac: "eind"},
@@ -2166,20 +2209,20 @@ function segAt(x) { for (let k = 0; k < SEGS.length; k++) if (x < SEGS[k].b) ret
 // Extreem zeldzaam: een heilig relikwie op de route. Wie het pakt, laat zijn gave ontwaken.
 const RELIC_P = 0.03;
 const AWAKE = {
-  chain: "Meteen Act 4, de rest van de race.", timeafter: "Mag 4× per derde terugspoelen, en het kost hem geen energie meer.",
-  parallel: "Love Train is vanaf nu actief.", primitive: "De oermeter loopt twee keer zo snel vol en besmetting duurt 6 seconden.",
-  raindance: "Het regent nu altijd een beetje voor hem, ook bij droog weer.", magnetic: "Ijzer vanaf twee keer zo ver en pulsen twee keer zo sterk.",
-  standstill: "Slaat tot 8 klappen op en laat ze harder los.", goodvibes: "Pech raakt hem bijna nooit meer.",
+  chain: "Meteen Act 4, de rest van de race.", timeafter: "Zijn horloge laadt twee keer zo snel en terugspoelen kost niks meer.",
+  parallel: "Love Train is vanaf nu actief.", primitive: "De oermeter loopt twee keer zo snel vol.",
+  raindance: "Het regent nu altijd voor hem.", magnetic: "Ijzer vanaf twee keer zo ver en het veld trekt harder.",
+  standstill: "Slaat tot 8 klappen op en kaatst al terug vanaf 2.", goodvibes: "Een geluksgolf, nu meteen, en pech raakt hem bijna nooit meer.",
   oldbefore: "Elke stalen bal veroudert dubbel.", undermyskin: "5 ladingen, en elk derde 5 nieuwe.",
-  silence: "Legt elke 9 seconden een geluidswoord.", leanon: "Splitst zich altijd langs zijn touw als het misgaat.",
+  silence: "Schrijft twee keer zo vaak.", leanon: "Splitst zich altijd langs zijn touw als het misgaat.",
 };
 const AU_P = 0.1;
 const DT = 0.25, BASEV = 20;
 const loveOn = (s, E) => E.x / s.D > 0.66 || !!E.g.relic;
-const actOf = (E, D) => { if (E.g.relic) return 4; const p = E.x / D, t = E.g.at || [0, 0, 0.25, 0.5, 0.75]; return p >= t[4] ? 4 : p >= t[3] ? 3 : p >= t[2] ? 2 : 1; };
 // zeldzame interacties (voor de teller): id -> korte naam
-const SPECIALS = {staal: "Staal en magneet", vlees: "Vers vlees", rotatie: "Onontkoombaar", werelden: "Tussen de werelden", lasso: "Lasso om de dubbelganger", gouden: "Gouden rotatie, samen", geluk: "Geluk tegen Love Train",
-  regenjager: "Regen tegen de jager", dinolasso: "Lasso om een jager", heyya: "Pas op, links!", stiltijd: "Stilstand in stilstaande tijd", genezen: "Vlees tegen besmetting", gejaagd: "De jager wordt gejaagd", spijkerdubbel: "Spijker in de dubbelganger"};
+const SPECIALS = {staal: "Staal en magneet", vlees: "Vers vlees", rotatie: "Onontkoombaar", werelden: "Tussen de werelden", lasso: "Lasso om de dubbelganger", gouden: "Jonas ziet de spiraal", geluk: "Geluk tegen Love Train",
+  regenjager: "Regen tegen de raptor", dinolasso: "Lasso om een jager", heyya: "Pas op, links!", stiltijd: "Stilstand in stilstaande tijd", genezen: "Vlees tegen besmetting", eigengat: "In zijn eigen gat", spijkerdubbel: "Spijker in de dubbelganger",
+  vermomd: "Rotatie op de verkeerde"};
 
 function pickW(r, obj) { const ks = Object.keys(obj); let tot = 0; ks.forEach(k => tot += obj[k]); let x = r() * tot; for (const k of ks) { x -= obj[k]; if (x <= 0) return k; } return ks[ks.length - 1]; }
 function makeField(cs) {
@@ -2199,9 +2242,9 @@ function makeField(cs) {
 }
 // vaste karaktertrekken (en balans) per ruiter
 const RIDER_ADJ = {
-  jonas: {spd: 0.011, tank: 0.1}, giorgio: {spd: 0.014, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.004, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
-  sandor: {spd: -0.034, tank: 0.16, aff: a => { a.splice(0, 8, 0, 2, 2, 1, 0, -1, 1, -1); }}, paco: {spd: 0.003}, magenta: {spd: -0.002}, boomer: {spd: 0.022}, valentin: {spd: 0.012},
-  hettie: {spd: 0.019, tank: 0.04}, bergman: {spd: 0.011}, blackwood: {spd: 0.004}, ringwald: {spd: 0.0},
+  jonas: {spd: 0.014, tank: 0.1}, giorgio: {spd: 0.019, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.004, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
+  sandor: {spd: -0.04, tank: 0.16, aff: a => { a.splice(0, 8, 0, 2, 2, 1, 0, -1, 1, -1); }}, paco: {spd: 0.011}, magenta: {spd: -0.017}, boomer: {spd: 0.031}, valentin: {spd: 0.024},
+  hettie: {spd: 0.022, tank: 0.04}, bergman: {spd: 0.011}, blackwood: {spd: 0.007}, ringwald: {spd: 0.0},
 };
 // het weer per stuk en de gebeurtenissen langs de route
 function makeRace(r) { const wxs = STAGES.map(st => pickW(r, st.wx)); return {wxs, sched: makeSchedFor(wxs, r)}; }
@@ -2214,89 +2257,166 @@ function fx(s) {
   return {m: 0.6 + s.r() * 0.8, tag: "", crit: 0};
 }
 const between = (r, a, b) => a + r() * (b - a);
-function cloneE(x) { return {...x, nx: {...x.nx}, u: {...x.u}, mk: {...x.mk}, g: {...x.g}}; }
+function cloneE(x) { return {...x, nx: {...x.nx}, u: {...x.u}, mk: {...x.mk}, g: {...x.g}, lw: {...x.lw}}; }
 const GOODT = ["rots", "berg", "zand"];
-// R = {ent}; RC = {wxs, sched}; opts = {rec, betW}
+// Paco's profetie: past de gebeurtenissen aan zodat hij wel/niet uitkomt
+function fitProph(sched, P, r) {
+  const hit = e => e.k === P.k && e.seg === P.seg;
+  if (P.tru) {
+    if (!sched.some(hit)) { const sg = SEGS[P.seg]; sched = [...sched, {at: Math.round((sg.a + (0.2 + r() * 0.6) * sg.len) / D_TOTAL * 1000) / 1000, k: P.k, seg: P.seg}].sort((a, b) => a.at - b.at); }
+  } else sched = sched.filter(e => !hit(e));
+  return sched;
+}
+function makeProph(r) {
+  const seg = 1 + Math.floor(r() * (SEGS.length - 2)), t = SEGS[seg].t;
+  const pool = {}; Object.entries(EVT).forEach(([k, v]) => { if (v.t === "*" || v.t.includes(t)) pool[k] = v.w; });
+  return {k: pickW(r, pool), seg, tru: r() < 0.5};
+}
+// R = {ent, proph?}; RC = {wxs, sched}; opts = {rec, betW, proph}
 function newSim(R, RC, sched, r, opts = {}) {
-  const e = R.ent.map((H, i) => ({i, x: 0, pv: 0, sta: H.tank, n: gauss(r) * 0.02, form: 1 + gauss(r) * 0.012, frz: 0, spook: 0, slow: 0, inj: 1, done: false, ft: 0, nx: {}, u: {}, mk: {}, g: {}, eff: 1, fl: 0, c: "", ph: 0, sg: 0}));
-  const s = {R, wxs: RC.wxs, D: D_TOTAL, t: 0, tick: 0, e, ev: sched.map(x => ({...x, f: -1, ex: []})), fin: 0, order: [], log: [], r, opts, snaps: [], traps: [], inf: null,
+  const e = R.ent.map((H, i) => ({i, x: 0, pv: 0, sta: H.tank, n: gauss(r) * 0.02, form: 1 + gauss(r) * 0.012, frz: 0, spook: 0, slow: 0, inj: 1, done: false, ft: 0, nx: {}, u: {}, mk: {}, g: {}, lw: {}, eff: 1, fl: 0, c: "", ph: 0, sg: 0, ht: 0, dg: -1, tie: -1}));
+  let P = null;
+  const pp = opts.proph || (R.proph && {k: R.proph.k, seg: R.proph.seg});
+  if (pp && R.ent.some(H => H.gift === "goodvibes")) { P = {k: pp.k, seg: pp.seg, tru: pp.tru != null ? pp.tru : r() < 0.5, done: 0, told: 0}; sched = fitProph(sched, P, r); }
+  const s = {R, wxs: RC.wxs, D: D_TOTAL, t: 0, tick: 0, e, ev: sched.map(x => ({...x, f: -1, ex: []})), fin: 0, order: [], log: [], r, opts, snaps: [], haz: [], tg: [], tgid: 0, hzid: 0, inf: null, spin: 0, proph: P,
     rewind: R.ent.some(H => H.gift === "timeafter"), relicAt: r() < RELIC_P ? 0.15 + r() * 0.7 : 0, relicBy: null, auAt: 0, auBy: null, lastLead: -1, lateCh: 0};
   if (R.ent.some(H => H.gift === "parallel") && R.ent.some(H => H.rid === "dario") && r() < AU_P) s.auAt = 0.5 + r() * 0.3;
   e.forEach(E => {
     const g = R.ent[E.i].gift;
-    if (g === "chain") { E.g.act = 1; E.nx.nail = between(r, 3, 10); const t2 = between(r, 0.08, 0.4), t3 = t2 + between(r, 0.08, 0.38), t4 = t3 + between(r, 0.08, 0.4); E.g.at = [0, 0, t2, t3, t4]; }
-    else if (g === "primitive") E.g.dm = 0.25 + r() * 0.35;
-    else if (g === "magnetic") E.nx.pulse = 8 + r() * 4;
-    else if (g === "oldbefore") E.nx.ball = 4 + r() * 5;
-    else if (g === "raindance") E.nx.hop = 6 + r() * 4;
-    else if (g === "undermyskin") E.g.ch = 3;
-    else if (g === "silence") E.nx.trap = 5 + r() * 4;
+    if (g === "chain") { E.g.act = 1; E.g.hits = 0; E.nx.nail = between(r, 3, 8); }
+    else if (g === "primitive") E.g.dm = 0.2 + r() * 0.3;
+    else if (g === "magnetic") E.nx.field = between(r, 14, 24);
+    else if (g === "oldbefore") E.nx.ball = between(r, 4, 9);
+    else if (g === "raindance") { E.nx.wall = 4; E.nx.cloud = between(r, 10, 26); }
+    else if (g === "undermyskin") { E.g.ch = 3; E.nx.dg = between(r, 8, 20); E.nx.spray = 18; }
+    else if (g === "silence") E.nx.word = between(r, 4, 9);
     else if (g === "standstill") E.g.ch = 0;
-    else if (g === "goodvibes") { E.g.ls = 0; E.nx.luck = r() < 0.35 ? 10 + r() * 40 : 1e9; E.nx.cheer = 8 + r() * 20; }
+    else if (g === "goodvibes") E.nx.luck = r() < 0.3 ? between(r, 10, 150) : 1e9;
+    else if (g === "timeafter") E.g.w = 0.3 + r() * 0.3;
+    else if (g === "parallel") E.nx.clone = between(r, 10, 22);
   });
   return s;
 }
 const logE = (s, o) => { if (s.opts.rec) s.log.push({t: s.t, ...o}); };
 const nm_ = (s, i) => s.R.ent[i].nm;
-function snapE(s) { return {tick: s.tick, t: s.t, fin: s.fin, order: s.order.slice(), e: s.e.map(cloneE), traps: s.traps.map(t => ({...t, hit: t.hit.slice()})), inf: s.inf ? {...s.inf} : null}; }
+const short_ = (s, i) => s.R.ent[i].nm.split(" ").slice(-1)[0];
+function snapE(s) { return {tick: s.tick, t: s.t, fin: s.fin, order: s.order.slice(), e: s.e.map(cloneE), haz: s.haz.map(h => ({...h, hit: h.hit.slice()})), inf: s.inf ? {...s.inf} : null, spin: s.spin}; }
 function restoreSnap(s, sn) {
-  s.e = sn.e.map(cloneE); s.t = sn.t; s.tick = sn.tick; s.fin = sn.fin; s.order = sn.order.slice(); s.traps = sn.traps.map(t => ({...t, hit: t.hit.slice()}));
+  s.e = sn.e.map(cloneE); s.t = sn.t; s.tick = sn.tick; s.fin = sn.fin; s.order = sn.order.slice(); s.haz = (sn.haz || []).map(h => ({...h, hit: h.hit.slice()}));
 }
 // per derde van de race krijgen de "1× per derde" gaven een nieuwe kans
-const PHASE_FLAGS = ["pull", "split", "sp", "heal", "snd", "fresh", "deTry", "dgTry", "wl", "rw", "love", "lovepop", "dino", "bite", "hop", "pulse", "ball", "nail", "trap", "spr", "ch", "par", "mr", "rel", "worm"];
-function newPhase(s, E, ph) {
+const PHASE_FLAGS = ["split", "sp", "heal", "wave", "worm", "tie", "pull", "deTry", "wl", "dl"];
+function newPhase(s, E) {
   const H = s.R.ent[E.i];
   PHASE_FLAGS.forEach(k => { delete E.u[k]; });
-  if (H.gift === "undermyskin") E.g.ch = Math.min(5, (E.g.ch || 0) + (E.g.relic ? 5 : 3));
-  if (H.gift === "goodvibes") { if (!E.u.hit) E.g.ls = Math.min(4, (E.g.ls || 0) + 1); else E.g.ls = 0; delete E.u.hit; if (s.r() < 0.3 + 0.12 * E.g.ls) E.nx.luck = s.t + 5 + s.r() * 20; }
+  if (H.gift === "undermyskin") E.g.ch = Math.min(5, (E.g.ch || 0) + (E.g.relic ? 5 : 2));
 }
 function doRewind(s, who, why) {
   const secs = Math.round(between(s.r, 3, 9)), want = s.tick - secs * 4;
   let sn = null; for (const x of s.snaps) if (x.tick <= want) sn = x;
   if (!sn) sn = s.snaps[0];
   if (!sn) return false;
-  const uses = s.e.map(x => ({...x.u}));
+  const uses = s.e.map(x => ({...x.u})), gx = s.e.map(x => Math.round(x.x));
   const t0 = s.t;
   const val = s.e.find(o => s.R.ent[o.i].gift === "parallel" && o.i !== who && !o.done);
   const keep = val && !val.u.between && s.r() < 0.35 ? cloneE(val) : null;
   s.e = sn.e.map((x, i) => ({...cloneE(x), u: uses[i]}));
   if (keep) { const old = s.e[keep.i]; keep.u.between = 1; keep.x = old.x + 0.5 * (keep.x - old.x); keep.frz = Math.max(keep.frz, 1); s.e[keep.i] = keep; }
-  s.fin = sn.fin; s.order = sn.order.slice(); s.traps = sn.traps.map(t => ({...t, hit: t.hit.slice()}));
+  s.fin = sn.fin; s.order = sn.order.slice(); s.haz = (sn.haz || []).map(h => ({...h, hit: h.hit.slice()}));
   s.ev.forEach(ev => { if (ev.f > sn.tick) ev.f = -1; });
   s.snaps = s.snaps.filter(x => x.tick <= sn.tick);
   // de klok loopt door (de wereld gaat terug, de tijd niet): zo blijft alles in volgorde
   s.e.forEach(E => { for (const k in E.nx) if (E.nx[k] < 1e8) E.nx[k] += t0 - sn.t; });
   const RR = s.e[who]; if (!RR.g.relic) RR.sta -= 0.03;
   if (s.relicBy != null && !s.e[s.relicBy].g.relic) { s.relicBy = null; logE(s, {k: "gift", g: "timeafter", who, txt: "🦴 Door het terugspoelen ligt het relikwie weer in het zand…"}); }
-  if (keep) logE(s, {k: "gift", g: "parallel", who: keep.i, pop: true, lvl: 3, sp: 1, sid: "werelden", txt: `✦ Tussen de werelden: ${nm_(s, keep.i)} stond net in een andere wereld en merkt het terugspoelen maar half. Hij houdt de helft van zijn voorsprong, maar is even gedesoriënteerd.`});
-  logE(s, {k: "gift", g: "timeafter", who, pop: true, rw: 1, lvl: why === "fate" ? 3 : 2, txt: why === "fate" ? `↺ ${nm_(s, who)} wordt ingehaald en spoelt ${secs} seconden terug. Hij weet nu wat er komt.` : `↺ ${nm_(s, who)} krijgt pech en spoelt de race ${secs} seconden terug!`});
+  if (keep) logE(s, {k: "gift", g: "parallel", who: keep.i, pop: true, lvl: 3, sp: 1, sid: "werelden", txt: `✦ Tussen de werelden: ${nm_(s, keep.i)} stond net in een andere wereld en merkt het terugspoelen maar half. Hij houdt de helft van zijn voorsprong.`});
+  logE(s, {k: "gift", g: "timeafter", who, pop: true, rw: 1, gx, lvl: why === "fate" ? 3 : 2, txt: why === "fate" ? `↺ ${nm_(s, who)} wordt ingehaald en spoelt ${secs} seconden terug. Hij weet nu wat er komt.` : `↺ ${nm_(s, who)} krijgt pech en spoelt de race ${secs} seconden terug!`});
   return true;
 }
-// Zeldzaam: staal (spijkers, stalen ballen) buigt af naar de magneet
-function magnetRedirect(s, src, tgt, what) {
-  const b = s.e.find(o => s.R.ent[o.i].gift === "magnetic" && !o.done);
-  if (!b || b === tgt || b === src || Math.abs(b.x - tgt.x) > 14 || (b.u.mr || 0) >= 1 || s.r() > 0.2) return tgt;
-  b.u.mr = 1;
-  logE(s, {k: "gift", g: "magnetic", who: b.i, pop: true, lvl: 3, sp: 1, sid: "staal", txt: `✦ ${what} van ${nm_(s, src.i)} buigt af naar de magneet van ${nm_(s, b.i)} en raakt hem zelf!`});
-  return b;
+
+// ---------- telegraaf: eerst zie je het aankomen, dan gebeurt het ----------
+// opts = [{k, nm, p}]; de uitkomst wordt meteen geloot, zodat je er eerlijk op kunt wedden
+function tele(s, o) {
+  const tot = o.opts.reduce((a, b) => a + b.p, 0);
+  o.opts.forEach(x => { x.p = x.p / tot; });
+  let x = s.r(), res = o.opts[o.opts.length - 1].k;
+  for (const op of o.opts) { x -= op.p; if (x <= 0) { res = op.k; break; } }
+  const T = {id: ++s.tgid, t0: s.t, t1: s.t + o.dur, ...o, res};
+  if (o.dur > 0) s.tg.push(T);
+  logE(s, {k: "tg", id: T.id, who: o.src, tgt: o.tgt, t1: T.t1, kind: o.kind, ic: o.ic, txt: o.txt, fb: o.fb ? 1 : 0, opts: o.opts.map(z => ({k: z.k, nm: z.nm, p: Math.round(z.p * 1000) / 1000})), res, g: o.g});
+  return T;
 }
-// Aanval van een gave op een ander paard. true = raak.
-function attack(s, src, T, what) {
-  const g = s.R.ent[T.i].gift, r = s.r;
-  if (g === "parallel" && loveOn(s, T)) { if (!T.u.lovepop) { T.u.lovepop = 1; logE(s, {k: "gift", g, who: T.i, txt: `💘 ${what} raakt ${nm_(s, T.i)} niet: Love Train.`}); } return false; }
-  if (g === "standstill" && (T.u.ss || 0) < 12) {
-    T.u.ss = (T.u.ss || 0) + 1; T.frz = Math.max(T.frz, 0.8); T.g.ch = Math.min(T.g.relic ? 8 : 5, (T.g.ch || 0) + 1);
-    logE(s, {k: "gift", g, who: T.i, pop: T.u.ss === 1, txt: `🛡️ ${nm_(s, T.i)} houdt ${what} tegen en slaat de klap op (${T.g.ch}/5).`}); return false;
+// verdedigingen van het doelwit (en van wie er vlakbij rijdt) nemen eerst hun deel van de kans
+function withDef(s, src, tgt, base, steel) {
+  const R = s.R, out = []; let rem = 1;
+  const add = (k, nm, p) => { const q = rem * p; if (q > 0.001) { out.push({k, nm, p: q}); rem -= q; } };
+  const tg = R.ent[tgt.i].gift;
+  if (tgt.g.lucky > 0) add("luck", "Geluksgolf: glijdt af", 1);
+  if (tg === "parallel" && loveOn(s, tgt)) add("love", "Love Train stuurt het door", 0.85);
+  if (tg === "standstill") { const lim = tgt.g.relic ? 2 : 3; if ((tgt.g.ch || 0) >= lim) add("ref", "Teruggekaatst ×2", 0.75); add("abs", "Standstill houdt het tegen", 0.85); }
+  if (tg === "leanon" && !tgt.u.split) add("split", "Splitst zich langs zijn touw", tgt.g.relic ? 1 : 0.45);
+  const paco = s.e.find(o => R.ent[o.i].gift === "goodvibes" && !o.done && o !== src);
+  if (paco && Math.abs(paco.x - tgt.x) < 10) add("warn", "Paco: 'Pas op, links!'", paco === tgt ? 0.35 : 0.25);
+  if (steel) { const b = s.e.find(o => R.ent[o.i].gift === "magnetic" && !o.done && o !== tgt && o !== src); if (b && Math.abs(b.x - tgt.x) < 14) add("mag", `Buigt af naar ${short_(s, b.i)}`, 0.2); }
+  const het = s.e.find(o => R.ent[o.i].gift === "undermyskin" && o.dg >= 0 && !o.done);
+  if (het && het !== src && (het === tgt || het.dg === tgt.i)) add("wrong", "Vermomming: raakt de verkeerde", 0.4);
+  const tot = base.reduce((a, b) => a + b.p, 0);
+  base.forEach(b => out.push({k: b.k, nm: b.nm, p: rem * b.p / tot}));
+  return out;
+}
+// geeft het geraakte paard terug (of null); onHit(paard, kracht) voert het effect uit
+function resolveAtk(s, T, what, onHit) {
+  const R = s.R, src = s.e[T.src], tgt = s.e[T.tgt], r = s.r;
+  const L = o => logE(s, {k: "tr", id: T.id, kind: T.kind, ...o});
+  switch (T.res) {
+    case "hit": if (tgt.done) { L({who: tgt.i, txt: `${what}: ${nm_(s, tgt.i)} is al binnen.`}); return null; } tgt.ht++; onHit(tgt, 1); return tgt;
+    case "mis": L({who: src.i, txt: `${what} mist ${nm_(s, tgt.i)}.`}); return null;
+    case "luck": L({who: tgt.i, txt: `🍀 ${what} glijdt af: ${nm_(s, tgt.i)} heeft een geluksgolf.`}); return null;
+    case "love": {
+      const bw = s.opts.betW; let nt = null;
+      if (bw) { let best = 0; s.e.forEach(x => { if (!x.done && x !== tgt && x !== src && (bw[x.i] || 0) > best) { best = bw[x.i]; nt = x; } }); }
+      if (!nt) { const c = s.e.filter(x => !x.done && x !== tgt && x !== src); nt = c.length ? c[Math.floor(r() * c.length)] : null; }
+      L({who: tgt.i, love: 1, pop: true, lvl: 2, txt: `💘 Love Train: ${what} gaat via ${nm_(s, tgt.i)} door naar ${nt ? nm_(s, nt.i) : "niemand"}.`});
+      if (nt) { nt.ht++; onHit(nt, 1); } return nt;
+    }
+    case "abs": tgt.frz = Math.max(tgt.frz, 0.8); tgt.g.ch = Math.min(tgt.g.relic ? 8 : 5, (tgt.g.ch || 0) + 1); L({who: tgt.i, txt: `🛡️ ${nm_(s, tgt.i)} houdt ${what} tegen en slaat de klap op (${tgt.g.ch}).`}); return null;
+    case "ref": {
+      tgt.g.ch -= tgt.g.relic ? 2 : 3; tgt.frz = Math.max(tgt.frz, 0.5);
+      const own = R.ent[src.i].rid === "jonas";
+      src.frz = Math.max(src.frz, own ? 2 : 1.6); src.ht++;
+      L({who: tgt.i, pop: true, lvl: own ? 3 : 2, sp: own ? 1 : 0, sid: own ? "eigengat" : "", fly: [tgt.i, src.i], txt: own ? `✦ ${nm_(s, tgt.i)} kaatst de spijker dubbel terug: ${nm_(s, src.i)} rijdt in zijn eigen gat!` : `🛡️ ${nm_(s, tgt.i)} kaatst ${what} dubbel zo hard terug: ${nm_(s, src.i)} staat stil!`});
+      return null;
+    }
+    case "split": tgt.u.split = 1; L({who: tgt.i, txt: `🪢 ${nm_(s, tgt.i)} splitst zich langs zijn touw: ${what} gaat erdoorheen.`}); return null;
+    case "warn": {
+      const paco = s.e.find(o => R.ent[o.i].gift === "goodvibes"); tgt.x += 3;
+      const other = paco && paco !== tgt;
+      L({who: tgt.i, pop: other, lvl: 3, sp: other ? 1 : 0, sid: other ? "heyya" : "", txt: other ? `✦ "Pas op, links!" ${nm_(s, paco.i)} waarschuwt ${nm_(s, tgt.i)}, die ${what} op het nippertje ontwijkt.` : `📣 "Pas op, links!" ${nm_(s, tgt.i)} ontwijkt ${what}.`});
+      return null;
+    }
+    case "mag": {
+      const b = s.e.find(o => R.ent[o.i].gift === "magnetic" && !o.done);
+      if (!b) return null;
+      L({who: b.i, pop: true, lvl: 3, sp: 1, sid: "staal", fly: [T.src, b.i], txt: `✦ ${what} buigt af naar de magneet van ${nm_(s, b.i)} en raakt hem zelf!`});
+      b.ht++; onHit(b, 1); return b;
+    }
+    case "wrong": {
+      const het = s.e.find(o => R.ent[o.i].gift === "undermyskin");
+      const nt = het === tgt ? (het.dg >= 0 ? s.e[het.dg] : het) : het;
+      if (nt.done) return null;
+      L({who: het.i, pop: true, lvl: 2, fly: [T.src, nt.i], txt: `💧 Vermomming! ${what} was voor ${nm_(s, tgt.i)} bedoeld, maar raakt ${nm_(s, nt.i)}.`});
+      nt.ht++; onHit(nt, 1); return nt;
+    }
   }
-  if (g === "leanon" && !T.u.split && (T.g.relic || r() < 0.5)) { T.u.split = 1; logE(s, {k: "gift", g, who: T.i, pop: true, txt: `🪢 ${nm_(s, T.i)} splitst zich langs zijn touw: ${what} gaat erdoorheen.`}); return false; }
-  if (g === "goodvibes") T.u.hit = 1;
-  return true;
+  return null;
 }
+
 function hitNeg(s, ev, E, kind) {
   const H = s.R.ent[E.i], g = H.gift, r = s.r, T = EVT[kind];
   if (kind === "short") {
     if (g === "goodvibes" || r() < 0.55) { E.x += 35; logE(s, {k: "ev", ic: T.ic, who: E.i, txt: `${T.ic} ${H.nm} vindt een binnenweg! (+35)` + (g === "goodvibes" ? " Natuurlijk." : "")}); return; }
   }
+  if (E.g.lucky > 0) { logE(s, {k: "ev", ic: T.ic, who: E.i, txt: `🍀 ${T.nm}… maar ${H.nm} heeft een geluksgolf. Niks aan de hand.`}); return; }
   if (g === "parallel" && loveOn(s, E) && (E.u.love || 0) < 3) {
     E.u.love = (E.u.love || 0) + 1;
     const bw = s.opts.betW;
@@ -2312,22 +2432,30 @@ function hitNeg(s, ev, E, kind) {
     if (tgt) applyNeg(s, tgt, kind);
     return;
   }
-  if (g === "timeafter" && (E.u.rw || 0) < (E.g.relic ? 4 : 2) && r() < 0.65 && s.rewind && s.snaps.length) {
-    E.u.rw = (E.u.rw || 0) + 1;
+  if (g === "timeafter" && E.g.w >= 1 && s.rewind && s.snaps.length) {
+    E.g.w = E.g.relic ? 0.5 : 0;
     ev.ex.push(E.i);
+    // wie de pech straks wél krijgt, ligt nu al vast (wedbaar)
+    const cand = s.e.filter(x => !x.done && !ev.ex.includes(x.i) && x.x > 0);
+    if (cand.length) {
+      const ws = cand.map(x => evW(s, x));
+      const T2 = tele(s, {src: E.i, tgt: E.i, kind: "fate", dur: 0, fb: 1, g: "timeafter", ic: "↺", txt: `↺ ${H.nm} spoelt terug. De ${T.nm.toLowerCase()} komt zo opnieuw, maar raakt iemand anders. Wie?`,
+        opts: cand.map((x, k) => ({k: String(x.i), nm: short_(s, x.i), p: ws[k]}))});
+      ev.force = +T2.res; ev.fid = T2.id;
+    }
     if (doRewind(s, E.i)) return "rw";
   }
-  if (g === "standstill" && (E.u.ss || 0) < 12) {
-    E.u.ss = (E.u.ss || 0) + 1; E.frz = Math.max(E.frz, 1.2); E.g.ch = Math.min(E.g.relic ? 8 : 5, (E.g.ch || 0) + 1);
-    logE(s, {k: "gift", g, who: E.i, pop: E.u.ss === 1, txt: `🛡️ ${T.nm} raakt ${H.nm} niet. Hij staat even stil en slaat de klap op (${E.g.ch}/5).`}); return;
+  if (g === "standstill") {
+    E.frz = Math.max(E.frz, 1.2); E.g.ch = Math.min(E.g.relic ? 8 : 5, (E.g.ch || 0) + 1);
+    logE(s, {k: "gift", g, who: E.i, pop: !E.u.ssp, txt: `🛡️ ${T.nm} raakt ${H.nm} niet. Hij staat even stil en slaat de klap op (${E.g.ch}).`}); E.u.ssp = 1; return;
   }
   if (g === "leanon" && !E.u.split && (E.g.relic || r() < 0.5)) { E.u.split = 1; logE(s, {k: "gift", g, who: E.i, pop: true, txt: `🪢 ${H.nm} splitst zich langs zijn touw en ontwijkt: ${T.nm}.`}); return; }
-  if (g === "raindance" && s.wxs[E.sg] === "regen" && kind === "trip") { logE(s, {k: "gift", g, who: E.i, txt: `🌧️ ${H.nm} glijdt niet uit: het regent toch.`}); return; }
+  if (g === "raindance" && (s.wxs[E.sg] === "regen" || E.g.cloud > 0) && kind === "trip") { logE(s, {k: "gift", g, who: E.i, txt: `🌧️ ${H.nm} glijdt niet uit: het regent toch.`}); return; }
   applyNeg(s, E, kind);
 }
 function applyNeg(s, E, kind) {
   const H = s.R.ent[E.i], T = EVT[kind];
-  if (H.gift === "goodvibes") E.u.hit = 1;
+  E.ht++;
   if (kind === "trip") E.frz = Math.max(E.frz, 1.5);
   else if (kind === "snake") E.spook = Math.max(E.spook, 3);
   else if (kind === "aval") E.frz = Math.max(E.frz, 2.2);
@@ -2339,9 +2467,17 @@ function applyNeg(s, E, kind) {
   }
   logE(s, {k: "ev", ic: T.ic, who: E.i, txt: kind === "short" ? `${T.ic} ${H.nm} neemt een binnenweg en verdwaalt!` : `${T.ic} ${T.nm}: ${H.nm}${kind === "lame" ? " is geblesseerd (rest van de race −4%)" : ""}`});
 }
+// hoe groot de kans is dat pech dit paard kiest
+const evW = (s, x) => s.R.ent[x.i].gift === "goodvibes" ? (x.g.relic ? 0.03 : 0.25) : 1;
 function fireEvent(s, ev) {
   ev.f = s.tick;
   const T = EVT[ev.k], r = s.r;
+  const P = s.proph;
+  if (P && !P.done && ev.k === P.k && ev.seg === P.seg) {
+    P.done = 1;
+    const pc = s.e.find(E => s.R.ent[E.i].gift === "goodvibes");
+    if (pc && !pc.done) { pc.g.lucky = 20; logE(s, {k: "gift", g: "goodvibes", who: pc.i, pop: true, lvl: 3, txt: `📣 De profetie komt uit: ${T.ic} ${T.nm}! ${nm_(s, pc.i)} krijgt een geluksgolf: 20 seconden sneller en niets raakt hem.`}); }
+  }
   if (T.all) {
     s.e.forEach(E => {
       if (E.done) return;
@@ -2357,28 +2493,160 @@ function fireEvent(s, ev) {
   for (let j = 0; j < n; j++) {
     const cand = s.e.filter(x => !x.done && !ev.ex.includes(x.i) && x.x > 0);
     if (!cand.length) return;
-    const ws = cand.map(x => s.R.ent[x.i].gift === "goodvibes" ? (x.g.relic ? 0.03 : Math.max(0.06, 0.25 / (1 + 0.5 * (x.g.ls || 0)))) : 1);
-    let tot = ws.reduce((a, b) => a + b, 0), x = r() * tot, pick = cand[cand.length - 1];
-    for (let k = 0; k < cand.length; k++) { x -= ws[k]; if (x <= 0) { pick = cand[k]; break; } }
+    let pick = null;
+    if (ev.force != null) { pick = cand.find(x => x.i === ev.force) || null; if (pick) logE(s, {k: "tr", id: ev.fid, kind: "fate", who: pick.i, pop: true, lvl: 2, txt: `↺ De ${T.nm.toLowerCase()} komt opnieuw… en raakt nu ${nm_(s, pick.i)}.`}); ev.force = null; }
+    if (!pick) {
+      const ws = cand.map(x => evW(s, x));
+      let tot = ws.reduce((a, b) => a + b, 0), x = r() * tot; pick = cand[cand.length - 1];
+      for (let k = 0; k < cand.length; k++) { x -= ws[k]; if (x <= 0) { pick = cand[k]; break; } }
+    }
     ev.ex.push(pick.i);
     if (hitNeg(s, ev, pick, ev.k) === "rw") return "rw";
   }
 }
-// grijpen door een jager (Dario of een besmet paard); geeft true als het lukte
-function grab(s, hunter, prey, infected) {
-  const r = s.r, P = s.R.ent[prey.i];
-  if (P.gift === "goodvibes" && !prey.u.heyya && r() < 0.6) {
-    prey.u.heyya = 1; prey.x += 6;
-    logE(s, {k: "gift", g: "goodvibes", who: prey.i, pop: true, lvl: 3, sp: 1, sid: "heyya", txt: `✦ Good Vibrations roept: "Pas op, links!" ${P.nm} ontwijkt de jager en schiet vooruit (+6).`});
-    return false;
-  }
-  if (!attack(s, hunter, prey, infected ? "een besmette jager" : "de jager")) return false;
-  prey.frz = Math.max(prey.frz, infected ? 0.8 : 1);
-  if (!infected) prey.mk.dino = hunter.g.relic ? 6 : 4;
-  return true;
+// gevaren op de baan (gat, woorden, muren)
+function addHaz(s, ty, x, ttl, o) {
+  const h = {id: ++s.hzid, ty, x, t: s.t, ttl, o, hit: []};
+  s.haz.push(h);
+  logE(s, {k: "hz", hid: h.id, ty, x: Math.round(x * 10) / 10, ttl, who: o});
+  return h;
 }
 // vlaggen voor het scherm
-const F_FRZ = 1, F_DINO = 2, F_SPRINT = 4, F_ROPE = 8, F_DBL = 16, F_SPOOK = 32, F_MAG = 64, F_INF = 128, F_NAIL = 256, F_INFROT = 512, F_OLD = 1024, F_LOVE = 2048, F_REL = 4096, F_PULL = 8192, F_SPRAY = 16384, F_DUO = 32768, F_TS = 65536, F_KICK = 131072;
+const F_FRZ = 1, F_DINO = 2, F_SPRINT = 4, F_ROPE = 8, F_DBL = 16, F_SPOOK = 32, F_PACK = 64, F_RAP = 128, F_NAIL = 256, F_INFROT = 512, F_OLD = 1024, F_LOVE = 2048, F_REL = 4096, F_HOLE = 8192, F_SPRAY = 16384, F_DUO = 32768, F_TS = 65536, F_KICK = 131072, F_VAN = 262144, F_TIE = 524288, F_LUCK = 1048576, F_RAIN = 2097152, F_STEAL = 4194304;
+const WORDW = {BOOM: 0.45, ZZZ: 0.3, WHOOSH: 0.25};
+
+// ---------- telegrafen afhandelen ----------
+function resolveTg(s, T) {
+  const R = s.R, r = s.r, src = s.e[T.src], tgt = s.e[T.tgt];
+  const L = o => logE(s, {k: "tr", id: T.id, kind: T.kind, ...o});
+  const H = R.ent[T.src];
+  switch (T.kind) {
+    case "nail": {
+      const A = src.g.act;
+      const got = resolveAtk(s, T, "De spijker", (x, m) => {
+        x.mk.nail = 1.8 * m; addHaz(s, "gat", x.x - 1, 12, src.i);
+        if (A >= 2) { x.mk.hole = 6; }
+      });
+      if (got) {
+        if (got !== src && R.ent[got.i].rid !== "jonas") src.g.hits++;
+        L({who: src.i, fly: [src.i, got.i], pop: !src.u.nailp || T.fb, lvl: 1, txt: `🔩 Raak! ${nm_(s, got.i)} krijgt een draaiende spijker${A >= 2 ? " en het gat jaagt hem achterna" : ""}. Er ligt nu een gat in de baan.`});
+        src.u.nailp = 1;
+      }
+      return;
+    }
+    case "worm": {
+      src.g.van = 0;
+      if (T.res === "ok" && !tgt.done) { src.x = Math.max(src.x, tgt.x - 2); tgt.mk.steal = 6; src.g.draft = 6; L({who: src.i, pop: true, lvl: 2, txt: `🕳️ ${H.nm} duikt op, vlak achter ${nm_(s, tgt.i)}, en steelt zijn slipstream!`}); }
+      else { src.x += 4; src.frz = Math.max(src.frz, 1); L({who: src.i, pop: true, lvl: 1, txt: `🕳️ ${H.nm} verdwaalt in zijn eigen gat en komt er bijna op dezelfde plek weer uit.`}); }
+      return;
+    }
+    case "inf": {
+      if (T.res === "mis") { L({who: src.i, pop: true, lvl: 2, txt: `♾️ De rotatie valt net te kort. ${nm_(s, tgt.i)} ontsnapt.`}); return; }
+      let tg = tgt, extra = "", sid = "";
+      if (T.res === "wrong") { const het = s.e.find(o => R.ent[o.i].gift === "undermyskin"); tg = het === tgt ? (het.dg >= 0 ? s.e[het.dg] : het) : het; extra = ` ✦ Vermomming: de rotatie grijpt ${nm_(s, tg.i)} in plaats van ${nm_(s, tgt.i)}!`; sid = "vermomd"; }
+      if (tg.done) { L({who: src.i, txt: "♾️ De rotatie grijpt in het niets: hij is al binnen."}); return; }
+      const lg = R.ent[tg.i].gift;
+      if (!sid) {
+        if (lg === "parallel" && loveOn(s, tg)) { extra = " ✦ Love Train probeert het naar een andere wereld te sturen… maar rotatie is geen pech. Het blijft."; sid = "rotatie"; }
+        else if (lg === "standstill") { extra = ` ✦ Standstill blokkeert… en breekt. Al zijn opgeslagen klappen (${tg.g.ch || 0}) zijn weg.`; tg.g.ch = 0; sid = "rotatie"; }
+        else if (lg === "timeafter") { extra = " ✦ Time After Time spoelt terug… maar de rotatie zit er nog steeds."; sid = "rotatie"; }
+      }
+      s.inf = {tgt: tg.i, src: src.i, f: 0.99, dec: between(r, 0.002, 0.006), floor: between(r, 0.86, 0.94)};
+      tg.ht++;
+      L({who: src.i, pop: true, lvl: 3, sp: sid ? 1 : 0, sid, spiral: 1, fly: [src.i, tg.i], txt: `♾️ Act 4: Oneindige rotatie op ${nm_(s, tg.i)}! Die draait leeg tot ${H.nm} hem inhaalt.${extra}`});
+      return;
+    }
+    case "ball": {
+      const got = resolveAtk(s, T, "De stalen bal", (x, m) => {
+        if (R.ent[x.i].rid === "jonas") return;
+        x.mk.age = Math.min(3, (x.mk.age || 0) + (src.g.relic ? 2 : 1)); x.sta -= 0.03 * m;
+        if (x.mk.age === 3) x.mk.old = 1;
+      });
+      if (got) L({who: src.i, fly: [src.i, got.i], pop: got.mk.old && !got.u.oldp, lvl: 2, txt: got.mk.old ? `⏳ Derde stalen bal: ${nm_(s, got.i)} is verouderd en de rest van de race trager.` : `⏳ Raak: ${nm_(s, got.i)} wordt ouder (${got.mk.age}/3), minder energie.`});
+      if (got && got.mk.old) got.u.oldp = 1;
+      return;
+    }
+    case "spiral": {
+      src.g.spiral = T.res === "perfect" ? 5 : 2;
+      L({who: src.i, pop: T.res === "perfect", lvl: 2, spiral: 1, txt: T.res === "perfect" ? `🌀 Perfecte gouden spiraal! ${H.nm} sprint 5 seconden lang.` : `🌀 Bijna perfect… ${H.nm} sprint maar even.`});
+      const jo = s.e.find(o => R.ent[o.i].rid === "jonas");
+      if (T.res === "perfect" && jo && !jo.done && !s.spin && Math.abs(jo.x - src.x) < 60) {
+        s.spin = 1;
+        L({who: jo.i, pop: true, lvl: 3, sp: 1, sid: "gouden", spiral: 1, txt: `✦ ${nm_(s, jo.i)} ziet de perfecte spiraal van ${H.nm}… en begrijpt het. Zijn Act 4 gaat open${jo.g.act >= 3 ? "!" : " zodra hij Act 3 heeft."}`});
+      }
+      return;
+    }
+    case "dino": {
+      src.g.hunt = 10; src.g.bites = T.res === "x" ? 2 : T.res === "1" ? 1 : 0; src.g.pack = 0; src.g.ext = T.res === "x" ? 1 : 0; src.nx.bite = s.t + between(r, 1, 2.5);
+      L({who: src.i, pop: !src.u.dinop, lvl: 2, txt: `🦖 ${H.nm} is een dinosaurus! Hij jaagt nu op prooi.`}); src.u.dinop = 1;
+      return;
+    }
+    case "wave": {
+      const got = resolveAtk(s, T, "De geluidsgolf", (x, m) => { x.spook = Math.max(x.spook, 2 * m); });
+      if (got) L({who: src.i, fly: [src.i, got.i], txt: `🔊 De geluidsgolf raakt ${nm_(s, got.i)}: die schrikt zich rot.`});
+      return;
+    }
+    case "spray": {
+      const got = resolveAtk(s, T, "De vleesspray", (x, m) => { x.mk.spray = 2 * m; });
+      if (got) L({who: src.i, fly: [src.i, got.i], txt: `💧 ${nm_(s, got.i)} wordt ondergespoten: trager.`});
+      return;
+    }
+    case "field": {
+      const f = ({sterk: 0.55, normaal: 0.35, zwak: 0.18})[T.res] * (src.g.relic ? 1.4 : 1);
+      let n = 0;
+      for (const o of s.e) if (o !== src && !o.done && o.mk.iron && Math.abs(o.x - src.x) < 70) {
+        if (R.ent[o.i].gift === "standstill") { o.g.ch = Math.min(5, (o.g.ch || 0) + 1); o.frz = Math.max(o.frz, 0.6); continue; }
+        if (o.x > src.x) o.x -= (o.x - src.x) * f * 0.6; else o.x += (src.x - o.x) * f * 0.5;
+        n++;
+      }
+      for (const o of s.e) if (!o.done && Math.abs(o.x - src.x) < 12) o.mk.pack = 8;
+      src.g.ride = 5;
+      L({who: src.i, pop: true, lvl: 2, pack: 1, txt: `🧲 Magnetisch veld (${T.res})! ${n} paard${n === 1 ? "" : "en"} worden naar ${H.nm} getrokken. De klont rijdt in elkaars slipstream.`});
+      return;
+    }
+    case "flip": {
+      const gain = ({boom: 25, ok: 12, terug: -6})[T.res];
+      src.x += gain;
+      for (const o of s.e) if (o !== src && !o.done && o.mk.iron && Math.abs(o.x - src.x) < 35) { o.x += between(r, -12, 10); o.mk.iron = 0; }
+      L({who: src.i, pop: true, lvl: 3, txt: T.res === "terug" ? `🧲 Ompolen… en het ketst terug! ${H.nm} wordt zelf achteruit geslingerd, de klont vliegt alle kanten op.` : `🧲 OMPOLEN! De klont explodeert. ${H.nm} schiet ${gain} lengtes vooruit${T.res === "boom" ? " (EXPLOSIE)" : ""}.`});
+      return;
+    }
+    case "clone": {
+      const res = T.tgt === T.src ? T.res : null;
+      if (res === null) {
+        const got = resolveAtk(s, T, "De kopie", (x) => { x.frz = Math.max(x.frz, 2); x.g.van = 2; });
+        if (got) { L({who: src.i, pop: true, lvl: 2, fly: [src.i, got.i], txt: `🚪 ${H.nm} duwt de kopie uit een andere wereld tegen ${nm_(s, got.i)}: ze heffen elkaar op. ${nm_(s, got.i)} is 2 seconden van het bord!`}); return; }
+      }
+      const rr = res || T.res;
+      if (rr === "draft") { src.g.dbl = 7; L({who: src.i, txt: `🚪 De kopie wordt een dubbelganger van ${H.nm}: slipstream.`}); }
+      else if (rr === "poof") L({who: src.i, txt: `🚪 De kopie lost op in het niets.`});
+      return;
+    }
+    case "cloud": {
+      if (T.res === "rain") { src.g.cloud = 16; L({who: src.i, pop: true, lvl: 2, txt: `🌧️ De wolk breekt open boven ${H.nm}: regen! 16 seconden lang danst hij.`}); }
+      else L({who: src.i, txt: `☁️ De wolk waait over. ${H.nm} blijft droog.`});
+      return;
+    }
+    case "tie": {
+      const got = resolveAtk(s, T, "De lasso", (x) => {
+        if (x === src) return;
+        src.tie = x.i; src.g.tieT = 10;
+        const xg = R.ent[x.i].gift;
+        if (xg === "parallel" && x.g.dbl > 0 && !src.u.wl) {
+          src.u.wl = 1;
+          if (r() < 0.5) { src.x += 12; logE(s, {k: "tr", id: T.id, who: src.i, pop: true, lvl: 3, sp: 1, sid: "lasso", txt: `✦ ${H.nm}s lasso zit om de dubbelganger van ${nm_(s, x.i)}: hij wordt mee door de wereldgrens gesleurd. +12!`}); }
+          else { src.frz = Math.max(src.frz, 1.6); src.tie = -1; logE(s, {k: "tr", id: T.id, who: src.i, pop: true, lvl: 3, sp: 1, sid: "lasso", txt: `✦ ${H.nm}s lasso zit om een dubbelganger die verdwijnt. Hij hangt even in een andere wereld vast.`}); }
+        } else if ((xg === "primitive" && x.g.hunt > 0) || x.mk.rap > 0) {
+          src.mk.rap = 10; src.x += 8;
+          logE(s, {k: "tr", id: T.id, who: src.i, pop: true, lvl: 3, sp: 1, sid: "dinolasso", txt: `✦ ${H.nm} gooit zijn lasso om een jager! Hij wordt mee naar voren gesleurd (+8)… en is nu zelf een raptor.`});
+        }
+      });
+      if (got && got !== src && src.tie === got.i) L({who: src.i, fly: [src.i, got.i], txt: `🪢 ${H.nm} zit met zijn lasso vast aan ${nm_(s, got.i)}. Wat die overkomt, overkomt hem ook.`});
+      return;
+    }
+  }
+}
+
 function stepSim(s) {
   const r = s.r, D = s.D, R = s.R;
   s.tick++; s.t += DT;
@@ -2386,35 +2654,41 @@ function stepSim(s) {
   if (s.rewind && s.tick % 4 === 0) { s.snaps.push(snapE(s)); if (s.snaps.length > 9) s.snaps.shift(); }
   let lead = 0; s.e.forEach(E => { const x = E.done ? D : E.x; if (x > lead) lead = x; });
   for (const ev of s.ev) if (ev.f < 0 && lead >= ev.at * D) { if (fireEvent(s, ev) === "rw") return; }
+  // telegrafen die nu afgaan
+  if (s.tg.length) { const due = s.tg.filter(T => s.t >= T.t1); if (due.length) { s.tg = s.tg.filter(T => s.t < T.t1); due.forEach(T => resolveTg(s, T)); } }
   const act = s.e.filter(x => !x.done).sort((a, b) => b.x - a.x);
   const ldr = act[0];
   const jonas = s.e.find(E => R.ent[E.i].rid === "jonas"), gio = s.e.find(E => R.ent[E.i].rid === "giorgio");
   const duo = jonas && gio && !jonas.done && !gio.done && Math.abs(jonas.x - gio.x) < 15;
   const ranks = new Map(act.map((E, k) => [E.i, k]));
+  const busy = (E, kind) => s.tg.some(T => T.src === E.i && (!kind || T.kind === kind));
   for (const E of act) {
     const H = R.ent[E.i], g = H.gift, prog = E.x / D, mk = E.mk;
     E.sg = segAt(E.x);
     const SG = SEGS[E.sg], terr = SG.t, wx = s.wxs[E.sg];
     const ph = Math.min(2, Math.floor(prog * 3));
-    if (ph !== E.ph) { E.ph = ph; newPhase(s, E, ph); }
+    if (ph !== E.ph) { E.ph = ph; newPhase(s, E); }
     let fl = 0, c = "";
     for (const k of ["frz", "spook", "slow"]) if (E[k] > 0) E[k] = Math.max(0, E[k] - DT);
-    for (const k of ["nail", "pull", "dino", "spray", "rain", "ts"]) if (mk[k] > 0) mk[k] = Math.max(0, mk[k] - DT);
-    for (const k of ["dbl", "boost", "spiral", "hunt"]) if (E.g[k] > 0) E.g[k] = Math.max(0, E.g[k] - DT);
-    if (mk.nail2 && s.t >= mk.nail2) { mk.nail2 = 0; mk.nail = 1.2; logE(s, {k: "gift", g: "chain", who: E.i, txt: `🔩 Het spijkergat in ${H.nm} reist mee en raakt nog een keer.`}); }
+    for (const k of ["nail", "hole", "steal", "pack", "spray", "rap", "ts"]) if (mk[k] > 0) mk[k] = Math.max(0, mk[k] - DT);
+    for (const k of ["dbl", "spiral", "hunt", "van", "draft", "lucky", "cloud", "tieT", "dgT", "ride"]) if (E.g[k] > 0) E.g[k] = Math.max(0, E.g[k] - DT);
+    if (E.dg >= 0 && !(E.g.dgT > 0)) E.dg = -1;
+    if (E.tie >= 0 && (!(E.g.tieT > 0) || s.e[E.tie].done)) E.tie = -1;
     E.pv = E.x;
-    if (E.frz > 0) { E.fl = (mk.ts > 0 ? F_TS : F_FRZ) | (s.inf && s.inf.tgt === E.i ? F_INFROT : 0); continue; }
+    if (E.g.van > 0) fl |= F_VAN;
+    if (E.frz > 0) { E.fl = fl | (mk.ts > 0 ? F_TS : F_FRZ) | (s.inf && s.inf.tgt === E.i ? F_INFROT : 0) | (mk.rap > 0 ? F_RAP : 0); continue; }
     // inzet: tactiek, en in de laatste 15% een eindsprint die groter is naarmate je meer energie hebt gespaard
     let eff = H.tac === "voor" ? 1.03 : H.tac === "volg" ? 0.98 : (prog < 0.7 ? 0.955 : 1.06);
     if (H.rid === "jonas") eff += prog < 0.2 ? -0.02 : 0;
     const left = E.sta / H.tank;
     if (prog > 0.85) { const kick = 0.025 + 0.13 * clamp(left - 0.08, 0, 0.45); eff += kick; if (kick > 0.06) fl |= F_KICK; }
     if (E.sta < 0.05) eff = Math.min(eff, 0.84);
-    let ahead = null, behind = null;
+    let ahead = null, behind = null, nAhead6 = 0;
     for (const o of act) {
       if (o === E) continue;
       if (o.x > E.x && o.x - E.x < 14 && (!ahead || o.x < ahead.x)) ahead = o;
       if (o.x <= E.x && E.x - o.x < 8 && (!behind || o.x > behind.x)) behind = o;
+      if (o.x > E.x && o.x - E.x < 6) nAhead6++;
     }
     let cost = 1;
     if (ahead) cost *= wx === "wind" ? 0.68 : 0.78;
@@ -2427,33 +2701,34 @@ function stepSim(s) {
     E.n = E.n * 0.99 + gauss(r) * 0.0045 * H.temp * (wx === "mist" ? 1.5 : 1);
     // ---- gaven ----
     if (g === "chain") {
-      const A = actOf(E, D);
-      if (A !== E.g.act) { const early = A === 4 && prog < 0.6; E.g.act = A; if (A > 1) logE(s, {k: "gift", g, who: E.i, pop: true, lvl: A === 4 ? (early ? 3 : 2) : 1, actup: A, sp: early ? 1 : 0, txt: `🔩 ${H.nm} groeit: Act ${A}!${A === 2 ? " Zijn spijkergaten reizen nu mee." : A === 3 ? " Hij kan nu door zijn eigen spijkergat kruipen." : early ? " Nu al?! Oneindige rotatie komt eraan…" : " Oneindige rotatie komt eraan…"}`}); }
-      c = "Act " + A;
-      if (s.t >= E.nx.nail) {
-        E.nx.nail = s.t + between(r, A >= 2 ? 5 : 6, A >= 2 ? 14 : 16);
-        let tgt = null; for (const o of act) if (o.x > E.x && o.x - E.x < 30 && (!tgt || o.x < tgt.x)) tgt = o;
-        if (tgt && R.ent[tgt.i].gift === "parallel" && tgt.g.dbl > 0 && !E.u.spdb) {
+      const want = E.g.relic ? 4 : E.g.hits >= 4 ? (s.spin ? 4 : 3) : E.g.hits >= 2 ? 2 : 1;
+      if (want > E.g.act) {
+        E.g.act = want;
+        logE(s, {k: "gift", g, who: E.i, pop: true, lvl: want === 4 ? 3 : 2, actup: want, txt: `🔩 ${H.nm} groeit: Act ${want}!${want === 2 ? " Zijn spijkergaten jagen hun doelwit nu achterna." : want === 3 ? " Hij kan nu in zijn eigen gat duiken." : " Oneindige rotatie is ontgrendeld."}`});
+      }
+      const A = E.g.act;
+      c = `Act ${A}` + (A < 3 ? ` · ${E.g.hits}/${A === 1 ? 2 : 4} raak` : A === 3 && !s.spin ? " · zoekt de spiraal" : "");
+      if (s.t >= E.nx.nail && !busy(E)) {
+        E.nx.nail = s.t + between(r, 11, 19);
+        let tgt = null; for (const o of act) if (o !== E && o.x > E.x && o.x - E.x < 45 && !(o.g.van > 0) && (!tgt || o.x < tgt.x)) tgt = o;
+        if (tgt && R.ent[tgt.i].gift === "parallel" && tgt.g.dbl > 0 && !E.u.spdb && r() < 0.5) {
           E.u.spdb = 1; tgt.g.dbl = 0;
           logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "spijkerdubbel", txt: `✦ De spijker van ${H.nm} raakt de dubbelganger van ${nm_(s, tgt.i)}: die lost op in het niets. Geen slipstream meer.`});
-          tgt = null;
+        } else if (tgt) tele(s, {src: E.i, tgt: tgt.i, kind: "nail", dur: 2.5, fb: A >= 2, g, ic: "🔩", txt: `🔩 ${H.nm} mikt een draaiende spijker op ${nm_(s, tgt.i)}`, opts: withDef(s, E, tgt, [{k: "hit", nm: "Raak", p: 0.68}, {k: "mis", nm: "Mis", p: 0.32}], true)});
+      }
+      if (A >= 3 && !E.u.worm && !busy(E) && prog > 0.15 && prog < 0.95 && r() < 0.03) {
+        let tgt = null; for (const o of act) if (o !== E && o.x - E.x > 15 && o.x - E.x < 90 && (!tgt || o.x < tgt.x)) tgt = o;
+        if (tgt) {
+          E.u.worm = 1; E.g.van = 2.2;
+          tele(s, {src: E.i, tgt: tgt.i, kind: "worm", dur: 2, fb: 1, g, ic: "🕳️", txt: `🕳️ ${H.nm} duikt in zijn eigen spijkergat en verdwijnt… Duikt hij op achter ${nm_(s, tgt.i)}?`, opts: [{k: "ok", nm: `Duikt op achter ${short_(s, tgt.i)}`, p: 0.72}, {k: "lost", nm: "Verdwaalt in het gat", p: 0.28}]});
         }
-        if (tgt) tgt = magnetRedirect(s, E, tgt, "De spijker");
-        if (tgt && r() < 0.25) { logE(s, {k: "gift", g, who: E.i, txt: `🔩 ${H.nm} schiet… mis.`}); tgt = null; }
-        if (tgt && attack(s, E, tgt, "een spijker")) { const f = fx(s); tgt.mk.nail = 1.2 * f.m; if (A >= 2 && r() < 0.7) tgt.mk.nail2 = s.t + between(r, 2, 5); logE(s, {k: "gift", g, who: E.i, pop: !E.u.nail || f.crit, lvl: f.crit ? 2 : 1, txt: `🔩 ${H.nm} schiet een draaiende spijker in ${nm_(s, tgt.i)}${f.tag}.`}); E.u.nail = 1; }
       }
-      if (A >= 3 && !E.u.worm && ldr && ldr !== E && ldr.x - E.x > 10 && ldr.x - E.x < 90 && r() < 0.012) {
-        E.u.worm = 1; const jump = between(r, 8, 45), to = Math.min(E.x + jump, ldr.x - 3); E.x = Math.max(E.x, to); fl |= F_SPRINT;
-        logE(s, {k: "gift", g, who: E.i, pop: true, lvl: jump > 35 ? 2 : 1, txt: `🕳️ Act 3: ${H.nm} kruipt door zijn spijkergat${jump > 35 ? " (een enorme)" : jump < 15 ? " (een kleintje)" : ""} en duikt op ${Math.round(jump)} lengtes verder.`});
-      }
-      if (A >= 4 && !E.u.inf && ldr && ldr !== E && !s.inf && r() < 0.01) {
-        E.u.inf = 1; s.inf = {tgt: ldr.i, src: E.i, f: 0.99, dec: between(r, 0.0015, 0.006), floor: between(r, 0.88, 0.96)};
-        const lg = R.ent[ldr.i].gift;
-        let extra = "";
-        if (lg === "parallel" && loveOn(s, ldr)) extra = " ✦ Love Train probeert het naar een andere wereld te sturen… maar rotatie is geen pech. Het blijft.";
-        else if (lg === "standstill") { extra = ` ✦ Standstill blokkeert… en breekt. Al zijn opgeslagen klappen (${ldr.g.ch || 0}) zijn weg.`; ldr.g.ch = 0; }
-        else if (lg === "timeafter") extra = " ✦ Time After Time spoelt terug… maar de rotatie zit er nog steeds.";
-        logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: extra ? 1 : 0, sid: extra ? "rotatie" : "", spiral: 1, txt: `♾️ Act 4: Oneindige rotatie op ${nm_(s, ldr.i)}! Die wordt steeds trager tot Jonas hem inhaalt.${extra}`});
+      if (A >= 4 && (E.g.infd || 0) < (E.g.relic ? 2 : 1) && ldr && ldr !== E && !s.inf && prog > 0.35 && !busy(E) && r() < 0.025) {
+        E.g.infd = (E.g.infd || 0) + 1;
+        const base = [{k: "lock", nm: `Grijpt ${short_(s, ldr.i)}`, p: 0.82}, {k: "mis", nm: "Valt te kort", p: 0.18}];
+        const het = s.e.find(o => R.ent[o.i].gift === "undermyskin" && o.dg >= 0 && !o.done);
+        const opts = het && het !== E && (het === ldr || het.dg === ldr.i) ? [{k: "wrong", nm: "Grijpt de verkeerde (vermomd)", p: 0.35}, ...base.map(b => ({...b, p: b.p * 0.65}))] : base;
+        tele(s, {src: E.i, tgt: ldr.i, kind: "inf", dur: 3, fb: 1, g, ic: "♾️", txt: `♾️ ${H.nm} laadt Act 4 op en mikt op koploper ${nm_(s, ldr.i)}…`, opts});
       }
     } else if (E.g.au) {
       c = "⏸ " + (3 - (E.u.zw || 0)) + "× tijd";
@@ -2462,174 +2737,213 @@ function stepSim(s) {
         const zt = between(r, 1, 3.5);
         for (const o of act) if (o !== E) {
           o.frz = Math.max(o.frz, zt); o.mk.ts = zt;
-          if (R.ent[o.i].gift === "standstill" && !o.u.stiltijd) { o.u.stiltijd = 1; o.g.ch = Math.min(o.g.relic ? 8 : 5, (o.g.ch || 0) + 2); logE(s, {k: "gift", g: "standstill", who: o.i, pop: true, lvl: 3, sp: 1, sid: "stiltijd", txt: `✦ ${nm_(s, o.i)} stond toch al stil. Hij slaat de stilstaande tijd op als 2 extra klappen (${o.g.ch}/5).`}); }
+          if (R.ent[o.i].gift === "standstill" && !o.u.stiltijd) { o.u.stiltijd = 1; o.g.ch = Math.min(o.g.relic ? 8 : 5, (o.g.ch || 0) + 2); logE(s, {k: "gift", g: "standstill", who: o.i, pop: true, lvl: 3, sp: 1, sid: "stiltijd", txt: `✦ ${nm_(s, o.i)} stond toch al stil. Hij slaat de stilstaande tijd op als 2 extra klappen (${o.g.ch}).`}); }
         }
         logE(s, {k: "gift", g: "timestands", who: E.i, pop: true, lvl: 3, zw: 1, txt: `⏸ ${H.nm}: de tijd staat stil! ${zt.toFixed(1).replace(".", ",")} seconden lang bevriest iedereen. Alleen hij rijdt.`});
       }
     } else if (g === "primitive") {
       if (E.g.hunt > 0) {
-        fl |= F_DINO; v *= GOODT.includes(terr) ? 1.03 : 1.012; c = "🦖 jaagt";
-        for (const o of act) if (o !== E && o.frz <= 0 && Math.abs(o.x - E.x) < 30 && o.eff > 1.0 && r() < (E.g.hp || 0.022) && grab(s, E, o, false)) {
-          logE(s, {k: "gift", g, who: E.i, pop: !E.u.bite, txt: `🦖 ${H.nm} grijpt ${nm_(s, o.i)} (die sprintte). Die is nu besmet en jaagt zelf ook!`}); E.u.bite = 1;
-        }
-      } else {
-        E.g.dm += DT * (ahead ? 0.05 : GOODT.includes(terr) ? 0.035 : 0.02) * (E.g.relic ? 2 : 1) * Math.max(0, 1 + gauss(r) * 1.2);
-        c = "🦖 " + Math.min(99, Math.round(E.g.dm * 100)) + "%";
-        if (E.g.dm >= 1) { const f = fx(s); E.g.dm = 0; E.g.hunt = Math.max(2, 6 * f.m); E.g.hp = 0.022 * (0.5 + f.m * 0.5); logE(s, {k: "gift", g, who: E.i, pop: !E.u.dino || f.crit, lvl: f.crit ? 2 : 1, txt: `🦖 ${H.nm}: oermeter vol! ${Math.round(E.g.hunt)} seconden jager${f.tag}.`}); E.u.dino = 1; }
-      }
-    } else if (g === "raindance") {
-      const rain = wx === "regen", half = wx === "mist" || (!rain && !!E.g.relic);
-      if (rain || half) {
-        v *= rain ? 1.07 : 1.03;
-        if (s.t >= E.nx.hop) {
-          const f = fx(s); E.nx.hop = s.t + between(r, rain ? 6 : 10, rain ? 15 : 22); const jump = (rain ? 8 : 6) * f.m; E.x += jump; fl |= F_SPRINT;
-          let cut = 0;
-          if (rain) for (const o of act) if (o !== E && E.x - o.x > 0 && E.x - o.x < 18) {
-            if (R.ent[o.i].gift === "primitive" && o.g.hunt > 0 && !E.u.rj) {
-              E.u.rj = 1; o.g.hunt = 0; o.mk.rain = 2.5;
-              logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "regenjager", txt: `✦ De regendruppels van ${H.nm} snijden dwars door de jager: ${nm_(s, o.i)} is zijn oerinstinct kwijt en glijdt weg.`});
-              cut++; continue;
+        fl |= F_DINO; v *= GOODT.includes(terr) ? 1.04 : 1.02; c = "🦖 jaagt";
+        if (E.g.bites > 0 && s.t >= E.nx.bite) {
+          let vic = null, dd = 1e9;
+          for (const o of act) if (o !== E && !(o.mk.rap > 0) && R.ent[o.i].gift !== "standstill") { const d = Math.abs(o.x - E.x) - (o.eff > 1 ? 15 : 0); if (d < dd && Math.abs(o.x - E.x) < 150) { dd = d; vic = o; } }
+          E.nx.bite = s.t + between(r, 1.5, 3);
+          if (vic) {
+            E.g.bites--; E.g.pack++;
+            vic.mk.rap = 12; vic.frz = Math.max(vic.frz, 0.6); vic.ht++;
+            logE(s, {k: "gift", g, who: E.i, fly: [E.i, vic.i], pop: !E.u.bitep, lvl: 1, txt: `🦖 ${H.nm} bijt ${nm_(s, vic.i)}: die is nu een raptor in zijn roedel (${E.g.pack + 1}).`}); E.u.bitep = 1;
+            const VH = R.ent[vic.i];
+            if (VH.gift === "undermyskin" && vic.g.ch > 0 && !vic.g.cured && r() < 0.5) { vic.g.cured = 1; vic.g.ch--; vic.mk.rap = 0; logE(s, {k: "gift", g: "undermyskin", who: vic.i, pop: true, lvl: 3, sp: 1, sid: "genezen", txt: `✦ ${VH.nm} is gebeten… en spuit er vers vlees overheen. Weer gewoon een paard.`}); }
+            if (E.g.ext && E.g.pack >= 2) {
+              E.g.ext = 0; let n = 0;
+              for (const o of act) if (o !== E && !(o.mk.rap > 0) && Math.abs(o.x - E.x) < 45) { o.frz = Math.max(o.frz, 1.6); n++; }
+              logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, ext: 1, txt: `🦖🦖🦖 UITSTERVING! De roedel van ${H.nm} is compleet. ${n} paard${n === 1 ? "" : "en"} in de buurt bevriezen van angst.`});
             }
-            if (attack(s, E, o, "de regendruppels")) { o.mk.rain = 1.5; cut++; }
           }
-          logE(s, {k: "gift", g, who: E.i, pop: !E.u.hop || f.crit, lvl: f.crit ? 2 : 1, txt: `🌧️ ${H.nm} springt ${Math.round(jump)} lengtes over de regendruppels${cut ? ` en ${cut} paard${cut > 1 ? "en" : ""} achter hem worden gesneden` : ""}${f.tag}.`}); E.u.hop = 1;
         }
-      } else v *= 0.99;
+        if (E.g.bites <= 0 && E.g.hunt > 2) E.g.hunt = 2;
+      } else if (!busy(E)) {
+        E.g.dm += DT * (ahead ? 0.022 : GOODT.includes(terr) ? 0.016 : 0.009) * (E.g.relic ? 2 : 1) * Math.max(0, 1 + gauss(r) * 1.2);
+        c = "🦖 " + Math.min(99, Math.round(E.g.dm * 100)) + "%";
+        if (E.g.dm >= 1) {
+          E.g.dm = 0;
+          tele(s, {src: E.i, tgt: E.i, kind: "dino", dur: 2, fb: 1, g, ic: "🦖", txt: `🦖 De oermeter van ${H.nm} is vol: hij verandert in een dinosaurus… Hoeveel prooi pakt hij?`,
+            opts: [{k: "x", nm: "Roedel van 3: UITSTERVING", p: 0.2}, {k: "1", nm: "Eén prooi", p: 0.45}, {k: "0", nm: "Niemand", p: 0.35}]});
+        }
+      } else c = "🦖 verandert…";
+    } else if (g === "raindance") {
+      const rain = wx === "regen" || E.g.cloud > 0 || !!E.g.relic, half = !rain && wx === "mist";
+      if (rain) {
+        v *= 1.045; fl |= F_RAIN; c = "🌧️ danst";
+        if (s.t >= E.nx.wall) {
+          const f = fx(s); E.nx.wall = s.t + between(r, 8, 14);
+          const jump = 3 * f.m; E.x += jump; fl |= F_SPRINT;
+          addHaz(s, "muur", E.x - jump - 2, 10, E.i);
+          logE(s, {k: "gift", g, who: E.i, pop: !E.u.wallp, txt: `🌧️ ${H.nm} springt ${Math.round(jump)} lengtes over de druppels en laat een muur van bevroren regen achter.${f.tag}`}); E.u.wallp = 1;
+        }
+      } else if (half) { v *= 1.03; c = "🌫️"; }
+      else {
+        v *= 0.99; c = "☀️ wacht op regen";
+        if (s.t >= E.nx.cloud && !busy(E)) {
+          E.nx.cloud = s.t + between(r, 35, 55);
+          tele(s, {src: E.i, tgt: E.i, kind: "cloud", dur: 3, fb: 1, g, ic: "☁️", txt: `☁️ Er drijft een regenwolk naar ${H.nm}… Breekt hij open?`, opts: [{k: "rain", nm: "Regen!", p: 0.45}, {k: "weg", nm: "Waait over", p: 0.55}]});
+        }
+      }
     } else if (g === "magnetic") {
-      const aw = E.g.relic ? 2 : 1, str = (terr === "zand" ? 1.6 : terr === "stad" ? 1.3 : 1.1) * aw, near = (terr === "zand" ? 12 : 8) * aw;
-      for (const o of act) if (o !== E && Math.abs(o.x - E.x) < near && (o.mk.ironT || 0) < s.t && (o.mk.iron || 0) < 3) {
-        o.mk.ironT = s.t + 4;
-        if (attack(s, E, o, "het ijzer")) o.mk.iron = (o.mk.iron || 0) + 1;
-      }
-      if (s.t >= E.nx.pulse) {
-        E.nx.pulse = s.t + between(r, 6, 15);
-        const f = fx(s);
-        let back = 0, fwd = 0;
-        for (const o of act) if (o !== E && o.mk.iron && Math.abs(o.x - E.x) < 60) {
-          if (o.x > E.x) { if (attack(s, E, o, "de magneetpuls")) { o.mk.pull = 2; o.mk.pullF = Math.max(0.75, 1 - 0.035 * o.mk.iron * str * f.m); back++; } }
-          else { o.mk.pull = 2; o.mk.pullF = 1 + 0.015 * o.mk.iron * str * f.m; fwd++; }
-        }
-        if (back) E.g.boost = 3;
-        if (back + fwd) { logE(s, {k: "gift", g, who: E.i, pop: !E.u.pulse || f.crit, lvl: f.crit ? 2 : 1, txt: `🧲 ${H.nm}: magneetpuls! ${back} paard${back === 1 ? "" : "en"} vóór hem teruggetrokken, ${fwd} achter hem naar hem toe${f.tag}.`}); E.u.pulse = 1; }
-      }
-      if (E.g.boost > 0) { v *= 1.065; fl |= F_MAG; }
+      const aw = E.g.relic ? 2 : 1, near = (terr === "zand" ? 12 : 8) * aw;
+      for (const o of act) if (o !== E && Math.abs(o.x - E.x) < near && (o.mk.ironT || 0) < s.t && (o.mk.iron || 0) < 3 && R.ent[o.i].gift !== "standstill") { o.mk.ironT = s.t + 4; o.mk.iron = (o.mk.iron || 0) + 1; }
+      const iron = act.filter(o => o !== E && o.mk.iron && Math.abs(o.x - E.x) < 70);
       c = "🧲 " + act.filter(o => o.mk.iron).length + " met ijzer";
+      if (E.g.ride > 0) { v *= 1.06; fl |= F_SPRINT; }
+      if (s.t >= E.nx.field && !busy(E)) {
+        if (iron.length >= 2) {
+          E.nx.field = s.t + between(r, 28, 42);
+          tele(s, {src: E.i, tgt: E.i, kind: "field", dur: 3, fb: 0, g, ic: "🧲", txt: `🧲 ${H.nm} laadt een magnetisch veld op… ${iron.length} paarden hebben ijzer.`, opts: [{k: "sterk", nm: "Sterk veld", p: 0.3}, {k: "normaal", nm: "Normaal", p: 0.5}, {k: "zwak", nm: "Zwak", p: 0.2}]});
+        } else E.nx.field = s.t + 3;
+      }
+      if (!E.u.flip && prog > 0.78 && prog < 0.96 && !busy(E) && act.filter(o => o !== E && o.mk.iron && Math.abs(o.x - E.x) < 30).length >= 2 && r() < 0.03) {
+        E.u.flip = 1;
+        tele(s, {src: E.i, tgt: E.i, kind: "flip", dur: 3, fb: 1, g, ic: "🧲", txt: `🧲 ${H.nm} gaat de klont ompolen… Hoe hard knalt het?`, opts: [{k: "boom", nm: "Explosie: +25", p: 0.25}, {k: "ok", nm: "Normaal: +12", p: 0.5}, {k: "terug", nm: "Ketst terug: −6", p: 0.25}]});
+      }
     } else if (g === "standstill") {
-      c = "🛡️ " + (E.g.ch || 0) + "/5";
-      if (prog > 0.85 && E.g.ch) { if (!E.u.relD) { E.u.relD = 1; const f = fx(s); E.g.relM = f.m; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: f.crit ? 2 : 1, txt: `🛡️ ${H.nm} laat ${E.g.ch} opgeslagen klappen los: sprint!${f.tag}`}); } v *= 1 + (E.g.relic ? 0.018 : 0.014) * E.g.ch * (E.g.relM || 1); fl |= F_REL; }
+      c = "🛡️ " + (E.g.ch || 0) + "/5" + ((E.g.ch || 0) >= (E.g.relic ? 2 : 3) ? " · kaatst terug" : "");
+      if (prog > 0.85 && E.g.ch) { if (!E.u.relD) { E.u.relD = 1; const f = fx(s); E.g.relM = f.m; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: f.crit ? 2 : 1, txt: `🛡️ ${H.nm} laat ${E.g.ch} opgeslagen klappen los: sprint!${f.tag}`}); } v *= 1 + (E.g.relic ? 0.014 : 0.009) * E.g.ch * (E.g.relM || 1); fl |= F_REL; }
     } else if (g === "goodvibes") {
-      v *= 1.012; c = "🍀 reeks " + (E.g.ls || 0);
-      if (s.t >= E.nx.luck || r() < 0.0015) { E.nx.luck = 1e9; const gain = Math.round(between(r, 5, 28)); E.x += gain; logE(s, {k: "gift", g, who: E.i, pop: gain > 22, lvl: 2, txt: `🍀 ${H.nm} vindt een hoefijzer. Weer geluk. (+${gain})`}); }
-      if (s.t >= E.nx.cheer) { E.nx.cheer = s.t + 25 + r() * 30; logE(s, {k: "gift", g, who: E.i, pop: !E.u.chr, txt: `📣 Good Vibrations: "${["Je kan het!", "Daar ligt geluk, links!", "Gewoon doorgaan!", "Wat een tempo!"][Math.floor(r() * 4)]}"`}); E.u.chr = 1; }
+      v *= 1.01;
+      if (E.g.lucky > 0) { v *= 1.06; fl |= F_LUCK; c = "🍀 GELUKSGOLF"; } else c = s.proph ? (s.proph.done ? "📣 profetie ✓" : s.proph.told ? "📣 profetie ✗" : "📣 profetie…") : "📣";
+      if (s.t >= E.nx.luck) { E.nx.luck = 1e9; const gain = Math.round(between(r, 5, 28)); E.x += gain; logE(s, {k: "gift", g, who: E.i, pop: gain > 22, lvl: 2, txt: `🍀 ${H.nm} vindt een hoefijzer. Weer geluk. (+${gain})`}); }
     } else if (g === "oldbefore") {
-      if (s.t >= E.nx.ball) {
-        E.nx.ball = s.t + between(r, 6, 15);
-        let tgt = null, dd = 35; for (const o of act) if (o !== E && R.ent[o.i].rid !== "jonas" && Math.abs(o.x - E.x) < dd && (o.mk.age || 0) < 3) { dd = Math.abs(o.x - E.x); tgt = o; }
-        if (tgt) tgt = magnetRedirect(s, E, tgt, "De stalen bal");
-        if (tgt && r() < 0.25) { logE(s, {k: "gift", g, who: E.i, txt: `⏳ De stalen bal van ${H.nm} rolt net langs ${nm_(s, tgt.i)}.`}); tgt = null; }
-        if (tgt && attack(s, E, tgt, "een stalen bal")) {
-          const f = fx(s);
-          tgt.mk.age = Math.min(3, (tgt.mk.age || 0) + (E.g.relic ? 2 : 1) + (f.crit ? 1 : 0));
-          if (tgt.mk.age === 3) { tgt.mk.old = 1; logE(s, {k: "gift", g, who: E.i, pop: true, txt: `⏳ Derde stalen bal: ${nm_(s, tgt.i)} is verouderd en de rest van de race trager.`}); }
-          else logE(s, {k: "gift", g, who: E.i, pop: !E.u.ball, txt: `⏳ ${H.nm} gooit een stalen bal: ${nm_(s, tgt.i)} wordt ouder (${tgt.mk.age}/3) en raakt sneller moe.`});
-          E.u.ball = 1;
-        }
+      if (s.t >= E.nx.ball && !busy(E, "ball")) {
+        E.nx.ball = s.t + between(r, 12, 20);
+        let tgt = null, dd = 35; for (const o of act) if (o !== E && R.ent[o.i].rid !== "jonas" && Math.abs(o.x - E.x) < dd && !o.mk.old) { dd = Math.abs(o.x - E.x); tgt = o; }
+        if (tgt) tele(s, {src: E.i, tgt: tgt.i, kind: "ball", dur: 2, fb: 0, g, ic: "⏳", txt: `⏳ ${H.nm} mikt een stalen bal op ${nm_(s, tgt.i)}`, opts: withDef(s, E, tgt, [{k: "hit", nm: "Raak", p: 0.72}, {k: "mis", nm: "Mis", p: 0.28}], true)});
       }
-      const gap = ldr ? ldr.x - E.x : 0;
-      if (!E.u.sp && prog > 0.3 && ldr !== E && gap >= 5 && gap <= 21 && E.sta > 0.2 && r() < 0.05) { E.u.sp = 1; E.g.spiral = between(r, 2.5, 6.5); logE(s, {k: "gift", g, who: E.i, pop: true, spiral: 1, txt: `🌀 ${H.nm} staat precies ${Math.round(gap)} lengtes achter de kop: gouden spiraal!`}); }
-      if (duo && !E.u.dgTry && prog > 0.6 && E.sta > 0.25 && jonas.sta > 0.25) {
-        E.u.dgTry = 1;
-        if (r() < 0.3) {
-          E.g.spiral = 5; jonas.g.spiral = 5;
-          logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "gouden", spiral: 1, txt: `✦ Gouden rotatie, samen! ${H.nm} en ${nm_(s, jonas.i)} draaien precies tegelijk: allebei 5 seconden een perfecte sprint.`});
-        }
+      let bh = null; for (const o of act) if (o !== E && o.x < E.x && (!bh || o.x > bh.x)) bh = o;
+      const a = ldr && ldr !== E ? ldr.x - E.x : 0, b = bh ? E.x - bh.x : 0;
+      const phi = a > 0 && b > 0.5 ? a / b : 0;
+      c = phi ? "φ " + phi.toFixed(2).replace(".", ",") : "φ –";
+      if (!E.u.sp && phi && Math.abs(phi - 1.618) < 0.13 && a >= 5 && a <= 60 && E.sta > 0.12 && !(E.g.spiral > 0) && !busy(E, "spiral")) {
+        E.u.sp = 1;
+        tele(s, {src: E.i, tgt: E.i, kind: "spiral", dur: 2, fb: 1, g, ic: "🌀", txt: `🌀 ${H.nm} staat precies in de gulden snede (φ ${phi.toFixed(2).replace(".", ",")}): gouden spiraal…`, opts: [{k: "perfect", nm: "Perfect", p: 0.55}, {k: "bijna", nm: "Bijna", p: 0.45}]});
       }
-      if (E.g.spiral > 0) { v *= 1.1; cost *= 0.6; fl |= F_SPRINT; }
+      if (E.g.spiral > 0) { v *= 1.11; cost *= 0.6; fl |= F_SPRINT; }
     } else if (g === "undermyskin") {
-      c = "💧 " + (E.g.ch || 0);
-      if (mk.dino > 0 && E.g.ch > 0 && !E.u.cure && r() < 0.15) {
-        E.u.cure = 1; E.g.ch--; mk.dino = 0;
-        logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "genezen", txt: `✦ ${H.nm} is besmet door de jager… en spuit er vers vlees overheen. Besmetting weg.`});
+      c = "💧 " + (E.g.ch || 0) + (E.dg >= 0 ? " · vermomd" : "");
+      if (s.t >= E.nx.dg && E.dg < 0) {
+        const cand = act.filter(o => o !== E);
+        E.nx.dg = s.t + between(r, 22, 36);
+        if (cand.length) { const y = cand[Math.floor(r() * cand.length)]; E.dg = y.i; E.g.dgT = 12; logE(s, {k: "gift", g, who: E.i, pop: !E.u.dgp, lvl: 1, dg: y.i, txt: `💧 ${H.nm} spuit vlees over zichzelf en vermomt zich als ${nm_(s, y.i)}. Op het bord zie je nu twee keer ${short_(s, y.i)}.`}); E.u.dgp = 1; }
       }
       if (mk.age >= 2 && !mk.old && E.g.ch > 0 && !E.u.deTry) {
         E.u.deTry = 1;
         if (r() < 0.6) { E.g.ch--; const n = mk.age; mk.age = 0; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "vlees", txt: `✦ ${H.nm} spuit vers vlees over haar verouderde huid: ${n} stalen-bal-veroudering weg!`}); }
       }
-      if (!E.u.heal && left < 0.15 && prog < 0.95 && E.g.ch > 0) { E.u.heal = 1; E.g.ch--; E.sta += 0.12 * fx(s).m; logE(s, {k: "gift", g, who: E.i, pop: true, txt: `💧 ${H.nm} spuit zichzelf vol energie (nog ${E.g.ch}).`}); }
-      if (prog > 0.3 && E.g.ch >= 2 && s.t >= (E.nx.spray || 0)) {
-        let tgt = null; for (const o of act) if (o.x > E.x && o.x - E.x < 10 && (!tgt || o.x < tgt.x)) tgt = o;
-        if (tgt) { E.nx.spray = s.t + between(r, 6, 16); E.g.ch--; const f = fx(s); if (attack(s, E, tgt, "de vleesspray")) { tgt.mk.spray = 2 * f.m; logE(s, {k: "gift", g, who: E.i, pop: !E.u.spr || f.crit, lvl: f.crit ? 2 : 1, txt: `💧 ${H.nm} spuit ${nm_(s, tgt.i)} onder: ${(2 * f.m).toFixed(1).replace(".", ",")} seconden trager${f.tag}.`}); E.u.spr = 1; } }
+      if (!E.u.heal && left < 0.15 && prog < 0.95 && E.g.ch > 0) { E.u.heal = 1; E.g.ch--; E.sta += 0.12 * fx(s).m; logE(s, {k: "gift", g, who: E.i, txt: `💧 ${H.nm} spuit zichzelf vol energie (nog ${E.g.ch}).`}); }
+      if (prog > 0.25 && E.g.ch >= 2 && s.t >= E.nx.spray && ahead && ahead.x - E.x < 9 && !busy(E)) {
+        E.nx.spray = s.t + between(r, 12, 20); E.g.ch--;
+        tele(s, {src: E.i, tgt: ahead.i, kind: "spray", dur: 1.5, fb: 0, g, ic: "💧", txt: `💧 ${H.nm} richt haar vleesspray op ${nm_(s, ahead.i)}`, opts: withDef(s, E, ahead, [{k: "hit", nm: "Raak", p: 0.8}, {k: "mis", nm: "Mis", p: 0.2}], false)});
       }
     } else if (g === "silence") {
-      if (s.t >= E.nx.trap) { E.nx.trap = s.t + between(r, E.g.relic ? 5 : 8, E.g.relic ? 13 : 21); s.traps.push({x: E.x, t: s.t, o: E.i, hit: [], m: fx(s).m}); logE(s, {k: "gift", g, who: E.i, pop: !E.u.trap, txt: `🔊 ${H.nm} legt het woord „BOOM” op de grond. Wie erover rijdt, schrikt.`}); E.u.trap = 1; }
-      if (!E.u.snd && prog > 0.1 && r() < 0.01 && ldr && ldr !== E && attack(s, E, ldr, "de geluidsgolf")) { const f = fx(s); E.u.snd = 1; ldr.spook = 2.5 * f.m; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: f.crit ? 2 : 1, txt: `🔊 ${H.nm} laat een geluidsgolf los. ${nm_(s, ldr.i)} schrikt!${f.tag}`}); }
+      c = "🔊";
+      if (s.t >= E.nx.word) {
+        E.nx.word = s.t + (E.g.relic ? between(r, 5, 9) : between(r, 9, 16));
+        const w = pickW(r, WORDW);
+        addHaz(s, w, w === "WHOOSH" ? E.x + 12 : E.x - 1.5, 14, E.i);
+        if (!E.u["wp" + w]) { E.u["wp" + w] = 1; logE(s, {k: "gift", g, who: E.i, pop: !E.u.wordp, txt: `🔊 ${H.nm} schrijft „${w}” op de baan${w === "WHOOSH" ? ", vlak voor zichzelf" : ""}. ${w === "BOOM" ? "Wie erover rijdt, schrikt." : w === "ZZZ" ? "Wie erover rijdt, wordt moe." : "Wie erop komt, wordt gelanceerd."}`}); E.u.wordp = 1; }
+      }
+      if (!E.u.wave && prog > 0.1 && prog < 0.95 && r() < 0.008 && ldr && ldr !== E && !busy(E)) {
+        E.u.wave = 1;
+        tele(s, {src: E.i, tgt: ldr.i, kind: "wave", dur: 2.5, fb: 1, g, ic: "🔊", txt: `🔊 ${H.nm} zuigt alle geluid op… geluidsgolf op koploper ${nm_(s, ldr.i)}`, opts: withDef(s, E, ldr, [{k: "hit", nm: "Raak", p: 0.75}, {k: "mis", nm: "Mis", p: 0.25}], false)});
+      }
     } else if (g === "leanon") {
+      c = "🪢";
       if (ahead && ahead.x - E.x < 20) { cost *= 0.72; v *= 1.025; fl |= F_ROPE; }
-      if (ahead && ahead.x - E.x < 20 && R.ent[ahead.i].gift === "parallel" && ahead.g.dbl > 0 && !E.u.wl) {
-        E.u.wl = 1;
-        if (r() < 0.4) {
-          if (r() < 0.5) { E.x += 12; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "lasso", txt: `✦ ${H.nm} gooit zijn lasso om de dubbelganger van ${nm_(s, ahead.i)} en wordt mee door de wereldgrens gesleurd: +12!`}); }
-          else { E.frz = Math.max(E.frz, 1.6); logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "lasso", txt: `✦ ${H.nm}s lasso zit om een dubbelganger die verdwijnt. Hij hangt even in een andere wereld vast.`}); }
-        }
+      if (E.tie >= 0) {
+        const T = s.e[E.tie];
+        fl |= F_TIE; c = "🪢 → " + short_(s, T.i);
+        if (E.x < T.x - 3) E.x += Math.min(1.2, (T.x - 3 - E.x) * 0.08);
+        if (T.frz > 0 || T.spook > 0 || T.mk.nail > 0 || T.mk.spray > 0) v *= 0.85;
+        if (T.mk.pack > 0 || T.g.spiral > 0 || T.g.lucky > 0) v *= 1.05;
+      } else if (!E.u.tie && prog > 0.1 && prog < 0.95 && !busy(E) && r() < 0.02) {
+        let tgt = null; for (const o of act) if (o !== E && o.x > E.x && o.x - E.x < 20 && (!tgt || o.x < tgt.x)) tgt = o;
+        if (tgt) { E.u.tie = 1; tele(s, {src: E.i, tgt: tgt.i, kind: "tie", dur: 1.5, fb: 0, g, ic: "🪢", txt: `🪢 ${H.nm} gooit zijn lasso naar ${nm_(s, tgt.i)}`, opts: withDef(s, E, tgt, [{k: "hit", nm: "Zit vast", p: 0.75}, {k: "mis", nm: "Mis gegooid", p: 0.25}], false)}); }
       }
-      if (ahead && ahead.x - E.x < 20 && !E.u.dl && ((R.ent[ahead.i].gift === "primitive" && ahead.g.hunt > 0) || ahead.mk.dino > 0)) {
-        E.u.dl = 1;
-        if (r() < 0.5) { E.x += 8; mk.dino = 4; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, sp: 1, sid: "dinolasso", txt: `✦ ${H.nm} gooit zijn lasso om een jager! Hij wordt mee naar voren gesleurd (+8)… en is nu zelf besmet.`}); }
-      }
-      if (!E.u.pull && prog > 0.2 && ahead && ahead.x - E.x < 12 && r() < 0.04) { const f = fx(s); E.u.pull = 1; E.x += 6 * f.m; logE(s, {k: "gift", g, who: E.i, pop: !E.u.pullpop || f.crit, lvl: f.crit ? 2 : 1, txt: `🪢 ${H.nm} trekt zich langs zijn lasso ${Math.round(6 * f.m)} lengtes naar voren${f.tag}.`}); E.u.pullpop = 1; }
+      if (!E.u.pull && nAhead6 >= 2 && r() < 0.03) { E.u.pull = 1; E.x += 8; fl |= F_SPRINT; logE(s, {k: "gift", g, who: E.i, pop: !E.u.pullp, txt: `🪢 ${H.nm} splitst zich langs zijn touw dwars door de groep heen (+8).`}); E.u.pullp = 1; }
     } else if (g === "parallel") {
-      if (loveOn(s, E)) { fl |= F_LOVE; if (!E.u.lovein) { E.u.lovein = 1; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 2, love: 1, txt: `💘 ${H.nm} gaat het laatste derde in: Love Train is actief. Pech die hem treft, gaat naar iemand anders.`}); } }
-      if (ahead && behind && ahead.x - E.x < 8 && s.t >= (E.nx.par || 0) && prog < 0.95) {
-        E.nx.par = s.t + between(r, 15, 35); E.g.dbl = between(r, 3, 9);
-        let fresh = "";
-        if (!E.u.fresh && E.sta < 0.5 * H.tank && r() < 0.7) { E.u.fresh = 1; E.sta = Math.max(E.sta, between(r, 0.4, 0.75) * H.tank); fresh = " en ruilt met een uitgeruste versie van zichzelf"; }
-        logE(s, {k: "gift", g, who: E.i, pop: !E.u.parpop || !!fresh, txt: `🚪 ${H.nm} zit ingeklemd, stapt een andere wereld in, haalt een dubbelganger${fresh}.`}); E.u.parpop = 1;
-      } else if (!E.u.fresh && E.sta < 0.25 * H.tank && prog < 0.9) {
-        E.u.fresh = 1; E.sta = Math.max(E.sta, 0.5 * H.tank); logE(s, {k: "gift", g, who: E.i, pop: true, txt: `🚪 ${H.nm} is op en ruilt met een uitgeruste versie uit een andere wereld.`});
+      c = "🚪";
+      if (loveOn(s, E)) { fl |= F_LOVE; c = "💘"; if (!E.u.lovein) { E.u.lovein = 1; logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 2, love: 1, txt: `💘 ${H.nm} gaat het laatste derde in: Love Train is actief. Aanvallen en pech die hem raken, gaan naar iemand anders.`}); } }
+      if (s.t >= E.nx.clone && prog < 0.95 && !busy(E)) {
+        E.nx.clone = s.t + between(r, 30, 46);
+        let tgt = null, dd = 25; for (const o of act) if (o !== E && Math.abs(o.x - E.x) < dd) { dd = Math.abs(o.x - E.x); tgt = o; }
+        if (tgt) tele(s, {src: E.i, tgt: tgt.i, kind: "clone", dur: 2, fb: 1, g, ic: "🚪", txt: `🚪 ${H.nm} opent een deur en haalt een kopie van ${nm_(s, tgt.i)} uit een andere wereld…`, opts: withDef(s, E, tgt, [{k: "hit", nm: `Opgeheven: ${short_(s, tgt.i)} 2s weg`, p: 0.45}, {k: "draft", nm: "Wordt zijn dubbelganger", p: 0.35}, {k: "poof", nm: "Lost op", p: 0.2}], false)});
+        else tele(s, {src: E.i, tgt: E.i, kind: "clone", dur: 2, fb: 0, g, ic: "🚪", txt: `🚪 ${H.nm} haalt een kopie van zichzelf uit een andere wereld…`, opts: [{k: "draft", nm: "Dubbelganger", p: 0.65}, {k: "poof", nm: "Lost op", p: 0.35}]});
       }
       if (E.g.dbl > 0) { cost *= 0.7; v *= 1.02; fl |= F_DBL; }
+    } else if (g === "timeafter") {
+      E.g.w = Math.min(1, (E.g.w || 0) + DT / (E.g.relic ? 14 : 28));
+      c = E.g.w >= 1 ? "⌚ opgeladen" : "⌚ " + Math.round(E.g.w * 100) + "%";
     }
-    if (g === "timeafter") c = (2 - (E.u.rw || 0)) + "× terug";
     if (duo && (E === jonas || E === gio)) { v *= 1.012; fl |= F_DUO; }
     if (E.g.relic) v *= 1.015;
-    if (g === "chain" && E.g.spiral > 0) { v *= 1.1; cost *= 0.6; fl |= F_SPRINT; }
+    if (E.g.draft > 0) { cost *= 0.6; v *= 1.03; }
     // ---- merktekens van anderen ----
-    if (mk.dino > 0 && g !== "primitive") {
-      v *= 1.01; fl |= F_INF;
-      for (const o of act) if (o !== E && o.frz <= 0 && Math.abs(o.x - E.x) < 15 && o.eff > 1.0 && r() < 0.012) {
-        if (R.ent[o.i].gift === "primitive") {
-          if (!o.u.hunted && r() < 0.3) { o.u.hunted = 1; o.frz = 1.2; logE(s, {k: "gift", g: "primitive", who: o.i, pop: true, lvl: 3, sp: 1, sid: "gejaagd", txt: `✦ De jager wordt gejaagd! De besmette ${H.nm} grijpt ${nm_(s, o.i)} zelf.`}); }
-          continue;
-        }
-        if (grab(s, E, o, true)) logE(s, {k: "gift", g: "primitive", who: E.i, txt: `🦖 Besmet: ${H.nm} grijpt ${nm_(s, o.i)}.`});
-      }
+    if (mk.rap > 0) { v *= 1.012; fl |= F_RAP; }
+    if (mk.nail > 0) { v *= 0.9; fl |= F_NAIL; }
+    if (mk.hole > 0) {
+      v *= 0.95; fl |= F_HOLE;
+      if (r() < DT * 0.25) { let nb = null; for (const o of act) if (o !== E && R.ent[o.i].rid !== "jonas" && o.x < E.x && E.x - o.x < 6 && !(o.mk.hole > 0)) nb = o; if (nb) { nb.mk.hole = mk.hole; mk.hole = 0; logE(s, {k: "gift", g: "chain", who: nb.i, fly: [E.i, nb.i], txt: `🔩 Het spijkergat springt over van ${H.nm} naar ${nm_(s, nb.i)}!`}); } }
     }
-    if (mk.nail > 0) { v *= 0.92; fl |= F_NAIL; }
-    if (mk.pull > 0) { v *= mk.pullF; fl |= F_PULL; }
+    if (mk.steal > 0) { cost *= 1.35; fl |= F_STEAL; }
+    if (mk.pack > 0) { cost *= 0.82; fl |= F_PACK; }
     if (mk.spray > 0) { v *= 0.85; fl |= F_SPRAY; }
-    if (mk.rain > 0) v *= 0.93;
     if (mk.old) { v *= 0.975; fl |= F_OLD; }
     if (s.inf && s.inf.tgt === E.i) {
       const src = s.e[s.inf.src];
-      if (src.x >= E.x || src.done) { s.inf = null; logE(s, {k: "gift", g: "chain", who: src.i, txt: `♾️ Jonas haalt ${H.nm} in: de rotatie stopt.`}); }
-      else { v *= s.inf.f; s.inf.f = Math.max(s.inf.floor || 0.93, s.inf.f - (s.inf.dec || 0.003) * DT); fl |= F_INFROT; }
+      if (src.x >= E.x || src.done) { s.inf = null; logE(s, {k: "gift", g: "chain", who: src.i, txt: `♾️ ${nm_(s, src.i)} haalt ${H.nm} in: de rotatie stopt.`}); }
+      else { v *= s.inf.f; s.inf.f = Math.max(s.inf.floor || 0.9, s.inf.f - (s.inf.dec || 0.003) * DT); fl |= F_INFROT; }
     }
     if (E.spook > 0) { v *= 0.6; fl |= F_SPOOK; }
     if (E.slow > 0) v *= 0.85;
     if (mk.age && !mk.old) c = (c ? c + " " : "") + "⏳" + mk.age;
-    if (mk.iron) c = (c ? c + " " : "") + "🧲" + mk.iron;
     v *= eff * (1 + E.n);
     E.eff = eff;
     E.sta -= Math.pow(eff, 2.4) * 0.93 * cost * v * DT / D;
     E.x += v * DT;
-    E.fl = fl; E.c = E.g.relic ? "🦴 " + c : c;
+    E.fl = fl | (E.g.van > 0 ? F_VAN : 0); E.c = E.g.relic ? "🦴 " + c : c;
     if (E.x >= D) { E.done = true; E.ft = s.t - (E.x - D) / v; E.x = D; s.fin++; s.order.push(E.i); }
+  }
+  // gevaren op de baan
+  if (s.haz.length) {
+    s.haz = s.haz.filter(h => s.t - h.t < h.ttl && !h.gone);
+    for (const h of s.haz) for (const E of s.e) {
+      if (E.done || h.hit.includes(E.i) || !(E.pv < h.x && E.x >= h.x)) continue;
+      if (h.ty !== "WHOOSH" && E.i === h.o) continue;
+      h.hit.push(E.i);
+      const H = R.ent[E.i];
+      if (h.ty === "gat") { if (H.rid === "jonas") continue; E.mk.nail = Math.max(E.mk.nail || 0, 1.2); logE(s, {k: "gift", g: "chain", who: E.i, txt: `🔩 ${H.nm} rijdt in een spijkergat.`}); }
+      else if (h.ty === "muur") {
+        if (E.mk.rap > 0) { E.mk.rap = 0; logE(s, {k: "gift", g: "raindance", who: h.o, pop: !E.u.rjp, lvl: 3, sp: 1, sid: "regenjager", txt: `✦ ${H.nm} is een raptor en rijdt dwars door de regenmuur van ${nm_(s, h.o)}: de besmetting is weggespoeld!`}); E.u.rjp = 1; }
+        else { E.frz = Math.max(E.frz, 0.6); logE(s, {k: "gift", g: "raindance", who: E.i, txt: `🌧️ ${H.nm} knalt tegen een muur van bevroren regen.`}); }
+      } else if (h.ty === "WHOOSH") { E.x += 10; h.gone = 1; logE(s, {k: "gift", g: "silence", who: E.i, hzx: h.id, txt: `🔊 WHOOSH! ${H.nm} wordt gelanceerd (+10).`}); }
+      else {
+        E.lw[h.ty] = (E.lw[h.ty] || 0) + 1;
+        if (E.lw[h.ty] > 2) { if (E.lw[h.ty] === 3) logE(s, {k: "gift", g: "silence", who: E.i, txt: `✦ ${H.nm} kent het woord „${h.ty}” nu en springt er gewoon overheen.`}); continue; }
+        if (H.gift === "standstill") { E.g.ch = Math.min(5, (E.g.ch || 0) + 1); continue; }
+        if (h.ty === "BOOM") E.spook = Math.max(E.spook, 1.1); else E.sta -= 0.035;
+        logE(s, {k: "gift", g: "silence", who: E.i, txt: h.ty === "BOOM" ? `🔊 BOOM! ${H.nm} schrikt.` : `🔊 ZZZ… ${H.nm} wordt moe.`});
+      }
+    }
+  }
+  // Paco's profetie kwam niet uit
+  if (s.proph && !s.proph.done && !s.proph.told && lead > SEGS[s.proph.seg].b) {
+    s.proph.told = 1; const pc = s.e.find(E => R.ent[E.i].gift === "goodvibes");
+    logE(s, {k: "gift", g: "goodvibes", who: pc ? pc.i : null, txt: `📣 De profetie van Paco kwam niet uit.`});
   }
   // de deur naar een andere wereld
   if (s.auAt && s.auBy == null && lead >= s.auAt * D) {
     const d = s.e.find(E => R.ent[E.i].rid === "dario"), v = s.e.find(E => R.ent[E.i].gift === "parallel");
     if (d && v && !d.done) {
-      s.auBy = d.i; d.g.au = 1; d.g.hunt = 0; d.nx.zw = s.t + 4 + r() * 4;
+      s.auBy = d.i; d.g.au = 1; d.g.hunt = 0; d.g.bites = 0; d.nx.zw = s.t + 4 + r() * 4;
       logE(s, {k: "gift", g: "timestands", who: d.i, pop: true, lvl: 4, sp: 1, sid: "au", au: 1, txt: `🚪 ${nm_(s, v.i)} opent een deur naar een andere wereld… en duwt er een andere ${nm_(s, d.i)} doorheen. Deze is geen jager. Zijn gave heet Time Stands Still: hij kan de tijd stilzetten. Voor de rest van de race.`});
     } else s.auAt = 0;
   }
@@ -2641,24 +2955,17 @@ function stepSim(s) {
       s.relicBy = got.i; got.g.relic = 1;
       const H = R.ent[got.i];
       if (H.gift === "undermyskin") got.g.ch = (got.g.ch || 0) + 2;
+      if (H.gift === "goodvibes") got.g.lucky = 20;
       logE(s, {k: "gift", g: H.gift, who: got.i, pop: true, lvl: 4, sp: 1, sid: "relikwie", relic: 1, txt: `🦴 Iets glinstert in het ${TERRNM[SEGS[segAt(rx)].t].toLowerCase()}… een heilig relikwie! ${H.nm} grijpt het als eerste. Zijn gave ontwaakt: ${AWAKE[H.gift] || ""}`});
     }
   }
-  // geluidsvallen
-  if (s.traps.length) {
-    s.traps = s.traps.filter(tr => s.t - tr.t < 10);
-    for (const tr of s.traps) for (const E of s.e) if (!E.done && E.i !== tr.o && !tr.hit.includes(E.i) && E.pv < tr.x && E.x >= tr.x) {
-      tr.hit.push(E.i);
-      if (attack(s, s.e[tr.o], E, "het geluidswoord")) { E.spook = Math.max(E.spook, 0.8 * (tr.m || 1)); if (tr.hit.length === 1) logE(s, {k: "gift", g: "silence", who: tr.o, txt: `🔊 BOOM! ${nm_(s, E.i)} rijdt over het geluidswoord en schrikt.`}); }
-    }
-  }
-  // het lot: Time After Time wordt in de laatste 12% ingehaald
+  // het lot: Time After Time wordt in de laatste 12% ingehaald (alleen met een opgeladen horloge)
   const ring = s.e.find(E => R.ent[E.i].gift === "timeafter");
-  if (ring && !ring.done && s.rewind && !ring.u.fate && ring.x / D > 0.88 && ranks.has(ring.i) && s.snaps.length) {
+  if (ring && !ring.done && s.rewind && !ring.u.fate && ring.g.w >= 1 && ring.x / D > 0.88 && ranks.has(ring.i) && s.snaps.length) {
     const before = ranks.get(ring.i) + fin0;
     const now = s.e.filter(o => o !== ring && (o.done || o.x > ring.x)).length;
     if (now > before && before <= 2 && r() < 0.65) {
-      ring.u.fate = 1;
+      ring.u.fate = 1; ring.g.w = 0;
       if (doRewind(s, ring.i, "fate")) s.e[ring.i].form *= 1.02;
     }
   }
@@ -2723,7 +3030,8 @@ function mcFrom(snap, base, N, seed) {
 }
 const MARGIN = 0.08, MAXPAY = 25000;
 const toOdds = (p, m = MARGIN) => { const mm = m + Math.min(0.3, 0.004 / p); return p * (1 + mm) >= 0.97 ? 0 : clamp(Math.floor(100 / (p * (1 + mm))) / 100, 1.02, 150); };
-function betWins(b, order) {
+function betWins(b, order, L) {
+  if (b.k === "pr") return L && L.prTru != null && (b.h === 1) === L.prTru;
   const pos = order.indexOf(b.h);
   return b.k === "w" ? pos === 0 : b.k === "p" ? pos < 3 : b.k === "d" ? pos < order.indexOf(b.o) : false;
 }
@@ -2744,17 +3052,17 @@ function actInfo() {
   const next = a === 0 ? `Nog ${2 - k} pakket${2 - k === 1 ? "" : "ten"} goed leren voor Act 1` : a === 1 ? `Nog ${5 - k} pakketten voor Act 2` : a === 2 ? `Nog ${8 - k} pakketten voor Act 3` : a === 3 ? (k < 11 ? `Nog ${11 - k} pakketten + toetsoefening ‘Alles’ ≥ 80% voor Act 4` : "Haal de toetsoefening ‘Alles’ met ≥ 80% voor Act 4") : "Maximaal. Oneindige rotatie.";
   return {a, k, next};
 }
-const SWAPMAX = [0, 200, 500, 1000, 1000], swapUntil = a => a >= 3 ? 0.67 : 0.5;
+const SWAPMAX = [0, 200, 500, 1000, 1000], FLASHMAX = [0, 250, 500, 1000, 1000], MARKPAY = 60, swapUntil = a => a >= 3 ? 0.67 : 0.5;
 const ACTTXT = [
-  "Nog geen Act. Leer pakketten goed (alles minstens ‘goed’) om je gave te laten groeien.",
-  "Act 1: Wissel. Eén keer per race mag je in de eerste helft max 200 van je winnaar-inzet naar een ander paard verplaatsen, tegen de odds van dat moment.",
-  "Act 2: Wissel wordt groter: max 500.",
-  "Act 3: Wissel max 1000, en je mag wisselen tot tweederde van de race.",
-  "Act 4: alles van Act 3, en één keer per dag krijg je je grootste verloren inzet terug (max 1000, alleen bij odds tot 6). Gouden spiraal.",
+  "Nog geen Act. Leer pakketten goed (alles minstens ‘goed’) om je gave te laten groeien. Vanaf Act 1 kun je live wedden tijdens de race.",
+  "Act 1: Flash bets. Als er een grote gave aankomt, pauzeert de race en kun je wedden op wat er gebeurt (max 250). Plus Wissel: max 200 van je winnaar-inzet verplaatsen in de eerste helft.",
+  "Act 2: flash-vensters duren langer (8 s) en flash bets mogen tot 500. Wissel tot 500.",
+  "Act 3: markeer een paard voor de start (🎯). Elke keer dat het geraakt wordt, krijg je 60 (max 6×). Flash bets tot 1000, Wissel tot 1000 en tot tweederde van de race.",
+  "Act 4: Oneindige rotatie op je inzet. Eén keer per race draait een verloren flash bet terug: je krijgt je inzet terug en je volgende flash bet betaalt 1,5×.",
 ];
 
 // Opgeslagen races: versie 4 = één lange race. Oudere Oversteken worden netjes afgesloten.
-const RACEV = 4;
+const RACEV = 5;
 const NOGIFT = {ic: "–", nm: "geen gave", st: "EEEEEE", sh: "", rules: []};
 const giftOf = H => GIFTS[H.gift] || NOGIFT;
 function migrateRace() {
@@ -2764,12 +3072,14 @@ function migrateRace() {
   if (R.live && Array.isArray(R.live.bets)) R.live.bets.forEach(b => { if (b.paid == null) back += b.amt; });
   if (Array.isArray(R.ob) && !R.oPaid) R.ob.forEach(b => { back += b.amt; });
   S.money += back; S.race = null; save(); lbQueue();
-  setTimeout(() => toast(back ? `De paardenrace is nu één lange race. Open inzetten terug: +${fmtMoney(back)}` : "De paardenrace is nu één lange race!"), 600);
+  setTimeout(() => toast(back ? `Nieuwe gaven in de paardenrace! Open inzetten terug: +${fmtMoney(back)}` : "Nieuwe gaven in de paardenrace!"), 600);
 }
 const race = {view: "race", running: false, slip: [], chip: 25, duelA: null, busy: false, play: null, built: false};
 function newRace() {
-  const cs = rseed(), RC = makeRace(mulberry(hseed(cs, "race")));
-  S.race = {v: RACEV, cs, ent: makeField(cs), wxs: RC.wxs, sched: RC.sched, odds: null, live: null, swap: false, seen: (S.race && S.race.seen) || [], over: false};
+  const cs = rseed(), rr = mulberry(hseed(cs, "race")), RC = makeRace(rr), ent = makeField(cs);
+  const proph = ent.some(H => H.gift === "goodvibes") ? makeProph(rr) : null;
+  if (proph) RC.sched = fitProph(RC.sched, proph, rr);
+  S.race = {v: RACEV, cs, ent, proph, wxs: RC.wxs, sched: RC.sched, odds: null, live: null, swap: false, seen: (S.race && S.race.seen) || [], over: false};
   save();
 }
 const RCof = R => ({wxs: R.wxs, sched: R.sched});
@@ -2790,7 +3100,7 @@ function computeOdds(cb) {
     // te zeldzaam in de simulaties = geen betrouwbare prijs, dus niet aanbieden
     const ok = c => c >= 3;
     R.odds = {w: st.win.map((p, i) => ok(acc.win[i]) ? toOdds(p) : 0), p: st.top.map((p, i) => ok(acc.top[i]) ? toOdds(p) : 0),
-      ah: st.ah.map((row, i) => row.map((p, k) => i !== k && ok(acc.ah[i][k]) ? toOdds(p) : 0)), ms: Math.round(performance.now() - t0)};
+      ah: st.ah.map((row, i) => row.map((p, k) => i !== k && ok(acc.ah[i][k]) ? toOdds(p) : 0)), pr: R.proph ? toOdds(0.5) : 0, ms: Math.round(performance.now() - t0)};
     race.busy = false; save(); if (view === "race" && !race.running) renderRace(); cb && cb();
   };
   setTimeout(run, 30);
@@ -2884,10 +3194,12 @@ function renderRace() {
   const a = myAct();
   $("#rTitle").textContent = "De Grote Oversteek · San Diego → New York";
   const found = (S.found || []).filter(x => SPECIALS[x]).length, nsp = Object.keys(SPECIALS).length;
-  const giftCard = `<details class="gcard" ${!hist().length ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = giftOf(H); return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> <span class="gt">${G.ic} ${G.nm}</span><ul class="gs">${G.rules.map(t => `<li>${t}</li>`).join("")}</ul></div>`; }).join("")}<p class="qs">✦ Zeldzame interacties ontdekt: <b>${found}/${nsp}</b>. Sommige gaven reageren op elkaar als de omstandigheden precies goed zijn. ${(S.found || []).includes("relikwie") ? "🦴 Jij hebt de legende gezien." : "Er gaat ook een gerucht over iets heiligs op de route…"} ${(S.found || []).includes("au") ? "🚪 En je weet wat er achter Valentins deur zit." : ""}</p><p class="qs">🎲 Elke gave heeft geluk nodig: wanneer hij afgaat en hoe sterk is elke keer anders. Soms <b>mislukt hij bijna</b>, soms is hij <b>✦ KRITIEK</b> (dubbel zo sterk).</p><p class="qs">Gaven gaan vanzelf af en werken op elkaar in. Jij rijdt niet mee, jij wedt alleen.</p></details>`;
+  const giftCard = `<details class="gcard" ${!hist().length ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = giftOf(H); return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> <span class="gt">${G.ic} ${G.nm}</span><ul class="gs">${G.rules.map(t => `<li>${t}</li>`).join("")}</ul></div>`; }).join("")}<p class="qs">✦ Zeldzame interacties ontdekt: <b>${found}/${nsp}</b>. Sommige gaven reageren op elkaar als de omstandigheden precies goed zijn. ${(S.found || []).includes("relikwie") ? "🦴 Jij hebt de legende gezien." : "Er gaat ook een gerucht over iets heiligs op de route…"} ${(S.found || []).includes("au") ? "🚪 En je weet wat er achter Valentins deur zit." : ""}</p><p class="qs">⚠ Grote gaven worden eerst aangekondigd: je ziet wie op wie mikt. Daarna rolt de dobbelsteen, en verdedigingen (Standstill, Paco, de magneet, een vermomming…) kunnen het nog laten mislukken.</p><p class="qs">⚡ Vanaf Act 1 van jouw gave pauzeert de race bij grote momenten en kun je live wedden op de uitkomst.</p><p class="qs">Jij rijdt niet mee, jij wedt alleen.</p></details>`;
   const tabs = `<div class="rtabs">${[["race", "Race"], ["hist", "Uitslagen"]].map(([k, l]) => `<button type="button" data-tab="${k}" class="${race.view === k ? "on" : ""}">${l}</button>`).join("")}</div>`;
   const info = `<div class="sinfo"><div><b>${KM_TOTAL.toLocaleString("nl-NL")} km</b> in één race, ±3 minuten · terrein en weer per stuk:</div>${routeHTML(R)}
-    <div class="fc warn">💘 In het laatste derde is Love Train actief: pech van F. Valentin gaat naar het paard met jouw grootste inzet.</div>
+    <div class="fc warn">💘 In het laatste derde is Love Train actief: aanvallen en pech van F. Valentin gaan naar het paard met jouw grootste inzet.</div>
+    ${R.proph && R.odds ? `<div class="fc proph">📣 Paco's profetie: <i>"Ik zie… ${EVT[R.proph.k].ic} ${EVT[R.proph.k].nm.toLowerCase()} bij ${esc(STAGES[R.proph.seg].nm)}."</i><div class="prb"><button type="button" class="ob" data-bet="pr:1"><small>Komt uit</small>${fmtOdds(R.odds.pr)}</button><button type="button" class="ob" data-bet="pr:0"><small>Komt niet uit</small>${fmtOdds(R.odds.pr)}</button></div></div>` : ""}
+    ${a >= 3 ? `<div class="fc">🎯 Act 3: markeer een paard (tik 🎯 bij een ruiter). Elke keer dat het geraakt wordt: +${MARKPAY}.${race.mark != null ? ` Gemarkeerd: <b>${esc(R.ent[race.mark].nm)}</b>` : ""}</div>` : ""}
     <button type="button" class="mygift" id="rGift">Jouw gave 「Go Your Own Way」 ${a ? `<span class="act">ACT ${a}</span>` : "· nog geen Act"}</button></div>`;
   let body = "";
   if (race.view === "hist") {
@@ -2913,7 +3225,7 @@ function renderRace() {
 }
 function betLabel(b) {
   const R = S.race, n = i => esc(R.ent[i].nm.split(" ").slice(-1)[0]);
-  return b.k === "w" ? `🏆 ${n(b.h)}` : b.k === "p" ? `🥉 Top 3 ${n(b.h)}` : `⚔️ ${n(b.h)} > ${n(b.o)}`;
+  return b.k === "w" ? `🏆 ${n(b.h)}` : b.k === "p" ? `🥉 Top 3 ${n(b.h)}` : b.k === "pr" ? `📣 Profetie ${b.h ? "komt uit" : "komt niet uit"}` : `⚔️ ${n(b.h)} > ${n(b.o)}`;
 }
 function rowHTML(i) {
   const R = S.race, H = R.ent[i], G = giftOf(H);
@@ -2924,6 +3236,7 @@ function rowHTML(i) {
       <small>🐎 ${esc(H.horse)} · ${TAC[H.tac]} · ${terrTxt(H)}</small>
       ${fm.length ? `<small>vorm: ${fm.map(x => `<span class="fpos p${Math.min(x, 4)}">${x}</span>`).join("")}</small>` : ""}
       <small class="gtag">${G.ic} 「${G.nm}」</small></button>
+    ${myAct() >= 3 ? `<button type="button" class="mark ${race.mark === i ? "on" : ""}" data-mark="${i}" title="Markeer (Act 3)">🎯</button>` : ""}
     <div class="obs">
       <button class="ob" type="button" data-bet="w:${i}" ${R.odds.w[i] ? "" : "disabled"}><small>Winst</small>${fmtOdds(R.odds.w[i])}</button>
       <button class="ob" type="button" data-bet="p:${i}" ${R.odds.p[i] ? "" : "disabled"}><small>Top 3</small>${fmtOdds(R.odds.p[i])}</button>
@@ -2937,6 +3250,7 @@ function bindRace() {
   m.querySelectorAll("[data-rch]").forEach(b => b.onclick = () => { race.chip = b.dataset.rch === "max" ? "max" : +b.dataset.rch; renderRace(); });
   m.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { race.slip.splice(+b.dataset.rm, 1); renderRace(); });
   m.querySelectorAll("[data-bet]").forEach(b => b.onclick = () => { const [k, h] = b.dataset.bet.split(":"); addBet(k, +h); });
+  m.querySelectorAll("[data-mark]").forEach(b => b.onclick = () => { const i = +b.dataset.mark; race.mark = race.mark === i ? null : i; renderRace(); });
   m.querySelectorAll("[data-duel]").forEach(b => b.onclick = () => {
     const i = +b.dataset.duel;
     if (race.duelA === null) { race.duelA = i; renderRace(); return; }
@@ -2947,7 +3261,7 @@ function bindRace() {
   $("#rGift").onclick = showMyGift;
   if ($("#rRep")) $("#rRep").onclick = () => {
     const keep = race.chip, R = S.race, idx = rid => R.ent.findIndex(H => H.rid === rid);
-    race.lastSlip.forEach(b => { const h = idx(b.h), o = b.o != null ? idx(b.o) : undefined; if (h >= 0 && (b.o == null || o >= 0)) { race.chip = b.amt; addBet(b.k, h, o); } });
+    race.lastSlip.forEach(b => { if (b.k === "pr") return; const h = idx(b.h), o = b.o != null ? idx(b.o) : undefined; if (h >= 0 && (b.o == null || o >= 0)) { race.chip = b.amt; addBet(b.k, h, o); } });
     race.chip = keep; renderRace();
   };
   $("#rGo").onclick = () => startRace(false);
@@ -2956,7 +3270,7 @@ function bindRace() {
 function addBet(k, h, o) {
   const R = S.race;
   if (!R.odds) return;
-  const odds = k === "w" ? R.odds.w[h] : k === "p" ? R.odds.p[h] : R.odds.ah[h][o];
+  const odds = k === "w" ? R.odds.w[h] : k === "p" ? R.odds.p[h] : k === "pr" ? R.odds.pr : R.odds.ah[h][o];
   if (!odds) return toast("Geen odds op deze", false);
   const free = S.money - race.slip.reduce((x, b) => x + b.amt, 0);
   const amt = race.chip === "max" ? free : Math.min(race.chip, free);
@@ -2978,32 +3292,34 @@ function startRace(fast) {
   if (tot > S.money) { race.slip = []; renderRace(); return toast("Niet genoeg geld", false); }
   const bets = race.slip.slice();
   S.money -= tot;
-  const betW = R.ent.map(() => 0); bets.forEach(b => betW[b.h] += b.amt);
+  const betW = R.ent.map(() => 0); bets.forEach(b => { if (b.k !== "pr") betW[b.h] += b.amt; });
   // Uitslag meteen bepalen en opslaan: wegklikken of herladen verandert niets.
   const RC = RCof(R);
-  const s = newSim(R, RC, R.sched, mulberry(rseed()), {rec: true, betW});
+  const s = newSim(R, RC, R.sched, mulberry(rseed()), {rec: true, betW, proph: R.proph});
   const frames = [], snaps = [];
   const order = runSim(s, x => {
-    if (x.tick % 2 === 0) frames.push({t: x.t, x: x.e.map(E => Math.round(E.x * 10) / 10), s: x.e.map(E => Math.round(Math.max(0, E.sta) / R.ent[E.i].tank * 100)), f: x.e.map(E => E.fl), c: x.e.map(E => E.c)});
+    if (x.tick % 2 === 0) frames.push({t: x.t, x: x.e.map(E => Math.round(E.x * 10) / 10), f: x.e.map(E => E.fl), c: x.e.map(E => E.c), k: x.e.map(E => E.g.dbl > 0 ? Math.round((E.x + 4) * 10) / 10 : 0), d: x.e.map(E => E.dg)});
     if (x.tick % 4 === 0) snaps.push({fi: frames.length - 1, ...snapE(x)});
   });
   const ft = order.map(i => s.e[i].ft);
   const photo = ft[1] - ft[0] < 0.15;
   if (photo) s.log.push({t: s.e[order[0]].ft - 0.6, k: "ev", who: order[0], pop: true, lvl: 3, photo: 1, txt: `📸 Fotofinish! ${R.ent[order[0]].nm} en ${R.ent[order[1]].nm} komen bijna tegelijk over de streep…`});
   s.log.sort((x, y) => x.t - y.t);
-  R.live = {order, ft, bets, oddsW: R.odds.w.slice()};
+  const mark = myAct() >= 3 && race.mark != null ? race.mark : null;
+  R.live = {order, ft, bets, oddsW: R.odds.w.slice(), fb: [], mark, markHits: mark != null ? Math.min(6, s.e[mark].ht) : 0, prTru: R.proph ? !!R.proph.tru : null};
+  race.mark = null;
   R.over = true;
-  race.lastSlip = bets.map(b => ({k: b.k, h: R.ent[b.h].rid, o: b.o != null ? R.ent[b.o].rid : null, amt: b.amt}));
+  race.lastSlip = bets.filter(b => b.k !== "pr").map(b => ({k: b.k, h: R.ent[b.h].rid, o: b.o != null ? R.ent[b.o].rid : null, amt: b.amt}));
   S.rc = S.rc || {n: 0, bet: 0, won: 0}; S.rc.n++; S.rc.bet += tot;
   hist().push({o: order.map(i => R.ent[i].rid), n: order.map(i => R.ent[i].nm), mine: bets.length > 0, net: 0});
   if (hist().length > 40) S.rh = hist().slice(-40);
   save(); lbQueue();
   race.slip = []; race.duelA = null;
-  const base = {R: {ent: R.ent}, RC, D: s.D};
+  const base = {R: {ent: R.ent, proph: R.proph ? {k: R.proph.k, seg: R.proph.seg} : null}, RC, D: s.D};
   if (fast) {
     const res = settleLive(false);
-    const net = res ? res.pay - res.bets.reduce((x, b) => x + b.amt, 0) : 0;
-    toast(`${R.ent[order[0]].nm} wint` + (res && res.bets.length ? (net >= 0 ? `  +${fmtMoney(net)}` : `  −${fmtMoney(-net)}`) : "") + (res && res.refund ? ` (Act 4: ${fmtMoney(res.refund)} terug)` : ""), net >= 0);
+    const net = res ? res.net : 0;
+    toast(`${R.ent[order[0]].nm} wint` + (res && (res.bets.length || res.markPay) ? (net >= 0 ? `  +${fmtMoney(net)}` : `  −${fmtMoney(-net)}`) : ""), net >= 0);
     showResult({s, order, log: s.log}, res);
     return;
   }
@@ -3011,81 +3327,89 @@ function startRace(fast) {
 }
 function settleLive(quiet) {
   const R = S.race, L = R && R.live; if (!L) return null;
-  let pay = 0, lost = [];
+  let pre = 0, stake = 0;
   L.bets.forEach(b => {
-    const v = b.cash != null ? b.cash : betWins(b, L.order) ? Math.min(MAXPAY, Math.floor(b.amt * b.odds)) : 0;
-    b.paid = v; pay += v; if (!v && b.cash == null) lost.push(b);
+    const v = b.cash != null ? b.cash : betWins(b, L.order, L) ? Math.min(MAXPAY, Math.floor(b.amt * b.odds)) : 0;
+    b.paid = v; pre += v; stake += b.amt;
   });
-  let refund = 0;
-  const today = dayKey(NOW());
-  const okLost = lost.filter(b => b.odds <= 6);
-  if (okLost.length && myAct() >= 4 && S.a4 !== today) {
-    const big = okLost.sort((a, b) => b.amt - a.amt)[0];
-    refund = Math.min(1000, big.amt); S.a4 = today; pay += refund;
-  }
-  S.money += pay;
-  S.rc = S.rc || {n: 0, bet: 0, won: 0}; S.rc.won += pay;
-  const last = hist()[hist().length - 1]; if (last && L.bets.length) last.net = pay - L.bets.reduce((x, b) => x + b.amt, 0);
-  const res = {pay, refund, bets: L.bets, order: L.order};
+  // flash bets die nog niet zijn uitbetaald (overgeslagen of herladen)
+  let fnow = 0, fpay = 0, fbet = 0;
+  (L.fb || []).forEach(b => { fbet += b.amt; if (b.paid == null) { b.paid = b.pay + b.ref; fnow += b.paid; } fpay += b.paid; });
+  const markPay = (L.markHits || 0) * MARKPAY;
+  S.money += pre + fnow + markPay;
+  S.rc = S.rc || {n: 0, bet: 0, won: 0}; S.rc.won += pre + fpay + markPay; S.rc.bet += fbet;
+  const net = pre + fpay + markPay - stake - fbet;
+  const last = hist()[hist().length - 1]; if (last && (L.bets.length || fbet || markPay)) { last.net = net; last.mine = true; }
+  const res = {pay: pre + fpay + markPay, net, markPay, mark: L.mark, markHits: L.markHits || 0, fb: L.fb || [], fpay, fbet, bets: L.bets, order: L.order};
   R.live = null;
   save(); lbQueue();
-  if (quiet && pay > 0) toast("Race afgerekend: +" + fmtMoney(pay) + " 💰");
+  if (quiet && pre + fnow + markPay > 0) toast("Race afgerekend: +" + fmtMoney(pre + fnow + markPay) + " 💰");
   return res;
 }
 
-const FLAGTXT = [[65536, "⏸ tijd staat stil"], [512, "♾️ oneindige rotatie"], [1, "💫 staat stil"], [32, "😱 geschrokken"], [256, "🔩 spijker"], [16384, "💧 bespoten"], [8192, "🧲 getrokken"], [128, "🦖 besmet"], [2, "🦖 jaagt"], [16, "🚪 dubbelganger"], [4, "🌀 sprint"], [4096, "🛡️ laat los"], [131072, "🔥 eindsprint"], [64, "🧲 puls"], [8, "🪢 lasso"], [32768, "🤝 duo"], [1024, "⏳ verouderd"], [2048, "💘 Love Train"]];
+const FLAGTXT = [[65536, "⏸ tijd staat stil"], [262144, "🕳️ verdwenen"], [512, "♾️ rotatie"], [1, "💫 staat stil"], [32, "😱 geschrokken"], [256, "🔩 spijker"], [8192, "🕳️ gat jaagt hem"], [16384, "💧 bespoten"], [4194304, "🌀 slipstream gestolen"], [2, "🦖 jaagt"], [128, "🦖 raptor"], [1048576, "🍀 geluksgolf"], [16, "🚪 dubbelganger"], [4, "🌀 sprint"], [4096, "🛡️ laat los"], [131072, "🔥 eindsprint"], [64, "🧲 in de klont"], [524288, "🪢 vast"], [2097152, "🌧️ danst"], [8, "🪢 lasso"], [32768, "🤝 duo"], [1024, "⏳ verouderd"], [2048, "💘 Love Train"]];
 const SPEEDS = [[1.2, "1×"], [2.4, "2×"], [5, "4×"]];
+const FLY_IC = {nail: "🔩", ball: "⚪", wave: "🔊", spray: "💧", tie: "🪢", clone: "🚪", inf: "♾️", chain: "🕳️", primitive: "🦖", magnetic: "🧲", standstill: "🛡️", undermyskin: "💧"};
+const HAZ_IC = {gat: "🕳️", muur: "🧊", BOOM: "BOOM", ZZZ: "ZZZ", WHOOSH: "WHOOSH"};
 function playRace(P) {
   race.running = true;
   const R = S.race, el = $("#rMain");
   if (!R.seen) R.seen = [];
   $("#rTitle").textContent = "De Grote Oversteek · live";
   const a = myAct(), L = R.live, hasBets = L.bets.length > 0;
-  const mineSet = new Set(); L.bets.forEach(b => { mineSet.add(b.h); if (b.o != null) mineSet.add(b.o); });
-  const RH = 46;
-  el.innerHTML = `<div class="rstrip"><span>SD</span><div class="rsbar">${SEGS.map(sg => `<s style="left:${sg.a / D_TOTAL * 100}%"></s>`).join("")}<i id="rsLead"></i></div><span>NY 🏁</span></div>
+  L.fb = L.fb || [];
+  const mineSet = new Set(); L.bets.forEach(b => { if (b.k === "pr") return; mineSet.add(b.h); if (b.o != null) mineSet.add(b.o); });
+  const RH = 50, HTOP = 18;
+  el.innerHTML = `<div class="rstrip"><span>SD</span><div class="rsbar">${SEGS.map(sg => `<s style="left:${sg.a / D_TOTAL * 100}%"></s>`).join("")}<i id="rsLead"></i>${R.ent.map((H, i) => `<b class="rdot" id="rd${i}" style="background:${H.col}"></b>`).join("")}</div><span>NY 🏁</span></div>
     ${routeHTML(R)}
     <div class="rleft" id="rLeft"></div>
-    <div class="board" id="rBoard" style="height:${R.ent.length * RH}px">${R.ent.map((H, i) => {
+    <div class="tgbar" id="rTg"></div>
+    <div class="board" id="rBoard" style="height:${R.ent.length * RH + HTOP}px">${R.ent.map((H, i) => {
       const G = giftOf(H);
-      return `<div class="brow ${mineSet.has(i) ? "mine" : ""}" id="br${i}" style="--c:${H.col}">
+      return `<div class="brow ${mineSet.has(i) ? "mine" : ""} ${L.mark === i ? "marked" : ""}" id="br${i}" style="--c:${H.col}">
         <span class="bpos" id="bp${i}"></span>
-        <div class="bmid"><div class="bname"><b>${esc(H.nm)}</b><small id="bgt${i}">${G.ic} ${G.nm}</small>${mineSet.has(i) ? `<small class="bmine">jouw inzet</small>` : ""}</div>
-          <div class="blane"><i class="bfill" id="bf${i}"></i><span class="bhorse" id="bh${i}">🏇</span></div></div>
+        <div class="bmid"><div class="bname"><b id="bn${i}">${esc(H.nm)}</b><small id="bgt${i}">${G.ic} ${G.nm}</small>${mineSet.has(i) ? `<small class="bmine">jouw inzet</small>` : ""}${L.mark === i ? `<small class="bmine">🎯</small>` : ""}</div>
+          <div class="blane"><i class="bfill" id="bf${i}"></i><span class="bghost" id="bgh${i}" hidden>🏇</span><span class="bclone" id="bk${i}" hidden>🏇</span><span class="bhorse" id="bh${i}">🏇</span></div></div>
         <div class="bright"><span class="bgap" id="bg${i}"></span><span class="bst" id="bt${i}"></span></div>
-      </div>`; }).join("")}<div class="cdown" id="rCd" hidden></div></div>
+      </div>`; }).join("")}<div class="bfx" id="rFx"></div><div class="cdown" id="rCd" hidden></div></div>
+    <div class="flash" id="rFlash" hidden></div>
     <div class="ticker" id="rTick"></div>
     <div class="rctl" id="rCtl">
       <button type="button" class="cact" id="rSpd">1×</button>
-      ${hasBets ? `<button type="button" class="cashb" id="rCash">Cash out</button>` : ""}
+      ${hasBets && L.bets.some(b => b.k !== "pr") ? `<button type="button" class="cashb" id="rCash">Cash out</button>` : ""}
       ${a >= 1 && !R.swap && L.bets.some(b => b.k === "w") ? `<button type="button" class="cact" id="rSwap">Wissel</button>` : ""}
       <button type="button" class="cact" id="rSkip" title="Naar de uitslag">⏭</button>
     </div>
     <div class="cconf" id="rConf" hidden></div>
     <div class="mybets" id="rMy"></div>`;
-  const st = {t: 0, si: 0, li: 0, last: performance.now(), done: false, paused: false, cd: 3.2, slowUntil: 0, popUntil: 0, popQ: [], seg: -1};
+  const st = {t: 0, si: 0, li: 0, last: performance.now(), done: false, paused: false, cd: 3.2, slowUntil: 0, popUntil: 0, popQ: [], seg: -1,
+    wW: 90, haz: new Map(), tgs: [], ghost: null, flashN: 0, flashEnd: -1e9, hint0: false, dg: R.ent.map(() => -1)};
   const spd = () => SPEEDS[st.si][0];
   race.play = st;
   const F = P.frames, T = F[F.length - 1].t;
-  const tick = $("#rTick");
+  const tick = $("#rTick"), fxl = $("#rFx"), board = $("#rBoard");
   const addTick = (e) => {
     const d = document.createElement("div");
     const H = e.who != null ? R.ent[e.who] : null;
     if (H) d.style.borderLeftColor = H.col;
     if (e.late) d.className = "late";
+    if (e.cls) d.className = e.cls;
     d.textContent = e.txt; tick.prepend(d);
     while (tick.children.length > 3) tick.lastChild.remove();
   };
-  const myBets = () => { $("#rMy").innerHTML = hasBets ? L.bets.map(b => `<span class="sb">${betLabel(b)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.cash != null ? " · cash " + fmtMoney(b.cash) : ""}</span>`).join("") : "<span class='qs'>Je kijkt zonder inzet.</span>"; };
+  const myBets = () => {
+    const fb = L.fb.map(b => `<span class="sb fbb">⚡ ${esc(b.nm)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.paid != null ? (b.pay > 0 ? ` · <b class="cwin">+${fmtMoney(b.pay)}</b>` : b.ref ? ` · <span class="a4i">♾️ terug</span>` : " · ✗") : " · …"}</span>`).join("");
+    $("#rMy").innerHTML = (hasBets ? L.bets.map(b => `<span class="sb">${betLabel(b)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.cash != null ? " · cash " + fmtMoney(b.cash) : ""}</span>`).join("") : "<span class='qs'>Geen inzet vooraf.</span>") + fb;
+  };
   myBets();
-  addTick({txt: `🏁 ${KM_TOTAL.toLocaleString("nl-NL")} km van San Diego naar New York. Terrein en weer wisselen onderweg.`});
+  addTick({txt: `🏁 ${KM_TOTAL.toLocaleString("nl-NL")} km van San Diego naar New York. Het bord zoomt in op het peloton.`});
   const leadNow = () => Math.max(...frameAt(F, st.t).x) / P.D;
   const updCtl = () => {
     const cb = $("#rCash"), lead = leadNow(), fast = st.si === 2;
     if (cb) {
-      const open = L.bets.some(b => b.cash == null) && lead > 0.02 && lead < 0.95 && st.t < T;
+      const open = L.bets.some(b => b.cash == null && b.k !== "pr") && lead > 0.02 && lead < 0.95 && st.t < T;
       cb.disabled = !open || fast || st.paused;
-      cb.textContent = !L.bets.some(b => b.cash == null) ? "Uitbetaald ✓" : lead >= 0.95 ? "Cash out gesloten" : fast ? "Cash out (niet op 4×)" : "Cash out";
+      cb.textContent = !L.bets.some(b => b.cash == null && b.k !== "pr") ? "Uitbetaald ✓" : lead >= 0.95 ? "Cash out gesloten" : fast ? "Cash out (niet op 4×)" : "Cash out";
     }
     const sw = $("#rSwap"); if (sw && (lead >= swapUntil(a) || R.swap)) sw.remove();
   };
@@ -3101,7 +3425,7 @@ function playRace(P) {
     st.paused = true; updCtl();
     const {mc, N} = liveMC(90);
     const offer = new Map();
-    L.bets.forEach(b => { if (b.cash == null) offer.set(b, Math.min(MAXPAY, Math.floor(b.amt * b.odds * betProb(b, mc, N) * 0.88))); });
+    L.bets.forEach(b => { if (b.cash == null && b.k !== "pr") offer.set(b, Math.min(MAXPAY, Math.floor(b.amt * b.odds * betProb(b, mc, N) * 0.88))); });
     let tot = 0; offer.forEach(v => tot += v);
     conf(`<div>⏸ Race gepauzeerd. Je inzet nu verkopen voor <b>💰 ${fmtMoney(tot)}</b>?</div><div class="row"><button class="primary" id="cfY">Ja, uitbetalen</button><button class="ghost" id="cfN">Nee, doorrijden</button></div>`);
     $("#cfY").onclick = () => { offer.forEach((v, b) => { b.cash = v; }); save(); addTick({txt: `💰 Je cashte uit voor ${fmtMoney(tot)}.`}); conf(""); st.paused = false; myBets(); updCtl(); };
@@ -3128,13 +3452,94 @@ function playRace(P) {
     });
     $("#cfN").onclick = () => { conf(""); st.paused = false; updCtl(); };
   };
-  // alleen wat ertoe doet in de ticker: gebeurtenissen, de eerste keer dat een gave afgaat, en alles rond jouw paarden
-  const showTick = e => e.k === "ev" || e.pop || e.rw || e.love || e.spiral || mineSet.has(e.who);
+  // ---------- geometrie: waar ligt de baan op het scherm ----------
+  let geo = null, geoT = 0;
+  const getGeo = () => {
+    const lane = $("#bf0") && $("#bf0").parentElement, row = $("#br0");
+    if (!lane || !row) return null;
+    const br = board.getBoundingClientRect(), lr = lane.getBoundingClientRect(), rr = row.getBoundingClientRect();
+    return {x0: lr.left - br.left, w: lr.width, dy: lr.top - rr.top + lr.height / 2 - HTOP + HTOP};
+  };
+  const posOf = x => clamp((x - st.wL) / st.wW, 0, 1);
+  let rankNow = [];
+  const rowY = i => Math.max(0, rankNow.indexOf(i)) * RH + HTOP;
+  const fly = (e, fr) => {
+    if (!geo || !e.fly) return;
+    const [A, B] = e.fly; const ic = FLY_IC[e.kind] || FLY_IC[e.g] || "✦";
+    const d = document.createElement("span"); d.className = "flyer"; d.textContent = ic;
+    const xa = geo.x0 + posOf(fr.x[A]) * geo.w, xb = geo.x0 + posOf(fr.x[B]) * geo.w;
+    d.style.transform = `translate(${xa}px,${rowY(A) + geo.dy}px)`;
+    fxl.appendChild(d); void d.offsetWidth;
+    d.style.transform = `translate(${xb}px,${rowY(B) + geo.dy}px) scale(1.4)`;
+    setTimeout(() => d.classList.add("hit"), 650); setTimeout(() => d.remove(), 1200);
+  };
+  // ---------- flash bets ----------
+  const WIN = a >= 2 ? 8 : 6;
+  const openFlash = (e) => {
+    const opts = e.opts.filter(o => o.p >= 0.02 && o.p <= 0.97);
+    if (opts.length < 2) return;
+    st.paused = true; st.flashN++; st.flash = {e, until: performance.now() + WIN * 1000, chip: Math.min(FLASHMAX[a], 100), done: false};
+    const fp = $("#rFlash");
+    const odds = opts.map(o => clamp(Math.floor(100 / (o.p * 1.07)) / 100, 1.05, 40));
+    const rotTxt = (L.rotNext || 1) > 1 ? `<div class="qs">♾️ Rotatie: deze flash bet betaalt ×${L.rotNext}.</div>` : "";
+    const draw = () => {
+      const fl = st.flash; if (!fl) return;
+      const max = Math.min(FLASHMAX[a], S.money);
+      fp.innerHTML = `<div class="fhead"><b>⚡ FLASH BET</b><span id="fT"></span></div><div class="ftxt">${esc(e.txt)}</div>${rotTxt}
+        <div class="fopts">${opts.map((o, k) => `<button type="button" data-fo="${k}" ${fl.done || max < 10 ? "disabled" : ""}>${esc(o.nm)}<b>${fmtOdds(odds[k])}</b></button>`).join("")}</div>
+        <div class="fchips">${[25, 50, 100, 250, 500, 1000].filter(v => v <= FLASHMAX[a]).map(v => `<button type="button" data-fc="${v}" class="${fl.chip === v ? "sel" : ""}" ${v > S.money ? "disabled" : ""}>${v}</button>`).join("")}<button type="button" class="ghost" id="fSkip">Doorgaan</button></div>`;
+      fp.querySelectorAll("[data-fc]").forEach(b => b.onclick = () => { fl.chip = +b.dataset.fc; draw(); });
+      fp.querySelectorAll("[data-fo]").forEach(b => b.onclick = () => {
+        if (fl.done) return;
+        const k = +b.dataset.fo, o = opts[k], amt = Math.min(fl.chip, S.money, FLASHMAX[a]);
+        if (amt <= 0) return;
+        S.money -= amt; $("#rBal").textContent = fmtMoney(S.money);
+        const rot = L.rotNext || 1; L.rotNext = 1;
+        const win = o.k === e.res;
+        const rec = {id: e.id, kind: e.kind, nm: o.nm, amt, odds: odds[k], pay: win ? Math.min(MAXPAY, Math.floor(amt * odds[k] * rot)) : 0, ref: 0, paid: null};
+        if (!win && a >= 4 && !L.rotUsed) { L.rotUsed = 1; rec.ref = amt; L.rotNext = 1.5; }
+        L.fb.push(rec); save(); myBets();
+        fl.done = true; fl.until = Math.min(fl.until, performance.now() + 900);
+        addTick({txt: `⚡ Flash bet: ${fmtMoney(amt)} op „${o.nm}” @ ${fmtOdds(odds[k])}`});
+        draw();
+      });
+      $("#fSkip").onclick = () => { fl.until = 0; };
+    };
+    draw();
+    fp.hidden = false;
+  };
+  const closeFlash = () => { st.flash = null; $("#rFlash").hidden = true; st.paused = false; st.flashEnd = performance.now(); };
+  const payFlash = (id) => {
+    L.fb.forEach(b => {
+      if (b.id !== id || b.paid != null) return;
+      b.paid = b.pay + b.ref; S.money += b.paid; save(); $("#rBal").textContent = fmtMoney(S.money);
+      addTick({txt: b.pay ? `⚡ Flash bet gewonnen: +${fmtMoney(b.pay)}!` : b.ref ? `♾️ Flash bet verloren… maar hij draait terug: ${fmtMoney(b.ref)} terug, volgende ×1,5.` : `⚡ Flash bet verloren (${esc(b.nm)}).`, cls: b.pay ? "fwin" : ""});
+      if (b.pay) toast(`⚡ +${fmtMoney(b.pay)}`);
+      myBets();
+    });
+  };
+  const BIGK = ["inf", "worm", "fate", "flip", "spiral", "dino", "wave"];
+  const wantFlash = (e) => {
+    if (!e.fb || st.si === 2 || st.t >= T - 1) return false;
+    if (a < 1) { if (!st.hint0) { st.hint0 = true; addTick({txt: "⚡ Hier had je live kunnen wedden. Leer 2 pakketten goed voor Act 1."}); } return false; }
+    if (st.flashN >= 6 || S.money < 10) return false;
+    const mine = mineSet.has(e.who) || mineSet.has(e.tgt) || L.mark === e.tgt;
+    const gap = performance.now() - st.flashEnd;
+    return gap > (mine || BIGK.includes(e.kind) ? 7000 : 16000);
+  };
+  // alleen wat ertoe doet in de ticker
+  const showTick = e => e.k === "ev" || e.pop || e.rw || e.love || e.spiral || mineSet.has(e.who) || (e.k === "tr" && L.fb.some(b => b.id === e.id));
   let lastCtl = 0, lastRank = [];
   const cd = $("#rCd");
   const frame = now => {
     if (st.done) return;
     const dt = Math.min(0.1, (now - st.last) / 1000); st.last = now;
+    if (!geo || now - geoT > 1500) { geo = getGeo(); geoT = now; }
+    if (st.flash) {
+      const left = Math.max(0, (st.flash.until - now) / 1000);
+      const ft = $("#fT"); if (ft) ft.textContent = left.toFixed(1).replace(".", ",") + " s";
+      if (left <= 0) closeFlash();
+    }
     if (st.cd > 0) {
       st.cd -= dt;
       cd.hidden = st.cd <= 0; cd.textContent = st.cd > 2.2 ? "3" : st.cd > 1.2 ? "2" : st.cd > 0.3 ? "1" : "GO!";
@@ -3145,7 +3550,13 @@ function playRace(P) {
       if (fp && fq) return P.order.indexOf(p) - P.order.indexOf(q);
       return fr.x[q] - fr.x[p];
     });
+    rankNow = rank;
     const lx = fr.x[rank[0]], sgi = segAt(Math.min(lx, D_TOTAL - 1));
+    // het bord zoomt in op het peloton
+    const run = fr.x.filter(x => x < P.D), lo = run.length ? Math.min(...run) : lx, hi = run.length ? Math.max(...run) : lx;
+    const wT = clamp(hi - lo + 30, 70, 340);
+    st.wW += (wT - st.wW) * Math.min(1, dt * 1.5);
+    st.wL = hi + 10 - st.wW;
     if (sgi !== st.seg) {
       st.seg = sgi;
       document.querySelectorAll("#rMain .route .rseg").forEach((x, k) => { x.classList.toggle("on", k === sgi); x.classList.toggle("past", k < sgi); });
@@ -3153,54 +3564,101 @@ function playRace(P) {
     }
     $("#rsLead").style.width = (lx / P.D * 100).toFixed(1) + "%";
     $("#rLeft").textContent = lx >= P.D ? "Finish!" : st.cd > 0 ? "Klaar voor de start…" : `Nog ${Math.max(0, Math.round((P.D - lx) / P.D * KM_TOTAL)).toLocaleString("nl-NL")} km · ${TERRIC[SEGS[sgi].t]} ${STAGES[sgi].nm} · kop: ${R.ent[rank[0]].nm}`;
+    const ghostOn = st.ghost && st.t < st.ghost.until;
     R.ent.forEach((H, i) => {
       const pos = rank.indexOf(i);
       const row = $("#br" + i); if (!row) return;
-      if (lastRank[i] !== pos) row.style.transform = `translateY(${pos * RH}px)`;
-      const pr = fr.x[i] / P.D * 100;
+      if (lastRank[i] !== pos) row.style.transform = `translateY(${pos * RH + HTOP}px)`;
+      const pr = posOf(fr.x[i]) * 100;
       $("#bf" + i).style.width = pr.toFixed(2) + "%";
-      $("#bh" + i).style.left = `calc(${pr.toFixed(2)}% - 11px)`;
+      const hs = $("#bh" + i);
+      hs.style.left = `calc(${pr.toFixed(2)}% - 11px)`;
+      const f = fr.f[i];
+      hs.textContent = f & 2 ? "🦖" : f & 128 ? "🦖" : "🏇";
+      hs.className = "bhorse" + (f & 262144 ? " van" : "") + (f & 512 ? " spin" : "") + (f & 128 ? " rap" : "") + (f & 65536 ? " ts" : "");
+      $("#rd" + i).style.left = (fr.x[i] / P.D * 100).toFixed(2) + "%";
       const fin = fr.x[i] >= P.D;
       $("#bp" + i).textContent = fin ? (P.order.indexOf(i) + 1) : pos + 1;
       $("#bg" + i).textContent = fin ? (P.order.indexOf(i) === 0 ? "🏆" : "🏁") : pos === 0 ? "kop" : "+" + ((lx - fr.x[i]) / BASEV).toFixed(1).replace(".", ",") + "s";
-      const ftx = FLAGTXT.find(([b]) => fr.f[i] & b);
+      const ftx = FLAGTXT.find(([b]) => f & b);
       $("#bt" + i).textContent = fin ? "" : ftx ? ftx[1] : (fr.c && fr.c[i]) || "";
       row.classList.toggle("flag", !!ftx && !fin);
+      // kloon (Valentin)
+      const kx = fr.k ? fr.k[i] : 0, kEl = $("#bk" + i);
+      if (kx > 0) { kEl.hidden = false; kEl.style.left = `calc(${(posOf(kx) * 100).toFixed(2)}% - 11px)`; } else kEl.hidden = true;
+      // spookpositie na terugspoelen
+      const gEl = $("#bgh" + i);
+      if (ghostOn) { gEl.hidden = false; gEl.style.left = `calc(${(posOf(st.ghost.gx[i]) * 100).toFixed(2)}% - 11px)`; } else gEl.hidden = true;
+      // vermomming (Hettie)
+      const dg = fr.d ? fr.d[i] : -1;
+      if (dg !== st.dg[i]) {
+        st.dg[i] = dg;
+        const Y = dg >= 0 ? R.ent[dg] : H;
+        $("#bn" + i).textContent = Y.nm + (dg >= 0 ? " ?" : "");
+        row.style.setProperty("--c", Y.col); row.classList.toggle("disg", dg >= 0);
+      }
       lastRank[i] = pos;
     });
-    while (st.li < P.log.length && P.log[st.li].t <= st.t) {
+    // gevaren op de baan
+    st.haz.forEach((h, id) => {
+      if (st.t > h.t + h.ttl || h.gone) { h.el.remove(); st.haz.delete(id); return; }
+      const p = (h.x - st.wL) / st.wW;
+      if (!geo || p < 0 || p > 1) { h.el.hidden = true; return; }
+      h.el.hidden = false; h.el.style.left = (geo.x0 + p * geo.w) + "px";
+    });
+    // aankondigingen
+    st.tgs = st.tgs.filter(x => st.t < x.t1);
+    const tgEl = $("#rTg");
+    const tgHtml = st.tgs.slice(-2).map(x => `<div class="tg"><span>⚠ ${esc(x.txt)}</span><i style="width:${(clamp((st.t - x.t) / (x.t1 - x.t), 0, 1) * 100).toFixed(0)}%"></i></div>`).join("");
+    if (tgEl.dataset.h !== tgHtml) { tgEl.innerHTML = tgHtml; tgEl.dataset.h = tgHtml; }
+    const aimed = new Set(st.tgs.map(x => x.tgt)), aiming = new Set(st.tgs.map(x => x.who));
+    R.ent.forEach((H, i) => { const row = $("#br" + i); row.classList.toggle("aimed", aimed.has(i) && !aiming.has(i)); row.classList.toggle("aiming", aiming.has(i)); });
+    while (st.li < P.log.length && P.log[st.li].t <= st.t && !st.flash) {
       const e = P.log[st.li++];
+      if (e.k === "hz") {
+        const d = document.createElement("div"); d.className = "haz hz-" + e.ty; d.innerHTML = `<span>${HAZ_IC[e.ty] || "?"}</span>`; fxl.appendChild(d);
+        st.haz.set(e.hid, {x: e.x, t: e.t, ttl: e.ttl, el: d});
+        continue;
+      }
+      if (e.hzx && st.haz.has(e.hzx)) st.haz.get(e.hzx).gone = 1;
+      if (e.k === "tg") {
+        if (e.t1 > e.t) st.tgs.push(e);
+        if (e.kind === "fate") addTick({txt: e.txt, who: e.who});
+        if (wantFlash(e)) { openFlash(e); break; }
+        continue;
+      }
+      if (e.k === "tr") payFlash(e.id);
+      if (e.fly) fly(e, fr);
       if (showTick(e)) addTick(e);
       if (e.sid) { S.found = S.found || []; if (!S.found.includes(e.sid)) { S.found.push(e.sid); save(); } }
       if (e.au) { const g = $("#bgt" + e.who); if (g) g.textContent = "⏸ Time Stands Still ✦"; }
-      const big = e.rw || e.love || e.spiral || e.late || e.photo || /Act 3|Act 4|verouderd|laat \d+ opgeslagen/.test(e.txt);
+      if (e.gx) st.ghost = {gx: e.gx, until: st.t + 5};
+      const big = e.rw || e.love || e.spiral || e.late || e.photo || e.ext || e.actup || /Act 3|Act 4|verouderd|laat \d+ opgeslagen|OMPOLEN|Ompolen/.test(e.txt);
       const fresh = e.g && !R.seen.includes(e.g);
-      if (e.pop && (big || fresh || e.sp || e.actup || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.3) {
+      if (e.pop && (big || fresh || e.sp || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.3) {
         e.lv = e.lvl || (big ? 2 : 1);
         e.fresh = fresh; e.qt = now;
         if (e.g && fresh) R.seen.push(e.g);
         st.popQ.push(e);
-        // te veel tegelijk? dan valt het minst belangrijke af
         if (st.popQ.length > 3) { let lo = 0; st.popQ.forEach((x, k) => { if (x.lv < st.popQ[lo].lv) lo = k; }); st.popQ.splice(lo, 1); }
       }
       if (e.rw) flashRewind();
-      if (e.zw) { const b = $("#rBoard"); if (b) { b.classList.remove("zw"); void b.offsetWidth; b.classList.add("zw"); } }
+      if (e.zw) { board.classList.remove("zw"); void board.offsetWidth; board.classList.add("zw"); }
+      if (e.ext) { board.classList.remove("ext"); void board.offsetWidth; board.classList.add("ext"); }
     }
-    // wat te lang wacht (gewone uitleg) vervalt; dan komt die gave een volgende keer opnieuw in beeld
     st.popQ = st.popQ.filter(x => { if (x.lv <= 1 && now - x.qt > 6000) { if (x.fresh) R.seen = R.seen.filter(g => g !== x.g); return false; } return true; });
     const gapFor = lv => lv >= 3 ? 600 : lv === 2 ? 2500 : 5000;
     let bi = -1; st.popQ.forEach((x, k) => { if ((bi < 0 || x.lv > st.popQ[bi].lv) && !(x.lv <= 1 && st.n1 >= 4)) bi = k; });
     if (bi >= 0 && now > st.popUntil + gapFor(st.popQ[bi].lv) && !st.paused) {
       const e = st.popQ.splice(bi, 1)[0];
       if (e.lv <= 1) st.n1 = (st.n1 || 0) + 1;
-      // leestijd: belangrijker en langer = langer in beeld, en de race gaat trager
       const dur = [0, 3200, 4300, 5800, 9500][e.lv] + Math.min(3000, e.txt.length * 30);
       st.popUntil = now + dur; st.slowUntil = now + dur - 300; st.slowF = [1, 0.15, 0.08, 0.03, 0][e.lv];
       giftPop(e, dur, () => { st.popUntil = performance.now(); st.slowUntil = 0; });
       const row = $("#br" + e.who); if (row) { row.classList.remove("glow"); void row.offsetWidth; row.classList.add("glow"); }
     }
     if (now - lastCtl > 300) { lastCtl = now; updCtl(); }
-    if (st.t >= T && st.cd <= 0) { st.done = true; conf(""); return setTimeout(() => finishRace(P), 900); }
+    if (st.t >= T && st.cd <= 0 && !st.flash) { st.done = true; conf(""); return setTimeout(() => finishRace(P), 900); }
     requestAnimationFrame(frame);
   };
   updCtl();
@@ -3213,7 +3671,7 @@ function frameAt(F, t) {
   if (a === b || b.t === a.t) return a;
   const u = clamp((t - a.t) / (b.t - a.t), 0, 1);
   // bij terugspoelen niet interpoleren (anders glijden ze terug)
-  return {t, x: a.x.map((x, i) => b.x[i] < x ? x : x + (b.x[i] - x) * u), s: a.s, f: a.f, c: a.c};
+  return {t, x: a.x.map((x, i) => b.x[i] < x ? x : x + (b.x[i] - x) * u), s: a.s, f: a.f, c: a.c, k: a.k, d: a.d};
 }
 function giftPop(e, dur = 3200, onSkip) {
   const p = $("#gPop"); if (!p) return;
@@ -3237,11 +3695,11 @@ function finishRace(P) {
 function showResult(P, res) {
   const R = S.race, ord = P.order, el = $("#rMain");
   $("#rTitle").textContent = "De Grote Oversteek · uitslag";
-  const net = res ? res.pay - res.bets.reduce((x, b) => x + b.amt, 0) : 0;
+  const net = res ? res.net : 0;
   const t0 = P.s.e[ord[0]].ft;
-  const mine = new Set(); (res ? res.bets : []).forEach(b => { mine.add(b.h); if (b.o != null) mine.add(b.o); });
+  const mine = new Set(); (res ? res.bets : []).forEach(b => { if (b.k === "pr") return; mine.add(b.h); if (b.o != null) mine.add(b.o); });
   const key = new Set([...ord.slice(0, 3), ...mine]), seen = new Set();
-  const moments = P.log.filter(e => (e.who == null || key.has(e.who) || e.sp) && !/Good Vibrations: "/.test(e.txt) && !seen.has(e.txt) && seen.add(e.txt)).slice(-9);
+  const moments = P.log.filter(e => e.k !== "tg" && e.k !== "hz" && (e.pop || e.k === "ev" || e.sp) && (e.who == null || key.has(e.who) || e.sp) && !/Good Vibrations: "/.test(e.txt) && !seen.has(e.txt) && seen.add(e.txt)).slice(-9);
   const myPos = [...mine].map(i => `${esc(R.ent[i].nm)} werd ${ord.indexOf(i) + 1}e`).join(", ");
   const betLines = res && res.bets.length ? res.bets.map(b => `<li>${betLabel(b)} · ${fmtMoney(b.amt)} → ${b.cash != null ? `cash-out <b>${fmtMoney(b.paid)}</b>` : b.paid ? `<b class="cwin">+${fmtMoney(b.paid)}</b>` : `<span class="closs">verloren</span>`}</li>`).join("") : "";
   el.innerHTML = `<div class="rres">
@@ -3250,8 +3708,9 @@ function showResult(P, res) {
     ${betLines ? `<ul class="betres">${betLines}</ul>` : ""}
     ${myPos ? `<p class="qs">${myPos}.</p>` : ""}
     ${moments.length ? `<details class="moments" open><summary>Sleutelmomenten</summary><ul>${moments.map(e => `<li>${esc(e.txt)}</li>`).join("")}</ul></details>` : ""}
-    ${res && res.refund ? `<div class="a4"><div class="spiral sm"></div>Act 4 · Oneindige rotatie: ${fmtMoney(res.refund)} terug</div>` : ""}
-    ${res && res.bets.length ? `<p class="${net > 0 ? "cwin" : net < 0 ? "closs" : ""}" style="font-weight:700">${net > 0 ? "Winst +" + fmtMoney(net) : net < 0 ? "Verlies −" + fmtMoney(-net) : "Quitte"}</p>` : ""}
+    ${res && res.fb.length ? `<ul class="betres">${res.fb.map(b => `<li>⚡ ${esc(b.nm)} · ${fmtMoney(b.amt)} → ${b.pay ? `<b class="cwin">+${fmtMoney(b.pay)}</b>` : b.ref ? `<span class="a4i">♾️ ${fmtMoney(b.ref)} terug</span>` : `<span class="closs">verloren</span>`}</li>`).join("")}</ul>` : ""}
+    ${res && res.mark != null ? `<p class="qs">🎯 ${esc(R.ent[res.mark].nm)} werd ${res.markHits}× geraakt: +${fmtMoney(res.markPay)}</p>` : ""}
+    ${res && (res.bets.length || res.fb.length || res.markPay) ? `<p class="${net > 0 ? "cwin" : net < 0 ? "closs" : ""}" style="font-weight:700">${net > 0 ? "Winst +" + fmtMoney(net) : net < 0 ? "Verlies −" + fmtMoney(-net) : "Quitte"}</p>` : ""}
     <div class="row"><button class="primary" id="rNext">Volgende race →</button></div>
     <div class="tbc">To Be Continued <span>⟶</span></div>
   </div>`;
