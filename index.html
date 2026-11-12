@@ -665,7 +665,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-192010";
+<script>const BUILD="20261112-192414";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -1265,7 +1265,7 @@ function infoHTML(it, opts = {}) {
 }
 function drawReveal(it, style = "ok", withCap = true) {
   const fns = [() => drawItem(it, style === "ok" ? "ok" : "hl", it.name, "cur")];
-  if (it.cat === "land" && withCap) fns.push(() => mark(it.capLL, "cap", it.cap, "", {}));
+  if (it.cat === "land" && withCap) fns.push(...capMarks(it));
   if (it.feature) countryClass({[it.iso]: style === "ok" ? "ok" : "hl"}); else countryClass({});
   return fns;
 }
@@ -1490,10 +1490,16 @@ function examEnd() {
   if ($("#bR")) $("#bR").onclick = () => startSession("review");
 }
 
+// Landen met meerdere hoofdsteden: elke hoofdstad op zijn echte plek (bij leren/toets moeten ze nog steeds allemaal genoemd worden)
+const MULTICAP = {
+  L29: [{nm: "Pretoria", ll: [28.19, -25.75], alts: ["tshwane"], what: "regering"}, {nm: "Bloemfontein", ll: [26.21, -29.12], alts: [], what: "rechtspraak"}, {nm: "Kaapstad", ll: [18.42, -33.92], alts: ["cape town", "capetown"], what: "parlement"}],
+  L8: [{nm: "La Paz", ll: [-68.15, -16.50], alts: ["lapaz"], what: "regering"}, {nm: "Sucre", ll: [-65.26, -19.04], alts: [], what: "grondwet"}],
+};
+const capMarks = (it, cls = "cap", lblCls = "") => MULTICAP[it.id] ? MULTICAP[it.id].map(c => () => mark(c.ll, cls, c.nm, lblCls, {})) : [() => mark(it.capLL, cls, it.cap, lblCls, {})];
 /* ================= stedenquiz: een bolletje, jij zegt welke stad (steden + hoofdsteden) ================= */
 let cq = null;
 function startCityQuiz() {
-  const qs = [...ITEMS.filter(i => i.cat === "stad").map(it => ({t: "stad", it})), ...ITEMS.filter(i => i.cat === "land" && i.capLL).map(it => ({t: "cap", it}))];
+  const qs = [...ITEMS.filter(i => i.cat === "stad").map(it => ({t: "stad", it})), ...ITEMS.filter(i => i.cat === "land" && i.capLL).flatMap(it => MULTICAP[it.id] ? MULTICAP[it.id].map(c => ({t: "cap", it, mc: c})) : [{t: "cap", it}])];
   cq = {items: shuffle(qs), idx: 0, ok: 0, n: 0, miss: [], round: 1, first: 0};
   sess = null; exam = null; atlas = null;
   cq.total = cq.items.length;
@@ -1510,7 +1516,7 @@ function cityQ() {
     cq.items = shuffle(cq.miss); cq.miss = []; cq.idx = 0; cq.round++;
   }
   const q = cq.items[cq.idx], it = q.it, isCap = q.t === "cap";
-  const ll = isCap ? it.capLL : it.anchor;
+  const mc = q.mc, ll = mc ? mc.ll : isCap ? it.capLL : it.anchor;
   goRegion(regionOf(it));
   countryClass({});
   setDecor([() => mark(ll, "", null, "", {pulse: true})]);
@@ -1522,13 +1528,13 @@ function cityQ() {
   const inp = $("#cqI");
   setTimeout(() => inp.focus({preventScroll: true}), 60);
   const answer = v => {
-    const r = isCap ? checkCapital(it, v) : checkAnswer(v, it.name, it.alts), ok = !!(v && r.ok);
+    const r = mc ? checkAnswer(v, mc.nm, mc.alts) : isCap ? checkCapital(it, v) : checkAnswer(v, it.name, it.alts), ok = !!(v && r.ok);
     cq.n++;
     if (ok) { cq.ok++; if (cq.round === 1) cq.first++; S.money += 5; save(); lbQueue(); } else cq.miss.push(q);
-    if (isCap) { countryClass(it.feature ? {[it.iso]: ok ? "ok" : "hl"} : {}); setDecor([() => mark(it.capLL, "cap", it.cap, "cur", {})]); }
+    if (isCap) { countryClass(it.feature ? {[it.iso]: ok ? "ok" : "hl"} : {}); setDecor(mc ? MULTICAP[it.id].map(c => () => mark(c.ll, c === mc ? "" : "cap", c.nm, c === mc ? "cur" : "", {})) : [() => mark(it.capLL, "cap", it.cap, "cur", {})]); }
     else { countryClass({}); setDecor(drawReveal(it, ok ? "ok" : "hl")); }
-    const ansName = isCap ? it.cap : it.name;
-    $("#panel").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}"><div class="v">${ok ? "Goed! +5 💰" : v ? "Niet goed" : "Dit is het"}</div>${!ok && v ? `<p>Jij: <span style="text-decoration:line-through">${esc(v)}</span></p>` : ""}<div class="ans">${esc(ansName)}</div>${isCap ? `<p class="qs">hoofdstad van ${esc(it.name)}</p>` : ""}${r.note ? `<p>${r.note}</p>` : ""}${ok || isCap ? "" : infoHTML(it)}${ok ? "" : "<p class='qs'>Deze komt straks nog een keer.</p>"}</div>
+    const ansName = mc ? mc.nm : isCap ? it.cap : it.name;
+    $("#panel").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}"><div class="v">${ok ? "Goed! +5 💰" : v ? "Niet goed" : "Dit is het"}</div>${!ok && v ? `<p>Jij: <span style="text-decoration:line-through">${esc(v)}</span></p>` : ""}<div class="ans">${esc(ansName)}</div>${isCap ? `<p class="qs">${mc ? `een van de ${MULTICAP[it.id].length} hoofdsteden van ${esc(it.name)} (${mc.what}): ${MULTICAP[it.id].map(c => esc(c.nm)).join(", ")}` : `hoofdstad van ${esc(it.name)}`}</p>` : ""}${r.note ? `<p>${r.note}</p>` : ""}${ok || isCap ? "" : infoHTML(it)}${ok ? "" : "<p class='qs'>Deze komt straks nog een keer.</p>"}</div>
       <div class="row"><button class="primary" id="bNext">Volgende →</button></div>`;
     cq.idx++;
     $("#bNext").onclick = cityQ; $("#bNext").focus();
@@ -1570,7 +1576,7 @@ function renderAtlas() {
     else if (it.kind) fns.push(() => mark(it.anchor, "", label, sel ? "cur" : atlas.names ? "" : "num", {noDot: true}));
     else fns.push(() => it.markPts.length ? it.markPts.forEach((p, i) => mark(p, sel ? "" : "dim", i ? null : label, sel ? "cur" : atlas.names ? "" : "num")) : mark(it.anchor, "", label, (sel ? "cur " : "") + (it.cat === "deel" || it.cat === "water" ? "big" : ""), {noDot: true}));
   });
-  if (atlas.sel && atlas.sel.cat === "land") fns.push(() => mark(atlas.sel.capLL, "cap", atlas.sel.cap));
+  if (atlas.sel && atlas.sel.cat === "land") fns.push(...capMarks(atlas.sel));
   setDecor(fns);
   const cc = {};
   if (atlas.cat === "land" || atlas.cat === "all") list.filter(i => i.cat === "land").forEach(i => cc[i.iso] = "soft");
