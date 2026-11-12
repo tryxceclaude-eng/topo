@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sea:#cfe3ee; --land:#f6f1e4; --edge:#b9aa8b; --ink:#1b2730; --dim:#5d6b75; --rule:#dfe5e8;
+  --sea:#cfe3ee; --land:#f6f1e4; --edge:#6f5d43; --ink:#1b2730; --dim:#5d6b75; --rule:#dfe5e8;
   --paper:#fbfaf6; --card:#fff;
   --hl:#f76707; --hlfill:#ffa94d; --good:#2b8a3e; --goodfill:#8ce99a; --bad:#c92a2a; --badfill:#ffa8a8;
   --river:#1971c2; --mount:#8a5a2b; --blue:#1864ab;
@@ -132,7 +132,7 @@ form.ans input:focus{outline:none;border-color:var(--blue)}
 /* ---------- MAP ---------- */
 .sphere{fill:var(--sea)}
 .grat{fill:none;stroke:#fff;stroke-opacity:.45;stroke-width:.5;vector-effect:non-scaling-stroke}
-.c{fill:var(--land);stroke:var(--edge);stroke-width:.5;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.c{fill:var(--land);stroke:var(--edge);stroke-width:.9;stroke-opacity:.85;vector-effect:non-scaling-stroke;stroke-linejoin:round}
 .c.inlist{fill:#f1ead6}
 .waters .rng{fill:#b98b5e;fill-opacity:.32;stroke:#a0703f;stroke-opacity:.35;stroke-width:.5;vector-effect:non-scaling-stroke}
 svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
@@ -672,7 +672,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-202449";
+<script>const BUILD="20261112-204627";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
