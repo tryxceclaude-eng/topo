@@ -663,7 +663,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-183837";
+<script>const BUILD="20261112-191055";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -714,6 +714,9 @@ const REGBOX = {
 };
 const PACKREG = {1: "NAm", 2: "Car", 3: "SAm", 4: "Afr", 5: "Afr", 6: "Afr", 7: "ME", 8: "RCA", 9: "SA", 10: "EA", 11: "Oc"};
 const ITEMREG = {"streek-G": "NAm", "streek-P": "NAm"};
+// "Welk werelddeel is dit?": inzoomen op dat werelddeel (bij "klik op …" niet, dan zou je het weggeven)
+const CONTBOX = {"deel-I": [[-26, -38], [60, 39]], "deel-II": [[-168, 6], [-50, 76]], "deel-III": [[-92, -57], [-30, 14]], "deel-IV": [[-180, -88], [180, -58]],
+  "deel-V": [[105, -48], [180, 2]], "deel-VI": [[25, -2], [150, 76]], "deel-VII": [[-26, 34], [62, 72]]};
 const regionOf = it => WORLDVIEW.has(it.id) ? null : (ITEMREG[it.id] || PACKREG[it.pack]);
 // In een pakket- of werelddeel-sessie blijft de kaart op dat gebied (behalve voor oceanen/werelddelen die er niet in passen)
 function focusBox(packs) {
@@ -903,7 +906,8 @@ function applyLOD(force) {
 }
 const WRIVERS = topojson.feature(WATERS, WATERS.objects.rivers), WLAKES = topojson.feature(WATERS, WATERS.objects.lakes), WRANGES = topojson.feature(WATERS, WATERS.objects.ranges);
 const FEAT = {};
-world.features.forEach(f => { if (f.id) FEAT[f.id] = f; });
+// sommige ids komen dubbel voor (036 = Australië én de Ashmore-eilanden): houd de grootste
+world.features.forEach(f => { if (f.id && (!FEAT[f.id] || d3.geoArea(f) > d3.geoArea(FEAT[f.id]))) FEAT[f.id] = f; });
 const ISO2ITEM = {};
 ITEMS.forEach(it => { if (it.cat === "land") ISO2ITEM[it.iso] = it; });
 // neighbours that are on the list
@@ -1269,7 +1273,7 @@ function introQ(it) {
   it.cards.forEach(c => { S.c[c.id] = {b: 1, d: now, r: 0, w: 0}; sess.gap[c.id] = sess.step + gaps[c.type]; });
   save();
   sess.lastItem = it.id; sess.lastType = "intro"; sess.lastCat = it.cat;
-  goRegion(sessRegion(it));
+  goRegion(CONTBOX[it.id] || sessRegion(it));
   setDecor([]); countryClass({});
   $("#tapnote").hidden = false;
   $("#mapwrap").classList.add("aim");
@@ -1308,7 +1312,7 @@ function askCard(c) {
   sess.lastItem = it.id; sess.lastType = c.type; sess.lastCat = it.cat;
   const leech = st.w >= 3;
   const head = `<div class="qh"><span class="chip">${CAT[it.cat].nm}</span>${leech ? '<span class="chip lk">Lastige</span>' : ""}${dotsHTML(c)}</div>`;
-  goRegion(sessRegion(it));
+  goRegion(c.type !== "map" && CONTBOX[it.id] ? CONTBOX[it.id] : sessRegion(it));
   $("#tapnote").hidden = true;
   if (c.type === "map") {
     setDecor([]); countryClass({});
