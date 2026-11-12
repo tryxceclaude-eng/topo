@@ -672,7 +672,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-194722";
+<script>const BUILD="20261112-201116";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2359,7 +2359,7 @@ function makeField(cs) {
 const RIDER_ADJ = {
   jonas: {spd: -0.02, tank: 0.04}, giorgio: {spd: 0.015, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.036, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
   sandor: {spd: -0.01, tank: 0.16, aff: a => { a.splice(0, 8, 0, 2, 2, 1, 0, -1, 1, -1); }}, paco: {spd: 0.007}, magenta: {spd: 0.001}, boomer: {spd: 0.029}, valentin: {spd: 0.02},
-  hettie: {spd: 0.018, tank: 0.04}, bergman: {spd: 0.011}, blackwood: {spd: -0.005}, ringwald: {spd: 0.028},
+  hettie: {spd: 0.018, tank: 0.04}, bergman: {spd: 0.006}, blackwood: {spd: -0.005}, ringwald: {spd: 0.028},
 };
 // het weer per stuk en de gebeurtenissen langs de route
 function makeRace(r) { const wxs = STAGES.map(st => pickW(r, st.wx)); return {wxs, sched: makeSchedFor(wxs, r)}; }
@@ -2483,12 +2483,28 @@ function withDef(s, src, tgt, base, steel) {
   base.forEach(b => out.push({k: b.k, nm: b.nm, p: rem * b.p / tot}));
   return out;
 }
+// Pech: na een klap kan een ruiter (zelden) van zijn paard vallen
+const FALL_P = 0.035;
+function maybeFall(s, E, why) {
+  if (E.done || E.g.lucky > 0 || E.g.fall > 0 || s.r() >= FALL_P) return;
+  const H = s.R.ent[E.i], t = between(s.r, 4, 7);
+  E.frz = Math.max(E.frz, t); E.g.fall = t;
+  logE(s, {k: "ev", who: E.i, pop: true, lvl: 2, fall: 1, txt: H.rid === "sandor" ? `🤕 ${H.nm} struikelt na ${why} en rolt over de grond! ${Math.round(t)} seconden kwijt.` : `🤕 ${H.nm} valt na ${why} van zijn paard! Terug in het zadel kost hem ${Math.round(t)} seconden.`});
+}
+// Geluk: een paard dat ineens een tweede adem krijgt (zelden, één keer per race)
+const BURST = ["ruikt water verderop", "krijgt een tweede adem", "schrikt van een ratelslang en schiet ervandoor", "ziet een ander paard en wil winnen", "voelt de wind ineens in de rug", "hoort het publiek juichen"];
+function maybeBurst(s, E, prog) {
+  if (E.g.bursted || prog < 0.15 || prog > 0.95 || s.r() >= 0.00024) return;
+  E.g.bursted = 1; E.g.burst = between(s.r, 5, 9);
+  const H = s.R.ent[E.i];
+  logE(s, {k: "ev", who: E.i, pop: true, lvl: 2, burst: 1, txt: `⚡ Het paard van ${H.nm} ${BURST[Math.floor(s.r() * BURST.length)]}! ${Math.round(E.g.burst)} seconden lang veel sneller.`});
+}
 // geeft het geraakte paard terug (of null); onHit(paard, kracht) voert het effect uit
 function resolveAtk(s, T, what, onHit) {
   const R = s.R, src = s.e[T.src], tgt = s.e[T.tgt], r = s.r;
   const L = o => logE(s, {k: "tr", id: T.id, kind: T.kind, ...o});
   switch (T.res) {
-    case "hit": if (tgt.done) { L({who: tgt.i, txt: `${what}: ${nm_(s, tgt.i)} is al binnen.`}); return null; } tgt.ht++; onHit(tgt, 1); return tgt;
+    case "hit": if (tgt.done) { L({who: tgt.i, txt: `${what}: ${nm_(s, tgt.i)} is al binnen.`}); return null; } tgt.ht++; onHit(tgt, 1); maybeFall(s, tgt, what.toLowerCase()); return tgt;
     case "mis": L({who: src.i, txt: `${what} mist ${nm_(s, tgt.i)}.`}); return null;
     case "luck": L({who: tgt.i, txt: `🍀 ${what} glijdt af: ${nm_(s, tgt.i)} heeft een geluksgolf.`}); return null;
     case "love": {
@@ -2496,7 +2512,7 @@ function resolveAtk(s, T, what, onHit) {
       if (bw) { let best = 0; s.e.forEach(x => { if (!x.done && x !== tgt && x !== src && (bw[x.i] || 0) > best) { best = bw[x.i]; nt = x; } }); }
       if (!nt) { const c = s.e.filter(x => !x.done && x !== tgt && x !== src); nt = c.length ? c[Math.floor(r() * c.length)] : null; }
       L({who: tgt.i, love: 1, pop: true, lvl: 2, txt: `💘 Love Train: ${what} gaat via ${nm_(s, tgt.i)} door naar ${nt ? nm_(s, nt.i) : "niemand"}.`});
-      if (nt) { nt.ht++; onHit(nt, 1); } return nt;
+      if (nt) { nt.ht++; onHit(nt, 1); maybeFall(s, nt, what.toLowerCase()); } return nt;
     }
     case "abs": tgt.frz = Math.max(tgt.frz, 0.8); tgt.g.ch = Math.min(tgt.g.relic ? 8 : 5, (tgt.g.ch || 0) + 1); L({who: tgt.i, txt: `🛡️ ${nm_(s, tgt.i)} houdt ${what} tegen en slaat de klap op (${tgt.g.ch}).`}); return null;
     case "ref": {
@@ -2519,14 +2535,14 @@ function resolveAtk(s, T, what, onHit) {
       const b = s.e.find(o => R.ent[o.i].gift === "magnetic" && !o.done);
       if (!b) return null;
       L({who: b.i, pop: true, lvl: 3, sp: 1, sid: "staal", fly: [T.src, b.i], txt: `✦ ${what} buigt af naar de magneet van ${nm_(s, b.i)} en raakt hem zelf!`});
-      b.ht++; onHit(b, 1); return b;
+      b.ht++; onHit(b, 1); maybeFall(s, b, what.toLowerCase()); return b;
     }
     case "wrong": {
       const het = s.e.find(o => R.ent[o.i].gift === "undermyskin");
       const nt = het === tgt ? (het.dg >= 0 ? s.e[het.dg] : het) : het;
       if (nt.done) return null;
       L({who: het.i, pop: true, lvl: 2, fly: [T.src, nt.i], txt: `💧 Vermomming! ${what} was voor ${nm_(s, tgt.i)} bedoeld, maar raakt ${nm_(s, nt.i)}.`});
-      nt.ht++; onHit(nt, 1); return nt;
+      nt.ht++; onHit(nt, 1); maybeFall(s, nt, what.toLowerCase()); return nt;
     }
   }
   return null;
@@ -2586,6 +2602,7 @@ function applyNeg(s, E, kind) {
     if (H.gift === "undermyskin" && E.g.ch > 0) { E.g.ch--; E.frz = Math.max(E.frz, 0.5); logE(s, {k: "gift", g: "undermyskin", who: E.i, pop: true, txt: `💧 ${H.nm} raakt geblesseerd en spuit het meteen dicht (nog ${E.g.ch} ladingen).`}); return; }
     E.inj *= 0.96; E.frz = Math.max(E.frz, 1);
   }
+  if (kind !== "short" && kind !== "lame") maybeFall(s, E, "de " + T.nm.toLowerCase());
   logE(s, {k: "ev", ic: T.ic, who: E.i, txt: kind === "short" ? `${T.ic} ${H.nm} neemt een binnenweg en verdwaalt!` : `${T.ic} ${T.nm}: ${H.nm}${kind === "lame" ? " is geblesseerd (rest van de race −4%)" : ""}`});
 }
 // hoe groot de kans is dat pech dit paard kiest
@@ -2633,6 +2650,7 @@ function addHaz(s, ty, x, ttl, o) {
   return h;
 }
 // vlaggen voor het scherm
+const F_FALL = 8388608, F_BURST = 16777216;
 const F_FRZ = 1, F_DINO = 2, F_SPRINT = 4, F_ROPE = 8, F_DBL = 16, F_SPOOK = 32, F_PACK = 64, F_RAP = 128, F_NAIL = 256, F_INFROT = 512, F_OLD = 1024, F_LOVE = 2048, F_REL = 4096, F_HOLE = 8192, F_SPRAY = 16384, F_DUO = 32768, F_TS = 65536, F_KICK = 131072, F_VAN = 262144, F_TIE = 524288, F_LUCK = 1048576, F_RAIN = 2097152, F_STEAL = 4194304;
 const WORDW = {BOOM: 0.45, ZZZ: 0.3, WHOOSH: 0.25};
 
@@ -2808,12 +2826,12 @@ function stepSim(s) {
     let fl = 0, c = "";
     for (const k of ["frz", "spook", "slow"]) if (E[k] > 0) E[k] = Math.max(0, E[k] - DT);
     for (const k of ["nail", "hole", "steal", "pack", "spray", "rap", "ts"]) if (mk[k] > 0) mk[k] = Math.max(0, mk[k] - DT);
-    for (const k of ["dbl", "spiral", "hunt", "van", "draft", "lucky", "cloud", "tieT", "dgT", "ride"]) if (E.g[k] > 0) E.g[k] = Math.max(0, E.g[k] - DT);
+    for (const k of ["dbl", "spiral", "hunt", "van", "draft", "lucky", "cloud", "tieT", "dgT", "ride", "fall", "burst"]) if (E.g[k] > 0) E.g[k] = Math.max(0, E.g[k] - DT);
     if (E.dg >= 0 && !(E.g.dgT > 0)) E.dg = -1;
     if (E.tie >= 0 && (!(E.g.tieT > 0) || s.e[E.tie].done)) E.tie = -1;
     E.pv = E.x;
     if (E.g.van > 0) fl |= F_VAN;
-    if (E.frz > 0) { E.fl = fl | (mk.ts > 0 ? F_TS : F_FRZ) | (s.inf && s.inf.tgt === E.i ? F_INFROT : 0) | (mk.rap > 0 ? F_RAP : 0); continue; }
+    if (E.frz > 0) { E.fl = fl | (E.g.fall > 0 ? F_FALL : 0) | (mk.ts > 0 ? F_TS : F_FRZ) | (s.inf && s.inf.tgt === E.i ? F_INFROT : 0) | (mk.rap > 0 ? F_RAP : 0); continue; }
     // inzet: tactiek, en in de laatste 15% een eindsprint die groter is naarmate je meer energie hebt gespaard
     let eff = H.tac === "voor" ? 1.012 : H.tac === "volg" ? 0.995 : (prog < 0.7 ? 0.985 : 1.03);
     if (H.rid === "jonas") eff += prog < 0.2 ? -0.02 : 0;
@@ -3049,6 +3067,8 @@ function stepSim(s) {
       E.g.w = Math.min(1, (E.g.w || 0) + DT / (E.g.relic ? 14 : 28));
       c = E.g.w >= 1 ? "⌚ opgeladen" : "⌚ " + Math.round(E.g.w * 100) + "%";
     }
+    maybeBurst(s, E, prog);
+    if (E.g.burst > 0) { v *= 1.3; cost *= 0.8; fl |= F_BURST; }
     if (duo && (E === jonas || E === gio)) { v *= 1.012; fl |= F_DUO; }
     if (E.g.relic) v *= 1.015;
     if (E.g.draft > 0) { cost *= 0.6; v *= 1.06; }
@@ -3545,7 +3565,7 @@ function settleLive(quiet) {
   return res;
 }
 
-const FLAGTXT = [[65536, "⏸ tijd staat stil"], [262144, "🕳️ verdwenen"], [512, "♾️ rotatie"], [1, "💫 staat stil"], [32, "😱 geschrokken"], [256, "🔩 spijker"], [8192, "🕳️ gat jaagt hem"], [16384, "💧 bespoten"], [4194304, "🌀 slipstream gestolen"], [2, "🦖 jaagt"], [128, "🦖 raptor"], [1048576, "🍀 geluksgolf"], [16, "🚪 dubbelganger"], [4, "🌀 sprint"], [4096, "🛡️ laat los"], [131072, "🔥 eindsprint"], [64, "🧲 in de klont"], [524288, "🪢 vast"], [2097152, "🌧️ danst"], [8, "🪢 lasso"], [32768, "🤝 duo"], [1024, "⏳ verouderd"], [2048, "💘 Love Train"]];
+const FLAGTXT = [[8388608, "🤕 gevallen"], [16777216, "⚡ tweede adem"], [65536, "⏸ tijd staat stil"], [262144, "🕳️ verdwenen"], [512, "♾️ rotatie"], [1, "💫 staat stil"], [32, "😱 geschrokken"], [256, "🔩 spijker"], [8192, "🕳️ gat jaagt hem"], [16384, "💧 bespoten"], [4194304, "🌀 slipstream gestolen"], [2, "🦖 jaagt"], [128, "🦖 raptor"], [1048576, "🍀 geluksgolf"], [16, "🚪 dubbelganger"], [4, "🌀 sprint"], [4096, "🛡️ laat los"], [131072, "🔥 eindsprint"], [64, "🧲 in de klont"], [524288, "🪢 vast"], [2097152, "🌧️ danst"], [8, "🪢 lasso"], [32768, "🤝 duo"], [1024, "⏳ verouderd"], [2048, "💘 Love Train"]];
 const SPEEDS = [[1.2, "1×"], [2.4, "2×"], [5, "4×"]];
 const FLY_IC = {volley: "🔩", nail: "🔩", ball: "⚪", wave: "🔊", spray: "💧", tie: "🪢", clone: "🚪", inf: "♾️", chain: "🕳️", primitive: "🦖", magnetic: "🧲", standstill: "🛡️", undermyskin: "💧"};
 const HAZ_IC = {gat: "🕳️", muur: "🧊", BOOM: "BOOM", ZZZ: "ZZZ", WHOOSH: "WHOOSH"};
@@ -3837,7 +3857,7 @@ function playRace(P) {
       if (e.sid) { S.found = S.found || []; if (!S.found.includes(e.sid)) { S.found.push(e.sid); save(); } }
       if (e.au) { const g = $("#bgt" + e.who); if (g) g.textContent = "⏸ Time Stands Still ✦"; }
       if (e.gx) st.ghost = {gx: e.gx, until: st.t + 5};
-      const big = e.rw || e.love || e.spiral || e.late || e.photo || e.ext || e.actup || /Act 3|Act 4|verouderd|laat \d+ opgeslagen|OMPOLEN|Ompolen/.test(e.txt);
+      const big = e.rw || e.love || e.spiral || e.late || e.photo || e.ext || e.actup || e.fall || e.burst || /Act 3|Act 4|verouderd|laat \d+ opgeslagen|OMPOLEN|Ompolen/.test(e.txt);
       const fresh = e.g && !R.seen.includes(e.g);
       if (e.pop && !race.mini && (big || fresh || e.sp || mineSet.has(e.who)) && st.si < 2 && st.t < T - 0.3) {
         e.lv = e.lvl || (big ? 2 : 1);
