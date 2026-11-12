@@ -672,7 +672,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-201116";
+<script>const BUILD="20261112-202449";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2275,7 +2275,7 @@ const GIFTS = {
   undermyskin: {ic: "💧", nm: "Under My Skin", st: "CCCABC", sh: "Vleesspray: genezen, aanvallen en vermommen.",
     rules: ["Vermomt zich als een ander paard: haar rij op het bord krijgt diens naam en kleur. Aanvallen kunnen dan het verkeerde paard raken.", "Spuit het paard vlak voor haar onder: dat vertraagt.", "Haar ladingen genezen blessures, besmetting en veroudering."]},
   silence: {ic: "🔊", nm: "Sound of Silence", st: "BBACBB", sh: "Schrijft geluid op de baan.",
-    rules: ["Schrijft woorden op de baan, die je ziet liggen: BOOM (schrik), ZZZ (moe), WHOOSH (lanceert wie erop komt, vaak hijzelf).", "Een paard dat hetzelfde woord twee keer heeft gehad, springt er voortaan overheen.", "Geluidsgolf op de koploper (wedbaar).", "Loopt te voet: traag maar taai."]},
+    rules: ["Schrijft woorden op de baan, die je ziet liggen: BOOM (schrik), ZZZ (moe), WHOOSH (lanceert wie erop komt, vaak hijzelf).", "Een paard dat hetzelfde woord twee keer heeft gehad, springt er voortaan overheen.", "Geluidsgolf op de koploper (wedbaar)."]},
   timestands: {ic: "⏸", nm: "Time Stands Still", st: "AACABB", sh: "Een Dario uit een andere wereld, met een andere gave: hij zet de tijd stil.",
     rules: ["Alleen te krijgen als F. Valentin een deur naar een andere wereld opent (zeldzaam, ergens na de helft van de race).", "Om de 14 tot 32 seconden staat de tijd 1 tot 3,5 seconden stil: alle andere paarden bevriezen, alleen hij rijdt door. Max 3× per race.", "Niets houdt de stilstaande tijd tegen.", "Hij is geen jager meer: Primitive is weg."]},
   leanon: {ic: "🪢", nm: "Lean on Me", st: "CCBCCB", sh: "Lasso en opsplitsen.",
@@ -2347,19 +2347,18 @@ function makeField(cs) {
   const riders = [...RIDERS.filter(x => fixed.includes(x.id)), ...rest].map(x => [r(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
   const pool = HORSES.map(h => [r(), h]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
   return riders.map((R, i) => {
-    const aff = TERR.map(() => clamp(Math.round(gauss(r) * 0.9), -2, 2));
-    const E = {rid: R.id, nm: R.nm, horse: R.horse || pool.pop(), gift: R.gift, tac: R.tac,
-      spd: 1 + clamp(gauss(r), -2, 2) * 0.009, tank: 1 + clamp(gauss(r), -2, 2) * 0.05, temp: 0.7 + 0.6 * r(), aff, col: RCOL[i]};
-    const B = RIDER_ADJ[R.id]; if (B) { E.spd += B.spd || 0; E.tank += B.tank || 0; if (B.aff) B.aff(E.aff); }
+    // alle paarden even goed: alleen de gaven (en hun geluk) maken het verschil
+    const aff = TERR.map(() => 0);
+    const E = {rid: R.id, nm: R.nm, horse: R.horse || pool.pop(), gift: R.gift, tac: R.tac, spd: 1, tank: 1, temp: 1, aff, col: RCOL[i]};
+    const B = RIDER_ADJ[R.id]; if (B) { E.spd += B.spd || 0; E.tank += B.tank || 0; }
     E.spd = Math.round(E.spd * 1000) / 1000; E.tank = Math.round(E.tank * 1000) / 1000; E.temp = Math.round(E.temp * 100) / 100;
     return E;
   });
 }
 // vaste karaktertrekken (en balans) per ruiter
 const RIDER_ADJ = {
-  jonas: {spd: -0.02, tank: 0.04}, giorgio: {spd: 0.015, aff: a => { a[3] = Math.max(a[3], 1); }}, dario: {spd: 0.036, tank: -0.03, aff: a => { a[1] = Math.max(a[1], 1); a[2] = Math.max(a[2], 1); }},
-  sandor: {spd: -0.01, tank: 0.16, aff: a => { a.splice(0, 8, 0, 2, 2, 1, 0, -1, 1, -1); }}, paco: {spd: 0.007}, magenta: {spd: 0.001}, boomer: {spd: 0.029}, valentin: {spd: 0.02},
-  hettie: {spd: 0.018, tank: 0.04}, bergman: {spd: 0.006}, blackwood: {spd: -0.005}, ringwald: {spd: 0.028},
+  jonas: {spd: -0.0315}, giorgio: {spd: -0.0031}, dario: {spd: 0.0144}, sandor: {spd: 0.0041}, paco: {spd: -0.0076}, magenta: {spd: -0.0028},
+  boomer: {spd: 0.0165}, valentin: {spd: 0.0022}, hettie: {spd: 0.0098}, bergman: {spd: -0.0016}, blackwood: {spd: -0.0106}, ringwald: {spd: 0.0245},
 };
 // het weer per stuk en de gebeurtenissen langs de route
 function makeRace(r) { const wxs = STAGES.map(st => pickW(r, st.wx)); return {wxs, sched: makeSchedFor(wxs, r)}; }
@@ -2833,8 +2832,7 @@ function stepSim(s) {
     if (E.g.van > 0) fl |= F_VAN;
     if (E.frz > 0) { E.fl = fl | (E.g.fall > 0 ? F_FALL : 0) | (mk.ts > 0 ? F_TS : F_FRZ) | (s.inf && s.inf.tgt === E.i ? F_INFROT : 0) | (mk.rap > 0 ? F_RAP : 0); continue; }
     // inzet: tactiek, en in de laatste 15% een eindsprint die groter is naarmate je meer energie hebt gespaard
-    let eff = H.tac === "voor" ? 1.012 : H.tac === "volg" ? 0.995 : (prog < 0.7 ? 0.985 : 1.03);
-    if (H.rid === "jonas") eff += prog < 0.2 ? -0.02 : 0;
+    let eff = 1;
     const left = E.sta / H.tank;
     if (prog > 0.85) { const kick = 0.025 + 0.13 * clamp(left - 0.08, 0, 0.45); eff += kick; if (kick > 0.06) fl |= F_KICK; }
     if (E.sta < 0.05) eff = Math.min(eff, 0.84);
@@ -3255,7 +3253,7 @@ const ACTTXT = [
 ];
 
 // Opgeslagen races: versie 4 = één lange race. Oudere Oversteken worden netjes afgesloten.
-const RACEV = 6;
+const RACEV = 7;
 const NOGIFT = {ic: "–", nm: "geen gave", st: "EEEEEE", sh: "", rules: []};
 const giftOf = H => GIFTS[H.gift] || NOGIFT;
 function migrateRace() {
@@ -3265,7 +3263,7 @@ function migrateRace() {
   if (R.live && Array.isArray(R.live.bets)) R.live.bets.forEach(b => { if (b.paid == null) back += b.amt; });
   if (Array.isArray(R.ob) && !R.oPaid) R.ob.forEach(b => { back += b.amt; });
   S.money += back; S.race = null; save(); lbQueue();
-  setTimeout(() => toast(back ? `Paardenrace bijgewerkt. Open inzetten terug: +${fmtMoney(back)}` : "De paardenrace is bijgewerkt: spannender eindes!"), 600);
+  setTimeout(() => toast(back ? `Paardenrace bijgewerkt. Open inzetten terug: +${fmtMoney(back)}` : "Alle paarden zijn nu even goed: alleen de gaven tellen!"), 600);
 }
 const race = {view: "race", running: false, slip: [], chip: 25, duelA: null, busy: false, play: null, built: false};
 function newRace() {
@@ -3357,13 +3355,10 @@ function showRider(i) {
   const aff = TERR.map((t, k) => `<span class="aff">${TERRIC[t]} ${H.aff[k] > 0 ? "▲".repeat(H.aff[k]) : H.aff[k] < 0 ? "▼".repeat(-H.aff[k]) : "–"}</span>`).join("");
   const fm = formOf(H.rid);
   modal(`<h3 style="color:${H.col}">${esc(H.nm)}</h3>
-    <p class="qs" style="margin:2px 0 8px">🐎 ${esc(H.horse)} · ${TAC[H.tac]}</p>
+    <p class="qs" style="margin:2px 0 8px">🐎 ${esc(H.horse)} · alle paarden zijn even snel: alleen de gave telt</p>
     <div class="giftc"><div><div class="gname">${G.ic} 「${G.nm}」</div><p>${G.sh}</p></div>${hexSVG(G.st, H.col)}</div>
     <ul class="grules">${G.rules.map(t => `<li>${t}</li>`).join("")}</ul>
-    <p class="qs" style="margin:8px 0 4px">Paard</p>
-    <div class="hstats">${[["Snelheid", (H.spd - 0.94) / 0.12], ["Uithouding", (H.tank - 0.8) / 0.55], ["Constant", (1.3 - H.temp) / 0.6]].map(([l, v]) => `<div><span>${l}</span><i><b style="width:${Math.round(clamp(v, 0.05, 1) * 100)}%"></b></i></div>`).join("")}</div>
     ${fm.length ? `<p class="qs" style="margin:6px 0 0">Vorm (laatste races): ${fm.map(x => x + "e").join(", ")}</p>` : ""}
-    <p class="qs" style="margin:8px 0 4px">Terrein</p><div class="affs">${aff}</div>
     <p class="qs" style="margin:6px 0 0">De zeshoek is de gave zelf (voor de fans), niet de snelheid van het paard.</p>
     <div class="row"><button class="ghost" id="mNo">Sluiten</button></div>`, () => { $("#mNo").onclick = closeModal; });
 }
@@ -3451,7 +3446,7 @@ function rowHTML(i) {
   const sel = race.duelA === i;
   return `<div class="rrow ${sel ? "sel" : ""}" style="--c:${H.col}">
     <button class="rname" data-rider="${i}" type="button"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b>
-      <small>🐎 ${esc(H.horse)} · ${TAC[H.tac]} · ${terrTxt(H)}</small>
+      <small>🐎 ${esc(H.horse)}</small>
       ${fm.length ? `<small>vorm: ${fm.map(x => `<span class="fpos p${Math.min(x, 4)}">${x}</span>`).join("")}</small>` : ""}
       <small class="gtag">${G.ic} 「${G.nm}」</small></button>
     ${myAct() >= 3 ? `<button type="button" class="mark ${race.mark === i ? "on" : ""}" data-mark="${i}" title="Markeer (Act 3)">🎯</button>` : ""}
