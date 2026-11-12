@@ -665,7 +665,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-191701";
+<script>const BUILD="20261112-192010";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -751,7 +751,8 @@ ITEMS.forEach(it => {
 });
 
 /* ================= state ================= */
-const IV = [0, 3 * MIN, 15 * MIN, 5 * HOUR, 20 * HOUR, 44 * HOUR, 72 * HOUR];
+// stampmodus voor de toets: korte wachttijden (was 3 min, 15 min, 5 u, 20 u, 44 u, 72 u)
+const IV = [0, 1 * MIN, 4 * MIN, 15 * MIN, 45 * MIN, 2 * HOUR, 4 * HOUR];
 const FINAL = EXAM - 2 * HOUR; // laatste herhaalronde: vrijdagochtend
 function nextDue(now, b) { const d = now + IV[b]; return (now < FINAL - 30 * MIN && d > FINAL) ? FINAL : d; }
 const LSKEY = "topotoets-v1";
@@ -760,6 +761,8 @@ function blank() { return {v: 1, t: 0, c: {}, i: {}, days: {}, exams: [], money:
 function fixState(x) {
   const b = blank();
   if (!x || typeof x !== "object") return b;
+  // oude, lange wachttijden inkorten naar de nieuwe
+  if (x.c && typeof x.c === "object") { const t = Date.now(); Object.values(x.c).forEach(st => { if (st && st.b != null && st.d > t + IV[Math.min(st.b, IV.length - 1)]) st.d = t + IV[Math.min(st.b, IV.length - 1)]; }); }
   return {v: 1, t: +x.t || 0, c: x.c || {}, i: x.i || {}, days: x.days || {}, exams: Array.isArray(x.exams) ? x.exams : [],
     money: Number.isFinite(+x.money) ? Math.max(0, Math.round(+x.money)) : 100, name: typeof x.name === "string" ? x.name.slice(0, 20) : "", mb: x.mb || {}, cas: x.cas || {n: 0, w: 0, l: 0},
     race: x.race && typeof x.race === "object" && Array.isArray(x.race.ent) ? x.race : null, rc: x.rc || {n: 0, bet: 0, won: 0}, a4: typeof x.a4 === "string" ? x.a4 : "", found: Array.isArray(x.found) ? x.found.filter(v => typeof v === "string").slice(0, 30) : [], rh: Array.isArray(x.rh) ? x.rh.slice(-40) : []};
@@ -1487,10 +1490,11 @@ function examEnd() {
   if ($("#bR")) $("#bR").onclick = () => startSession("review");
 }
 
-/* ================= stedenquiz: een bolletje, jij zegt welke stad ================= */
+/* ================= stedenquiz: een bolletje, jij zegt welke stad (steden + hoofdsteden) ================= */
 let cq = null;
 function startCityQuiz() {
-  cq = {items: shuffle(ITEMS.filter(i => i.cat === "stad")), idx: 0, ok: 0, n: 0, miss: [], round: 1, first: 0};
+  const qs = [...ITEMS.filter(i => i.cat === "stad").map(it => ({t: "stad", it})), ...ITEMS.filter(i => i.cat === "land" && i.capLL).map(it => ({t: "cap", it}))];
+  cq = {items: shuffle(qs), idx: 0, ok: 0, n: 0, miss: [], round: 1, first: 0};
   sess = null; exam = null; atlas = null;
   cq.total = cq.items.length;
   show("play");
@@ -1505,24 +1509,26 @@ function cityQ() {
     if (!cq.miss.length) return cityEnd();
     cq.items = shuffle(cq.miss); cq.miss = []; cq.idx = 0; cq.round++;
   }
-  const it = cq.items[cq.idx];
+  const q = cq.items[cq.idx], it = q.it, isCap = q.t === "cap";
+  const ll = isCap ? it.capLL : it.anchor;
   goRegion(regionOf(it));
   countryClass({});
-  setDecor([() => mark(it.anchor, "", null, "", {pulse: true})]);
+  setDecor([() => mark(ll, "", null, "", {pulse: true})]);
   $("#topStat").textContent = `${cq.idx + 1}/${cq.items.length}${cq.round > 1 ? " · herkansing " + (cq.round - 1) : ""} · ✓${cq.ok}`;
-  $("#panel").innerHTML = `<div class="qh"><span class="chip">Stad</span>${cq.round > 1 ? '<span class="chip lk">Herkansing</span>' : ""}</div>
-    <div class="qt">Welke stad is dit?</div>
-    <form class="ans" id="fCq" autocomplete="off"><input id="cqI" autocomplete="off" spellcheck="false" enterkeyhint="go" placeholder="Naam van de stad"><button class="okb">OK</button></form>
+  $("#panel").innerHTML = `<div class="qh"><span class="chip">${isCap ? "Hoofdstad" : "Stad"}</span>${cq.round > 1 ? '<span class="chip lk">Herkansing</span>' : ""}</div>
+    <div class="qt">${isCap ? "Welke hoofdstad is dit?" : "Welke stad is dit?"}</div>
+    <form class="ans" id="fCq" autocomplete="off"><input id="cqI" autocomplete="off" spellcheck="false" enterkeyhint="go" placeholder="${isCap ? "Naam van de hoofdstad" : "Naam van de stad"}"><button class="okb">OK</button></form>
     <div class="row"><button class="ghost" id="cqSkip" type="button">Weet ik niet</button></div>`;
   const inp = $("#cqI");
   setTimeout(() => inp.focus({preventScroll: true}), 60);
   const answer = v => {
-    const r = checkAnswer(v, it.name, it.alts), ok = !!(v && r.ok);
+    const r = isCap ? checkCapital(it, v) : checkAnswer(v, it.name, it.alts), ok = !!(v && r.ok);
     cq.n++;
-    if (ok) { cq.ok++; if (cq.round === 1) cq.first++; S.money += 5; save(); lbQueue(); } else cq.miss.push(it);
-    countryClass({});
-    setDecor(drawReveal(it, ok ? "ok" : "hl"));
-    $("#panel").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}"><div class="v">${ok ? "Goed! +5 💰" : v ? "Niet goed" : "Dit is het"}</div>${!ok && v ? `<p>Jij: <span style="text-decoration:line-through">${esc(v)}</span></p>` : ""}<div class="ans">${esc(it.name)}</div>${r.note ? `<p>${r.note}</p>` : ""}${ok ? "" : infoHTML(it)}${ok ? "" : "<p class='qs'>Deze komt straks nog een keer.</p>"}</div>
+    if (ok) { cq.ok++; if (cq.round === 1) cq.first++; S.money += 5; save(); lbQueue(); } else cq.miss.push(q);
+    if (isCap) { countryClass(it.feature ? {[it.iso]: ok ? "ok" : "hl"} : {}); setDecor([() => mark(it.capLL, "cap", it.cap, "cur", {})]); }
+    else { countryClass({}); setDecor(drawReveal(it, ok ? "ok" : "hl")); }
+    const ansName = isCap ? it.cap : it.name;
+    $("#panel").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}"><div class="v">${ok ? "Goed! +5 💰" : v ? "Niet goed" : "Dit is het"}</div>${!ok && v ? `<p>Jij: <span style="text-decoration:line-through">${esc(v)}</span></p>` : ""}<div class="ans">${esc(ansName)}</div>${isCap ? `<p class="qs">hoofdstad van ${esc(it.name)}</p>` : ""}${r.note ? `<p>${r.note}</p>` : ""}${ok || isCap ? "" : infoHTML(it)}${ok ? "" : "<p class='qs'>Deze komt straks nog een keer.</p>"}</div>
       <div class="row"><button class="primary" id="bNext">Volgende →</button></div>`;
     cq.idx++;
     $("#bNext").onclick = cityQ; $("#bNext").focus();
@@ -1638,12 +1644,12 @@ function renderHome() {
     <div class="cta">
       <button class="btn" id="bStart">Start sessie: alles (±20 min)<small>${sub} · de beste volgorde, alle gebieden door elkaar</small></button>
       <div class="grid2">
-        <button class="btn alt sm" id="bRev" ${c.due ? "" : "disabled"}>Alleen herhalen</button>
+        <button class="btn alt sm" id="bRev" ${c.due || Object.keys(S.c).length ? "" : "disabled"}>${c.due ? "Alleen herhalen" : "Alles nu herhalen"}</button>
         <button class="btn alt sm" id="bExam">Toetsoefening</button>
         <button class="btn alt sm" id="bAtlas">Atlas</button>
         <button class="btn alt sm" id="bCasino">🎰 Roulette</button>
       </div>
-      <button class="btn alt sm" id="bCity" style="width:100%;margin-top:8px">🏙️ Stedenquiz<small>een bolletje op de kaart: welke stad is dit? Fouten komen terug tot je ze allemaal hebt.</small></button>
+      <button class="btn alt sm" id="bCity" style="width:100%;margin-top:8px">🏙️ Stedenquiz<small>steden + hoofdsteden: een bolletje op de kaart, jij zegt welke. Fouten komen terug tot je ze allemaal hebt.</small></button>
       <div class="sec" style="margin-top:14px">Per werelddeel <span class="qs" style="text-transform:none;letter-spacing:0">alleen dat gebied, nieuw + herhalen</span></div>
       <div class="conts">${CONTS.map(C => {
         const its = C.packs.flatMap(n => PACKITEMS[n]), lv = its.map(itemLevel), m = lv.filter(x => x === 3).length, intro = lv.filter(x => x > 0).length, due = counts(C.packs).due;
@@ -1672,7 +1678,11 @@ function renderHome() {
     <div class="foot"><span>${syncMode === "cloud" ? "✓ Voortgang opgeslagen in je account" : "Voortgang staat op dit apparaat"}</span><span>${STANDALONE ? `<button class="link" id="bExp">Exporteren</button> · <button class="link" id="bImp">Importeren</button> · ` : ""}<button class="link" id="bReset">Alles resetten</button></span></div>
   </div>`;
   $("#bStart").onclick = () => startSession("mix");
-  $("#bRev").onclick = () => startSession("review");
+  $("#bRev").onclick = () => {
+    // niks klaar? dan zet alles wat je al gehad hebt nu klaar (geen wachten)
+    if (!counts().due) { const t = NOW(); Object.values(S.c).forEach(st => { st.d = Math.min(st.d, t); }); save(); }
+    startSession("review");
+  };
   $("#bExam").onclick = examPicker;
   $("#bAtlas").onclick = startAtlas;
   $("#bCity").onclick = startCityQuiz;
