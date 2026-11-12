@@ -223,7 +223,7 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 #rMap{width:100%;height:100%;display:block}
 .rmapbox.play{height:min(26vh,210px)}
 .rstrip{display:flex;align-items:center;gap:8px;margin:6px 0 2px;font:600 12px var(--head);color:#e3cfae}
-.rsbar{position:relative;flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.rsbar{position:relative;flex:1;height:14px;border-radius:7px;background:rgba(255,255,255,.12);overflow:hidden}
 .rsbar i{display:block;height:100%;background:linear-gradient(90deg,#f76707,#ffd59a);transition:width .2s linear}
 .rsbar em{position:absolute;right:4px;top:-3px;font-style:normal;font-size:11px}
 .rleft{font:600 13px var(--head);color:#ffd59a;margin:2px 0 6px;min-height:18px}
@@ -238,8 +238,8 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 .bname{display:flex;gap:6px;align-items:baseline;white-space:nowrap;overflow:hidden}
 .bname b{font:700 13.5px var(--head)}.bname small{font-size:10.5px;color:#e3cfae;overflow:hidden;text-overflow:ellipsis}
 .bname .bmine{color:#ffe066;font-weight:700}
-.blane{position:relative;height:10px;border-radius:6px;background:rgba(255,255,255,.08);margin:4px 12px 0 0}
-.bfill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--c);opacity:.55}
+.blane{position:relative;height:10px;border-radius:6px;background-color:rgba(255,255,255,.06);background-image:linear-gradient(90deg,rgba(255,255,255,.28) 0 2px,transparent 2px);background-repeat:repeat-x;margin:4px 12px 0 0}
+.bfill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,transparent,var(--c));opacity:.8}
 .bhorse{position:absolute;top:-6px;font-size:18px;line-height:1;transform:scaleX(-1);filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 .bsta{position:absolute;left:0;bottom:-4px;height:2px;background:#8ce99a;border-radius:2px}.bsta.low{background:#ff6b6b}
 .bright{width:86px;display:flex;flex-direction:column;align-items:flex-end;gap:1px}
@@ -362,7 +362,9 @@ svg.moving .c,svg.moving .waters *{shape-rendering:optimizeSpeed}
 .hlist small{display:block;color:#e3cfae;font-size:12px;margin-top:2px}
 .ticker div.late{color:#ffd43b;font-weight:700}
 .board.zw{animation:zw 2.2s ease-out}
-.rsbar .rdot{position:absolute;top:1px;width:8px;height:8px;margin-left:-4px;border-radius:50%;border:1px solid rgba(0,0,0,.5)}
+.rsbar .rdot{position:absolute;top:2px;width:10px;height:10px;margin-left:-5px;border-radius:50%;border:1px solid rgba(0,0,0,.5)}
+.camlbl{font-size:11px;color:#c9b48f;margin:0 0 4px}
+.sb.fbb.open{animation:fbp 1.2s ease-in-out infinite}@keyframes fbp{50%{box-shadow:0 0 10px #ffe066}}
 .tgbar{min-height:0;display:flex;flex-direction:column;gap:4px;margin:0 0 6px}
 .tgbar .tg{position:relative;overflow:hidden;padding:5px 9px;border-radius:9px;background:rgba(255,107,107,.16);border:1px solid rgba(255,107,107,.55);font:600 12.5px var(--head);color:#ffd8d8;animation:tgIn .25s ease-out}
 .tgbar .tg i{position:absolute;left:0;bottom:0;height:3px;background:#ff6b6b}
@@ -663,7 +665,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-191055";
+<script>const BUILD="20261112-191701";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -1205,7 +1207,7 @@ function updTop() {
   $("#topStat").innerHTML = `💰<b>${fmtMoney(S.money)}</b> · <b class="g">✓${sess.ok}</b> <b class="r">✗${sess.bad}</b>${sess.g ? ` <b title="goede gokken bij nieuwe plekken">🎯${sess.gh || 0}/${sess.g}</b>` : ""} · ${m}:${String(s).padStart(2, "0")}`;
 }
 function stopSession() {
-  clearInterval(curTimer); clearTimeout(grade.t); sess = null; exam = null; atlas = null; onMapTap = null;
+  clearInterval(curTimer); clearTimeout(grade.t); sess = null; exam = null; atlas = null; cq = null; onMapTap = null;
   setDecor([]); countryClass({});
   show("home"); renderHome();
 }
@@ -1485,6 +1487,61 @@ function examEnd() {
   if ($("#bR")) $("#bR").onclick = () => startSession("review");
 }
 
+/* ================= stedenquiz: een bolletje, jij zegt welke stad ================= */
+let cq = null;
+function startCityQuiz() {
+  cq = {items: shuffle(ITEMS.filter(i => i.cat === "stad")), idx: 0, ok: 0, n: 0, miss: [], round: 1, first: 0};
+  sess = null; exam = null; atlas = null;
+  cq.total = cq.items.length;
+  show("play");
+  $("#topTitle").textContent = "🏙️ Stedenquiz";
+  clearInterval(curTimer);
+  requestAnimationFrame(() => { layout(); cityQ(); });
+}
+function cityQ() {
+  if (!cq) return;
+  onMapTap = null; clearTimeout(grade.t);
+  if (cq.idx >= cq.items.length) {
+    if (!cq.miss.length) return cityEnd();
+    cq.items = shuffle(cq.miss); cq.miss = []; cq.idx = 0; cq.round++;
+  }
+  const it = cq.items[cq.idx];
+  goRegion(regionOf(it));
+  countryClass({});
+  setDecor([() => mark(it.anchor, "", null, "", {pulse: true})]);
+  $("#topStat").textContent = `${cq.idx + 1}/${cq.items.length}${cq.round > 1 ? " · herkansing " + (cq.round - 1) : ""} · ✓${cq.ok}`;
+  $("#panel").innerHTML = `<div class="qh"><span class="chip">Stad</span>${cq.round > 1 ? '<span class="chip lk">Herkansing</span>' : ""}</div>
+    <div class="qt">Welke stad is dit?</div>
+    <form class="ans" id="fCq" autocomplete="off"><input id="cqI" autocomplete="off" spellcheck="false" enterkeyhint="go" placeholder="Naam van de stad"><button class="okb">OK</button></form>
+    <div class="row"><button class="ghost" id="cqSkip" type="button">Weet ik niet</button></div>`;
+  const inp = $("#cqI");
+  setTimeout(() => inp.focus({preventScroll: true}), 60);
+  const answer = v => {
+    const r = checkAnswer(v, it.name, it.alts), ok = !!(v && r.ok);
+    cq.n++;
+    if (ok) { cq.ok++; if (cq.round === 1) cq.first++; S.money += 5; save(); lbQueue(); } else cq.miss.push(it);
+    countryClass({});
+    setDecor(drawReveal(it, ok ? "ok" : "hl"));
+    $("#panel").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}"><div class="v">${ok ? "Goed! +5 💰" : v ? "Niet goed" : "Dit is het"}</div>${!ok && v ? `<p>Jij: <span style="text-decoration:line-through">${esc(v)}</span></p>` : ""}<div class="ans">${esc(it.name)}</div>${r.note ? `<p>${r.note}</p>` : ""}${ok ? "" : infoHTML(it)}${ok ? "" : "<p class='qs'>Deze komt straks nog een keer.</p>"}</div>
+      <div class="row"><button class="primary" id="bNext">Volgende →</button></div>`;
+    cq.idx++;
+    $("#bNext").onclick = cityQ; $("#bNext").focus();
+    if (ok) grade.t = setTimeout(() => { if (cq && $("#bNext")) cityQ(); }, 1100);
+  };
+  $("#fCq").onsubmit = ev => { ev.preventDefault(); answer(inp.value.trim()); };
+  $("#cqSkip").onclick = () => answer("");
+}
+function cityEnd() {
+  setDecor([]); countryClass({});
+  $("#topStat").textContent = "klaar";
+  $("#panel").innerHTML = `<div class="res"><div class="sc">${cq.first}/${cq.total}</div>
+    <p style="margin:4px 0 8px">in één keer goed. ${cq.round > 1 ? `De rest had je na ${cq.round - 1} herkansing${cq.round > 2 ? "en" : ""} ook.` : "Alles meteen goed. 😎"}</p>
+    <div class="row"><button class="primary" id="bH">Naar overzicht</button><button class="ghost" id="bAgain">Nog een keer</button></div></div>`;
+  $("#bH").onclick = stopSession;
+  $("#bAgain").onclick = startCityQuiz;
+  cq = null;
+}
+
 /* ================= atlas ================= */
 let atlas = null;
 function startAtlas() {
@@ -1586,6 +1643,7 @@ function renderHome() {
         <button class="btn alt sm" id="bAtlas">Atlas</button>
         <button class="btn alt sm" id="bCasino">🎰 Roulette</button>
       </div>
+      <button class="btn alt sm" id="bCity" style="width:100%;margin-top:8px">🏙️ Stedenquiz<small>een bolletje op de kaart: welke stad is dit? Fouten komen terug tot je ze allemaal hebt.</small></button>
       <div class="sec" style="margin-top:14px">Per werelddeel <span class="qs" style="text-transform:none;letter-spacing:0">alleen dat gebied, nieuw + herhalen</span></div>
       <div class="conts">${CONTS.map(C => {
         const its = C.packs.flatMap(n => PACKITEMS[n]), lv = its.map(itemLevel), m = lv.filter(x => x === 3).length, intro = lv.filter(x => x > 0).length, due = counts(C.packs).due;
@@ -1617,6 +1675,7 @@ function renderHome() {
   $("#bRev").onclick = () => startSession("review");
   $("#bExam").onclick = examPicker;
   $("#bAtlas").onclick = startAtlas;
+  $("#bCity").onclick = startCityQuiz;
   $("#bCasino").onclick = openCasino;
   $("#bRace").onclick = openRace;
   $("#bName").onclick = () => STANDALONE ? askLogout() : askName(false);
@@ -2582,7 +2641,9 @@ function resolveTg(s, T) {
     }
     case "dino": {
       src.g.hunt = 10; src.g.bites = T.res === "x" ? 2 : T.res === "1" ? 1 : 0; src.g.pack = 0; src.g.ext = T.res === "x" ? 1 : 0; src.nx.bite = s.t + between(r, 1, 2.5);
-      L({who: src.i, pop: !src.u.dinop, lvl: 2, txt: `🦖 ${H.nm} is een dinosaurus! Hij jaagt nu op prooi.`}); src.u.dinop = 1;
+      if (src.done || src.g.au) { L({who: src.i, txt: `🦖 ${H.nm} is al binnen: geen jacht meer.`}); return; }
+      src.g.hid = T.id;
+      logE(s, {k: "gift", g: "primitive", who: src.i, pop: !src.u.dinop, lvl: 2, txt: `🦖 ${H.nm} is een dinosaurus! Hij jaagt nu op prooi.`}); src.u.dinop = 1;
       return;
     }
     case "wave": {
@@ -2750,7 +2811,7 @@ function stepSim(s) {
         fl |= F_DINO; v *= GOODT.includes(terr) ? 1.04 : 1.02; c = "🦖 jaagt";
         if (E.g.bites > 0 && s.t >= E.nx.bite) {
           let vic = null, dd = 1e9;
-          for (const o of act) if (o !== E && !(o.mk.rap > 0) && R.ent[o.i].gift !== "standstill") { const d = Math.abs(o.x - E.x) - (o.eff > 1 ? 15 : 0); if (d < dd && Math.abs(o.x - E.x) < 150) { dd = d; vic = o; } }
+          for (const o of act) if (o !== E && !(o.mk.rap > 0) && R.ent[o.i].gift !== "standstill") { const d = Math.abs(o.x - E.x) - (o.eff > 1 ? 15 : 0); if (d < dd) { dd = d; vic = o; } }
           E.nx.bite = s.t + between(r, 1.5, 3);
           if (vic) {
             E.g.bites--; E.g.pack++;
@@ -2761,11 +2822,14 @@ function stepSim(s) {
             if (E.g.ext && E.g.pack >= 2) {
               E.g.ext = 0; let n = 0;
               for (const o of act) if (o !== E && !(o.mk.rap > 0) && Math.abs(o.x - E.x) < 45) { o.frz = Math.max(o.frz, 1.6); n++; }
+              if (E.g.hid) { logE(s, {k: "tr", id: E.g.hid, kind: "dino", who: E.i, txt: "🦖 Roedel van 3: uitsterving!"}); E.g.hid = 0; }
               logE(s, {k: "gift", g, who: E.i, pop: true, lvl: 3, ext: 1, txt: `🦖🦖🦖 UITSTERVING! De roedel van ${H.nm} is compleet. ${n} paard${n === 1 ? "" : "en"} in de buurt bevriezen van angst.`});
             }
           }
         }
         if (E.g.bites <= 0 && E.g.hunt > 2) E.g.hunt = 2;
+      } else if (E.g.hid) {
+        logE(s, {k: "tr", id: E.g.hid, kind: "dino", who: E.i, txt: `🦖 De jacht is voorbij: ${E.g.pack ? E.g.pack + " prooi" : "niemand gepakt"}.`}); E.g.hid = 0;
       } else if (!busy(E)) {
         E.g.dm += DT * (ahead ? 0.022 : GOODT.includes(terr) ? 0.016 : 0.009) * (E.g.relic ? 2 : 1) * Math.max(0, 1 + gauss(r) * 1.2);
         c = "🦖 " + Math.min(99, Math.round(E.g.dm * 100)) + "%";
@@ -2914,7 +2978,10 @@ function stepSim(s) {
     E.sta -= Math.pow(eff, 2.4) * 0.93 * cost * v * DT / D;
     E.x += v * DT;
     E.fl = fl | (E.g.van > 0 ? F_VAN : 0); E.c = E.g.relic ? "🦴 " + c : c;
-    if (E.x >= D) { E.done = true; E.ft = s.t - (E.x - D) / v; E.x = D; s.fin++; s.order.push(E.i); }
+    if (E.x >= D) {
+      E.done = true; E.ft = s.t - (E.x - D) / v; E.x = D; s.fin++; s.order.push(E.i);
+      if (E.g.hid) { logE(s, {k: "tr", id: E.g.hid, kind: "dino", who: E.i, txt: E.g.ext ? "🦖 Roedel van 3: uitsterving! (net voor de finish)" : `🦖 Hij is binnen, de jacht stopt: ${E.g.pack ? E.g.pack + " prooi" : "niemand gepakt"}.`}); E.g.hid = 0; }
+    }
   }
   // gevaren op de baan
   if (s.haz.length) {
@@ -2947,6 +3014,7 @@ function stepSim(s) {
   if (s.auAt && s.auBy == null && lead >= s.auAt * D) {
     const d = s.e.find(E => R.ent[E.i].rid === "dario"), v = s.e.find(E => R.ent[E.i].gift === "parallel");
     if (d && v && !d.done) {
+      if (d.g.hid) { logE(s, {k: "tr", id: d.g.hid, kind: "dino", who: d.i, txt: "🦖 De jacht stopt: deze Dario komt uit een andere wereld."}); d.g.hid = 0; }
       s.auBy = d.i; d.g.au = 1; d.g.hunt = 0; d.g.bites = 0; d.nx.zw = s.t + 4 + r() * 4;
       logE(s, {k: "gift", g: "timestands", who: d.i, pop: true, lvl: 4, sp: 1, sid: "au", au: 1, txt: `🚪 ${nm_(s, v.i)} opent een deur naar een andere wereld… en duwt er een andere ${nm_(s, d.i)} doorheen. Deze is geen jager. Zijn gave heet Time Stands Still: hij kan de tijd stilzetten. Voor de rest van de race.`});
     } else s.auAt = 0;
@@ -2986,6 +3054,9 @@ function stepSim(s) {
 }
 function runSim(s, onFrame) {
   while (s.fin < s.e.length) { stepSim(s); if (onFrame) onFrame(s); }
+  // wat nog openstaat als iedereen binnen is, wordt alsnog afgerond
+  s.tg.forEach(T => logE(s, {k: "tr", id: T.id, kind: T.kind, who: T.src, txt: "🏁 De race is al voorbij."})); s.tg = [];
+  s.e.forEach(E => { if (E.g.hid) { logE(s, {k: "tr", id: E.g.hid, kind: "dino", who: E.i, txt: "🏁 De jacht stopt bij de finish."}); E.g.hid = 0; } });
   const order = s.order.slice();
   order.sort((a, b) => s.e[a].ft - s.e[b].ft);
   return order;
@@ -3367,6 +3438,7 @@ function playRace(P) {
   el.innerHTML = `<div class="rstrip"><span>SD</span><div class="rsbar">${SEGS.map(sg => `<s style="left:${sg.a / D_TOTAL * 100}%"></s>`).join("")}<i id="rsLead"></i>${R.ent.map((H, i) => `<b class="rdot" id="rd${i}" style="background:${H.col}"></b>`).join("")}</div><span>NY 🏁</span></div>
     ${routeHTML(R)}
     <div class="rleft" id="rLeft"></div>
+    <div class="camlbl">📷 Camera op het peloton · streepjes = 25 lengtes · bovenste balk = hele route</div>
     <div class="tgbar" id="rTg"></div>
     <div class="board" id="rBoard" style="height:${R.ent.length * RH + HTOP}px">${R.ent.map((H, i) => {
       const G = giftOf(H);
@@ -3402,7 +3474,7 @@ function playRace(P) {
     while (tick.children.length > 3) tick.lastChild.remove();
   };
   const myBets = () => {
-    const fb = L.fb.map(b => `<span class="sb fbb">⚡ ${esc(b.nm)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.paid != null ? (b.pay > 0 ? ` · <b class="cwin">+${fmtMoney(b.pay)}</b>` : b.ref ? ` · <span class="a4i">♾️ terug</span>` : " · ✗") : " · …"}</span>`).join("");
+    const fb = L.fb.map(b => `<span class="sb fbb ${b.paid == null ? "open" : ""}">⚡ ${esc(b.nm)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.paid != null ? (b.pay > 0 ? ` · <b class="cwin">+${fmtMoney(b.pay)}</b>` : b.ref ? ` · <span class="a4i">♾️ terug</span>` : ` · <span class="closs">verloren</span>`) : b.kind === "fate" ? " · wacht op de pech…" : b.kind === "dino" ? " · wacht op de jacht…" : " · …"}</span>`).join("");
     $("#rMy").innerHTML = (hasBets ? L.bets.map(b => `<span class="sb">${betLabel(b)} · ${fmtMoney(b.amt)} @ ${fmtOdds(b.odds)}${b.cash != null ? " · cash " + fmtMoney(b.cash) : ""}</span>`).join("") : "<span class='qs'>Geen inzet vooraf.</span>") + fb;
   };
   myBets();
@@ -3574,7 +3646,9 @@ function playRace(P) {
       const row = $("#br" + i); if (!row) return;
       if (lastRank[i] !== pos) row.style.transform = `translateY(${pos * RH + HTOP}px)`;
       const pr = posOf(fr.x[i]) * 100;
-      $("#bf" + i).style.width = pr.toFixed(2) + "%";
+      const bf = $("#bf" + i), tr = Math.min(pr, 14);
+      bf.style.left = (pr - tr).toFixed(2) + "%"; bf.style.width = tr.toFixed(2) + "%";
+      if (geo) { const lane = bf.parentElement, sp = 25 / st.wW * geo.w; lane.style.backgroundSize = `${sp.toFixed(1)}px 100%`; lane.style.backgroundPosition = `${(-(((st.wL % 25) + 25) % 25) / 25 * sp).toFixed(1)}px 0`; }
       const hs = $("#bh" + i);
       hs.style.left = `calc(${pr.toFixed(2)}% - 11px)`;
       const f = fr.f[i];
