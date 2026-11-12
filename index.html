@@ -620,7 +620,7 @@ const PLEKKEN = [
  ["water","p","Wolga",["volga"],8,{line:[[33,57],[35.9,56.86],[39.9,57.6],[44.0,56.3],[49.1,55.8],[48.4,54.3],[50.1,53.2],[46.0,51.5],[44.5,48.7],[48.04,46.35],[48.5,45.8]],m:4},220,"Langste rivier van Europa (Rusland), mondt uit in de Kaspische Zee."],
 ];
 </script>
-<script>const BUILD="20261112-174622";
+<script>const BUILD="20261112-175002";
 "use strict";
 /* ================= helpers ================= */
 const $ = s => document.querySelector(s);
@@ -2744,12 +2744,13 @@ function actInfo() {
   const next = a === 0 ? `Nog ${2 - k} pakket${2 - k === 1 ? "" : "ten"} goed leren voor Act 1` : a === 1 ? `Nog ${5 - k} pakketten voor Act 2` : a === 2 ? `Nog ${8 - k} pakketten voor Act 3` : a === 3 ? (k < 11 ? `Nog ${11 - k} pakketten + toetsoefening ‘Alles’ ≥ 80% voor Act 4` : "Haal de toetsoefening ‘Alles’ met ≥ 80% voor Act 4") : "Maximaal. Oneindige rotatie.";
   return {a, k, next};
 }
+const SWAPMAX = [0, 200, 500, 1000, 1000], swapUntil = a => a >= 3 ? 0.67 : 0.5;
 const ACTTXT = [
   "Nog geen Act. Leer pakketten goed (alles minstens ‘goed’) om je gave te laten groeien.",
-  "Act 1: je ziet tijdens de race de energie van elk paard.",
-  "Act 2: je ziet de voorspelling van gebeurtenissen langs de route. De odds weten die niet.",
-  "Act 3: één keer per race mag je (voor de helft) max 500 van je winnaar-inzet naar een ander paard verplaatsen, tegen de odds van dat moment. Zo red je een inzet die misgaat.",
-  "Act 4: één keer per dag krijg je je grootste verloren inzet terug (max 1000, alleen bij odds tot 6). Gouden spiraal.",
+  "Act 1: Wissel. Eén keer per race mag je in de eerste helft max 200 van je winnaar-inzet naar een ander paard verplaatsen, tegen de odds van dat moment.",
+  "Act 2: Wissel wordt groter: max 500.",
+  "Act 3: Wissel max 1000, en je mag wisselen tot tweederde van de race.",
+  "Act 4: alles van Act 3, en één keer per dag krijg je je grootste verloren inzet terug (max 1000, alleen bij odds tot 6). Gouden spiraal.",
 ];
 
 // Opgeslagen races: versie 4 = één lange race. Oudere Oversteken worden netjes afgesloten.
@@ -2886,7 +2887,6 @@ function renderRace() {
   const giftCard = `<details class="gcard" ${!hist().length ? "open" : ""}><summary>Gaven in deze race: wat doen ze?</summary>${R.ent.map((H, i) => { const G = giftOf(H); return `<div class="gline"><span class="cdot" style="background:${H.col}"></span><b>${esc(H.nm)}</b> <span class="gt">${G.ic} ${G.nm}</span><ul class="gs">${G.rules.map(t => `<li>${t}</li>`).join("")}</ul></div>`; }).join("")}<p class="qs">✦ Zeldzame interacties ontdekt: <b>${found}/${nsp}</b>. Sommige gaven reageren op elkaar als de omstandigheden precies goed zijn. ${(S.found || []).includes("relikwie") ? "🦴 Jij hebt de legende gezien." : "Er gaat ook een gerucht over iets heiligs op de route…"} ${(S.found || []).includes("au") ? "🚪 En je weet wat er achter Valentins deur zit." : ""}</p><p class="qs">🎲 Elke gave heeft geluk nodig: wanneer hij afgaat en hoe sterk is elke keer anders. Soms <b>mislukt hij bijna</b>, soms is hij <b>✦ KRITIEK</b> (dubbel zo sterk).</p><p class="qs">Gaven gaan vanzelf af en werken op elkaar in. Jij rijdt niet mee, jij wedt alleen.</p></details>`;
   const tabs = `<div class="rtabs">${[["race", "Race"], ["hist", "Uitslagen"]].map(([k, l]) => `<button type="button" data-tab="${k}" class="${race.view === k ? "on" : ""}">${l}</button>`).join("")}</div>`;
   const info = `<div class="sinfo"><div><b>${KM_TOTAL.toLocaleString("nl-NL")} km</b> in één race, ±3 minuten · terrein en weer per stuk:</div>${routeHTML(R)}
-    ${a >= 2 ? `<div class="fc">🔮 Voorspelling:<br>${R.sched.map(e => `${EVT[e.k].ic} ${EVT[e.k].nm} bij ${esc(STAGES[e.seg].nm)} <span class="qs">(${EVNOTE[e.k]})</span>`).join("<br>")}</div>` : ""}
     <div class="fc warn">💘 In het laatste derde is Love Train actief: pech van F. Valentin gaat naar het paard met jouw grootste inzet.</div>
     <button type="button" class="mygift" id="rGift">Jouw gave 「Go Your Own Way」 ${a ? `<span class="act">ACT ${a}</span>` : "· nog geen Act"}</button></div>`;
   let body = "";
@@ -3051,14 +3051,14 @@ function playRace(P) {
       return `<div class="brow ${mineSet.has(i) ? "mine" : ""}" id="br${i}" style="--c:${H.col}">
         <span class="bpos" id="bp${i}"></span>
         <div class="bmid"><div class="bname"><b>${esc(H.nm)}</b><small id="bgt${i}">${G.ic} ${G.nm}</small>${mineSet.has(i) ? `<small class="bmine">jouw inzet</small>` : ""}</div>
-          <div class="blane"><i class="bfill" id="bf${i}"></i><span class="bhorse" id="bh${i}">🏇</span>${a >= 1 ? `<s class="bsta" id="bs${i}"></s>` : ""}</div></div>
+          <div class="blane"><i class="bfill" id="bf${i}"></i><span class="bhorse" id="bh${i}">🏇</span></div></div>
         <div class="bright"><span class="bgap" id="bg${i}"></span><span class="bst" id="bt${i}"></span></div>
       </div>`; }).join("")}<div class="cdown" id="rCd" hidden></div></div>
     <div class="ticker" id="rTick"></div>
     <div class="rctl" id="rCtl">
       <button type="button" class="cact" id="rSpd">1×</button>
       ${hasBets ? `<button type="button" class="cashb" id="rCash">Cash out</button>` : ""}
-      ${a >= 3 && !R.swap && L.bets.some(b => b.k === "w") ? `<button type="button" class="cact" id="rSwap">Wissel</button>` : ""}
+      ${a >= 1 && !R.swap && L.bets.some(b => b.k === "w") ? `<button type="button" class="cact" id="rSwap">Wissel</button>` : ""}
       <button type="button" class="cact" id="rSkip" title="Naar de uitslag">⏭</button>
     </div>
     <div class="cconf" id="rConf" hidden></div>
@@ -3087,7 +3087,7 @@ function playRace(P) {
       cb.disabled = !open || fast || st.paused;
       cb.textContent = !L.bets.some(b => b.cash == null) ? "Uitbetaald ✓" : lead >= 0.95 ? "Cash out gesloten" : fast ? "Cash out (niet op 4×)" : "Cash out";
     }
-    const sw = $("#rSwap"); if (sw && (lead >= 0.5 || R.swap)) sw.remove();
+    const sw = $("#rSwap"); if (sw && (lead >= swapUntil(a) || R.swap)) sw.remove();
   };
   const liveMC = (N) => {
     const sn = [...P.snaps].reverse().find(x => x.t <= st.t) || P.snaps[0];
@@ -3108,14 +3108,14 @@ function playRace(P) {
     $("#cfN").onclick = () => { conf(""); st.paused = false; updCtl(); };
   };
   if ($("#rSwap")) $("#rSwap").onclick = () => {
-    if (st.paused || R.swap || leadNow() >= 0.5) return;
+    if (st.paused || R.swap || leadNow() >= swapUntil(a)) return;
     const wb = L.bets.filter(x => x.k === "w" && x.cash == null).sort((x, y) => y.amt - x.amt)[0];
     if (!wb) return;
     st.paused = true; updCtl();
     const {mc, N} = liveMC(90);
     const lo = R.ent.map((_, i) => toOdds(mc.win[i] / N, 0.10));
-    const mv = Math.min(500, wb.amt);
-    conf(`<div>⏸ Wissel (Act 3): verplaats ${fmtMoney(mv)} van ${esc(R.ent[wb.h].nm)} naar een ander paard, tegen de odds van <b>nu</b>.</div>
+    const mv = Math.min(SWAPMAX[a], wb.amt);
+    conf(`<div>⏸ Wissel (Act ${a}): verplaats ${fmtMoney(mv)} van ${esc(R.ent[wb.h].nm)} naar een ander paard, tegen de odds van <b>nu</b>.</div>
       <div class="swl">${R.ent.map((H, i) => i === wb.h || !lo[i] ? "" : `<button type="button" data-sw="${i}" style="--c:${H.col}">${esc(H.nm.split(" ").slice(-1)[0])} <b>${fmtOdds(lo[i])}</b></button>`).join("")}</div>
       <div class="row"><button class="ghost" id="cfN">Annuleren</button></div>`);
     $("#rConf").querySelectorAll("[data-sw]").forEach(b => b.onclick = () => {
@@ -3166,7 +3166,6 @@ function playRace(P) {
       const ftx = FLAGTXT.find(([b]) => fr.f[i] & b);
       $("#bt" + i).textContent = fin ? "" : ftx ? ftx[1] : (fr.c && fr.c[i]) || "";
       row.classList.toggle("flag", !!ftx && !fin);
-      if (a >= 1) { const sEl = $("#bs" + i); sEl.style.width = fr.s[i] + "%"; sEl.classList.toggle("low", fr.s[i] < 15); }
       lastRank[i] = pos;
     });
     while (st.li < P.log.length && P.log[st.li].t <= st.t) {
