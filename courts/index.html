@@ -127,14 +127,19 @@ const OVERPASS = [
 // Ask ALL mirrors at the same time; the first good answer wins and the rest get cancelled.
 // (Before, it tried them one after another, so 3 slow servers = 24 s of waiting.)
 async function fetchCourts(lat, lon, radius, signal) {
-  const q = `[out:json][timeout:10];
-    nwr["leisure"="pitch"]["sport"~"basketball"](around:${radius},${lat},${lon});
+  // A rectangle (bbox) uses Overpass's spatial index → much faster than (around:…).
+  // The rectangle's corners stick out past the circle, so toCourts() trims back to the radius.
+  const dLat = radius / 111320;                                  // metres per degree of latitude
+  const dLon = radius / (111320 * Math.cos(lat * Math.PI / 180)); // longitude degrees shrink towards the poles
+  const bbox = [lat - dLat, lon - dLon, lat + dLat, lon + dLon].map(v => v.toFixed(5)).join(',');
+  const q = `[out:json][timeout:25];
+    nwr["leisure"="pitch"]["sport"~"basketball"](${bbox});
     out center tags;`;
   const race = new AbortController();
   signal.addEventListener('abort', () => race.abort(), { once: true });
   const attempts = OVERPASS.map(async url => {
     const res = await fetchWithTimeout(url, { method:'POST', body:'data=' + encodeURIComponent(q),
-      headers:{ 'Content-Type':'application/x-www-form-urlencoded' } }, 9000, race.signal);
+      headers:{ 'Content-Type':'application/x-www-form-urlencoded' } }, 25000, race.signal);
     if (!res.ok) throw new Error(res.status === 429 ? 'too many requests, wait a bit' : 'HTTP ' + res.status);
     const json = await res.json();
     if (json.remark && !json.elements.length) throw new Error(json.remark); // Overpass reports its own timeouts here
@@ -145,14 +150,14 @@ async function fetchCourts(lat, lon, radius, signal) {
   finally { race.abort(); } // cancel the losers so they stop using server slots
 }
 
-function toCourts(elements, lat, lon) {
+function toCourts(elements, lat, lon, radius) {
   return elements.map(el => {
     const cLat = el.lat ?? el.center?.lat, cLon = el.lon ?? el.center?.lon;
     if (cLat == null) return null;
     return { lat: cLat, lon: cLon, tags: el.tags || {},
       osm: `https://www.openstreetmap.org/${el.type}/${el.id}`,
       air: haversine(lat, lon, cLat, cLon), bike: null, bikeTime: null };
-  }).filter(Boolean).sort((a, b) => a.air - b.air);
+  }).filter(c => c && c.air <= radius).sort((a, b) => a.air - b.air);
 }
 
 // ---------- 4. Bike distances: OSRM "table" service, ONE request for all courts ----------
@@ -275,7 +280,7 @@ async function searchFrom(lat, lon, label) {
   startTicker(`Searching courts within ${fmt(radius)}…`);
   let courts;
   try {
-    courts = toCourts(await fetchCourts(lat, lon, radius, signal), lat, lon);
+    courts = toCourts(await fetchCourts(lat, lon, radius, signal), lat, lon, radius);
   } catch (e) {
     if (id === searchId) stopTicker(), setStatus('Could not reach the OpenStreetMap servers (' + e.message + '). Try again in a minute.');
     return;
