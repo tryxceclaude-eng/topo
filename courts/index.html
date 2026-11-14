@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Court Finder</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root { --orange:#e8590c; --bg:#111; --card:#1c1c1c; --text:#eee; --muted:#999; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui, sans-serif; background:var(--bg); color:var(--text); }
+  header { padding:12px 14px 6px; }
+  h1 { margin:0; font-size:1.3rem; }
+  h1 span { color:var(--orange); }
+  .sub { color:var(--muted); font-size:.85rem; margin-top:2px; }
+  .controls { display:flex; flex-wrap:wrap; gap:8px; padding:8px 14px; }
+  .controls input { flex:1 1 180px; padding:10px; border-radius:8px; border:1px solid #333; background:#222; color:var(--text); font-size:1rem; }
+  button, select { padding:10px 12px; border-radius:8px; border:none; font-size:.95rem; cursor:pointer; }
+  button { background:var(--orange); color:#fff; font-weight:600; }
+  button.ghost { background:#2a2a2a; color:var(--text); }
+  select { background:#2a2a2a; color:var(--text); }
+  #status { padding:4px 14px 8px; color:var(--muted); font-size:.9rem; min-height:1.4em; }
+  #map { height:45vh; margin:0 14px; border-radius:10px; }
+  #list { list-style:none; margin:10px 14px 30px; padding:0; }
+  #list li { background:var(--card); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
+  #list li.best { outline:2px solid var(--orange); }
+  .rank { font-weight:700; color:var(--orange); min-width:1.6em; }
+  .info { flex:1; }
+  .name { font-weight:600; }
+  .meta { color:var(--muted); font-size:.82rem; margin-top:2px; }
+  .dist { font-weight:700; white-space:nowrap; }
+  .links a { color:var(--orange); font-size:.85rem; margin-right:12px; text-decoration:none; }
+  .links a:hover { text-decoration:underline; }
+  #list li:hover { background:#252525; }
+  #list:empty::before { content:'Pick a location to see courts here.'; color:var(--muted); font-size:.9rem; }
+
+  /* Desktop: big map on the left, scrollable results list on the right */
+  @media (min-width: 900px) {
+    body { height:100vh; display:grid; overflow:hidden;
+      grid-template-columns: 1fr 380px;
+      grid-template-rows: auto auto auto 1fr;
+      grid-template-areas: "head head" "ctrl ctrl" "stat stat" "map list"; }
+    header { grid-area:head; padding:16px 20px 4px; }
+    h1 { font-size:1.6rem; }
+    .controls { grid-area:ctrl; padding:8px 20px; }
+    .controls input { flex:0 1 420px; }
+    #status { grid-area:stat; padding:4px 20px 10px; }
+    #map { grid-area:map; height:auto; margin:0 0 20px 20px; }
+    #list { grid-area:list; margin:0 20px 20px 14px; overflow-y:auto; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏀 Court <span>Finder</span></h1>
+  <div class="sub">Nearest basketball courts, from OpenStreetMap data. Tip: you can also tap the map to set your spot.</div>
+</header>
+
+<div class="controls">
+  <button id="gps">📍 Use my location</button>
+  <input id="addr" placeholder="…or type an address / place">
+  <button id="search" class="ghost">Search</button>
+  <select id="radius" title="Search radius">
+    <option value="1000">1 km</option>
+    <option value="3000" selected>3 km</option>
+    <option value="5000">5 km</option>
+    <option value="10000">10 km</option>
+  </select>
+</div>
+<div id="status"></div>
+<div id="map"></div>
+<ol id="list"></ol>
+
+<script>
+// ---------- 1. Map setup ----------
+const map = L.map('map').setView([52.06, 4.49], 13); // start view: roughly Zoetermeer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+const courtLayer = L.layerGroup().addTo(map);
+let homeMarker = null, home = null;
+
+const $ = id => document.getElementById(id);
+const setStatus = msg => $('status').textContent = msg;
+
+// ---------- 2. Distance: haversine formula (great-circle distance on a sphere) ----------
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Earth radius in metres
+  const rad = d => d * Math.PI / 180;
+  const dLat = rad(lat2 - lat1), dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+const fmt = m => m < 1000 ? Math.round(m) + ' m' : (m/1000).toFixed(1) + ' km';
+
+// ---------- 3. Ask Overpass for basketball pitches around a point ----------
+// Regex ~"basketball" also catches multi-sport tags like "basketball;volleyball".
+// "out center" gives a centre point for courts mapped as areas (ways/relations).
+const OVERPASS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+];
+async function fetchCourts(lat, lon, radius) {
+  const q = `[out:json][timeout:25];
+    nwr["leisure"="pitch"]["sport"~"basketball"](around:${radius},${lat},${lon});
+    out center tags;`;
+  let lastErr;
+  for (const url of OVERPASS) {              // try mirrors until one answers
+    try {
+      const res = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q),
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return (await res.json()).elements;
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+
+// ---------- 4. Turn raw OSM elements into sorted courts ----------
+function toCourts(elements, lat, lon) {
+  return elements.map(el => {
+    const cLat = el.lat ?? el.center?.lat, cLon = el.lon ?? el.center?.lon;
+    if (cLat == null) return null;
+    const t = el.tags || {};
+    return {
+      lat: cLat, lon: cLon, tags: t,
+      osm: `https://www.openstreetmap.org/${el.type}/${el.id}`,
+      dist: haversine(lat, lon, cLat, cLon)
+    };
+  }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+}
+
+function describe(t) {
+  const bits = [];
+  if (t.surface) bits.push(t.surface.replace(/_/g, ' '));
+  if (t.hoops) bits.push(t.hoops + ' hoop' + (t.hoops === '1' ? '' : 's'));
+  if (t.lit === 'yes') bits.push('lit at night');
+  if (t.indoor === 'yes' || t.covered === 'yes') bits.push('indoor/covered');
+  if (t.access && t.access !== 'yes') bits.push('access: ' + t.access);
+  if (/;/.test(t.sport)) bits.push('shared: ' + t.sport.replace(/;/g, ', '));
+  return bits.join(' · ') || 'no extra details mapped';
+}
+
+// ---------- 5. Show results on map + list ----------
+function render(courts) {
+  courtLayer.clearLayers();
+  const list = $('list'); list.innerHTML = '';
+  courts.forEach((c, i) => {
+    const title = c.tags.name || 'Basketball court';
+    const walk = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=walking`;
+    const m = L.circleMarker([c.lat, c.lon], {
+      radius: i === 0 ? 10 : 7, color:'#e8590c', fillColor: i === 0 ? '#e8590c' : '#ffa94d', fillOpacity:.9, weight:2
+    }).addTo(courtLayer).bindPopup(`<b>${i+1}. ${title}</b><br>${fmt(c.dist)}<br><a href="${walk}" target="_blank">Walking route</a>`);
+
+    const li = document.createElement('li');
+    if (i === 0) li.className = 'best';
+    li.innerHTML = `<div class="rank">${i+1}</div>
+      <div class="info"><div class="name">${title}</div>
+        <div class="meta">${describe(c.tags)}</div>
+        <div class="links"><a href="${walk}" target="_blank">🚶 Route</a><a href="${c.osm}" target="_blank">OSM</a></div>
+      </div><div class="dist">${fmt(c.dist)}</div>`;
+    li.addEventListener('click', e => {
+      if (e.target.tagName === 'A') return;
+      map.setView([c.lat, c.lon], 17); m.openPopup();
+      if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' }); // phone: jump back up to the map
+    });
+    list.appendChild(li);
+  });
+  if (courts.length) {
+    const b = L.latLngBounds([[home.lat, home.lon], ...courts.slice(0, 5).map(c => [c.lat, c.lon])]);
+    map.fitBounds(b, { padding:[30, 30] });
+  }
+}
+
+// ---------- 6. Main flow: set a location, search, render ----------
+async function searchFrom(lat, lon, label) {
+  home = { lat, lon };
+  try { localStorage.setItem('courtHome', JSON.stringify(home)); } catch {}
+  if (homeMarker) homeMarker.remove();
+  homeMarker = L.marker([lat, lon]).addTo(map).bindPopup(label || 'You');
+  const radius = +$('radius').value;
+  setStatus(`Searching within ${fmt(radius)}…`);
+  try {
+    const courts = toCourts(await fetchCourts(lat, lon, radius), lat, lon);
+    render(courts);
+    setStatus(courts.length
+      ? `${courts.length} court${courts.length > 1 ? 's' : ''} found. Nearest: ${fmt(courts[0].dist)} (straight line).`
+      : `No courts mapped within ${fmt(radius)}. Try a bigger radius.`);
+  } catch (e) {
+    setStatus('Could not reach the OpenStreetMap servers (' + e.message + '). Try again in a minute.');
+  }
+}
+
+$('gps').onclick = () => {
+  if (!navigator.geolocation) return setStatus('Your browser has no location support. Type an address instead.');
+  setStatus('Getting your location…');
+  navigator.geolocation.getCurrentPosition(
+    p => searchFrom(p.coords.latitude, p.coords.longitude, 'You are here'),
+    err => setStatus('Location blocked or unavailable (' + err.message + '). Type an address or tap the map.'),
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+};
+
+// Geocoding: address → coordinates, via OpenStreetMap's Nominatim
+async function geocode() {
+  const q = $('addr').value.trim();
+  if (!q) return;
+  setStatus('Looking up address…');
+  try {
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+    const hits = await res.json();
+    if (!hits.length) return setStatus('Address not found. Try adding the town name.');
+    searchFrom(+hits[0].lat, +hits[0].lon, hits[0].display_name.split(',').slice(0, 2).join(','));
+  } catch (e) { setStatus('Address lookup failed (' + e.message + ').'); }
+}
+$('search').onclick = geocode;
+$('addr').addEventListener('keydown', e => { if (e.key === 'Enter') geocode(); });
+
+map.on('click', e => searchFrom(e.latlng.lat, e.latlng.lng, 'Chosen spot'));
+$('radius').onchange = () => { if (home) searchFrom(home.lat, home.lon); };
+
+// Reopen at your last spot, if the browser remembered it
+try {
+  const saved = JSON.parse(localStorage.getItem('courtHome'));
+  if (saved) searchFrom(saved.lat, saved.lon, 'Last spot');
+} catch {}
+</script>
+</body>
+</html>
