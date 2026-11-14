@@ -118,46 +118,75 @@ function haversine(lat1, lon1, lat2, lon2) {
 const fmt = m => m < 1000 ? Math.round(m) + ' m' : (m/1000).toFixed(1) + ' km';
 const mins = s => Math.max(1, Math.round(s / 60)) + ' min';
 
-// ---------- 3. Courts from Overpass ----------
-const OVERPASS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://overpass.private.coffee/api/interpreter',
-  'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+// ---------- 3. Where the courts come from ----------
+// Main source: courts.json, rebuilt every Monday by a GitHub Action from a full
+// download of the Netherlands. Read from raw.githubusercontent.com because
+// commits made by an Action don't trigger a new GitHub Pages build.
+const DATA_URLS = [
+  'https://raw.githubusercontent.com/tryxceclaude-eng/topo/main/courts/courts.json',
+  './courts.json'
 ];
-// Ask ALL mirrors at the same time; the first good answer wins and the rest get cancelled.
-// (Before, it tried them one after another, so 3 slow servers = 24 s of waiting.)
-async function fetchCourts(lat, lon, radius, signal) {
-  // A rectangle (bbox) uses Overpass's spatial index → much faster than (around:…).
-  // The rectangle's corners stick out past the circle, so toCourts() trims back to the radius.
-  const dLat = radius / 111320;                                  // metres per degree of latitude
-  const dLon = radius / (111320 * Math.cos(lat * Math.PI / 180)); // longitude degrees shrink towards the poles
-  const bbox = [lat - dLat, lon - dLon, lat + dLat, lon + dLon].map(v => v.toFixed(5)).join(',');
-  const q = `[out:json][timeout:25];
-    nwr["leisure"="pitch"]["sport"~"basketball"](${bbox});
-    out center tags;`;
-  const race = new AbortController();
-  signal.addEventListener('abort', () => race.abort(), { once: true });
-  const attempts = OVERPASS.map(async url => {
-    const res = await fetchWithTimeout(url, { method:'POST', body:'data=' + encodeURIComponent(q),
-      headers:{ 'Content-Type':'application/x-www-form-urlencoded' } }, 25000, race.signal);
-    if (!res.ok) throw new Error(res.status === 429 ? 'too many requests, wait a bit' : 'HTTP ' + res.status);
-    const json = await res.json();
-    if (json.remark && !json.elements.length) throw new Error(json.remark); // Overpass reports its own timeouts here
-    return json.elements;
-  });
-  try { return await Promise.any(attempts); }
-  catch (agg) { const e = agg.errors?.[0]; throw e?.name === 'AbortError' ? new Error('all servers too slow') : (e || agg); }
-  finally { race.abort(); } // cancel the losers so they stop using server slots
+const NL = { s: 50.7, w: 3.3, n: 53.7, e: 7.3 }; // rough box around the Netherlands
+const inNL = (lat, lon) => lat > NL.s && lat < NL.n && lon > NL.w && lon < NL.e;
+
+let dataPromise = null; // download once, reuse for every search
+function loadCourtData() {
+  if (!dataPromise) dataPromise = (async () => {
+    for (const url of DATA_URLS) {
+      try {
+        const res = await fetchWithTimeout(url, { cache: 'no-cache' }, 15000);
+        if (res.ok) return await res.json();
+      } catch {}
+    }
+    throw new Error('court data file not available');
+  })().catch(e => { dataPromise = null; throw e; }); // allow a retry next search
+  return dataPromise;
 }
 
-function toCourts(elements, lat, lon, radius) {
-  return elements.map(el => {
-    const cLat = el.lat ?? el.center?.lat, cLon = el.lon ?? el.center?.lon;
-    if (cLat == null) return null;
-    return { lat: cLat, lon: cLon, tags: el.tags || {},
-      osm: `https://www.openstreetmap.org/${el.type}/${el.id}`,
-      air: haversine(lat, lon, cLat, cLon), bike: null, bikeTime: null };
-  }).filter(c => c && c.air <= radius).sort((a, b) => a.air - b.air);
+// Fallback for spots outside the Netherlands: ask Overpass live, ONE server at a
+// time, and stop at "too many requests" instead of hammering (that gets you banned).
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+async function fetchOverpass(lat, lon, radius, signal) {
+  const dLat = radius / 111320, dLon = radius / (111320 * Math.cos(lat * Math.PI / 180));
+  const bbox = [lat - dLat, lon - dLon, lat + dLat, lon + dLon].map(v => v.toFixed(5)).join(',');
+  const q = `[out:json][timeout:25];nwr["leisure"="pitch"]["sport"~"basketball"](${bbox});out center tags;`;
+  let lastErr;
+  for (const url of OVERPASS) {
+    try {
+      const res = await fetchWithTimeout(url, { method:'POST', body:'data=' + encodeURIComponent(q),
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' } }, 25000, signal);
+      if (res.status === 429) throw new Error('too many requests, wait a minute');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return (await res.json()).elements.map(el => ({
+        lat: el.lat ?? el.center?.lat, lon: el.lon ?? el.center?.lon,
+        osm: `${el.type}/${el.id}`, tags: el.tags || {} }));
+    } catch (e) {
+      if (signal.aborted) throw e;
+      lastErr = e.name === 'AbortError' ? new Error('server too slow') : e;
+      if (/too many/.test(lastErr.message)) break;
+    }
+  }
+  throw lastErr;
+}
+
+let dataDate = null;
+async function getCourts(lat, lon, radius, signal) {
+  if (inNL(lat, lon)) {
+    try {
+      const data = await loadCourtData();
+      dataDate = data.generated?.slice(0, 10);
+      return data.courts.map(([la, lo, osm, tags]) => ({ lat: la, lon: lo, osm, tags }));
+    } catch { /* data file missing → fall through to live Overpass */ }
+  }
+  dataDate = null;
+  return fetchOverpass(lat, lon, radius, signal);
+}
+
+function toCourts(raw, lat, lon, radius) {
+  return raw.filter(c => c.lat != null).map(c => ({
+    ...c, osm: 'https://www.openstreetmap.org/' + c.osm,
+    air: haversine(lat, lon, c.lat, c.lon), bike: null, bikeTime: null
+  })).filter(c => c.air <= radius).sort((a, b) => a.air - b.air);
 }
 
 // ---------- 4. Bike distances: OSRM "table" service, ONE request for all courts ----------
@@ -280,9 +309,9 @@ async function searchFrom(lat, lon, label) {
   startTicker(`Searching courts within ${fmt(radius)}…`);
   let courts;
   try {
-    courts = toCourts(await fetchCourts(lat, lon, radius, signal), lat, lon, radius);
+    courts = toCourts(await getCourts(lat, lon, radius, signal), lat, lon, radius);
   } catch (e) {
-    if (id === searchId) stopTicker(), setStatus('Could not reach the OpenStreetMap servers (' + e.message + '). Try again in a minute.');
+    if (id === searchId) stopTicker(), setStatus('Could not load court data (' + e.message + '). Try again in a minute.');
     return;
   }
   if (id !== searchId) return;
@@ -295,9 +324,10 @@ async function searchFrom(lat, lon, label) {
   stopTicker();
   render(courts);
   const n = courts.length, s = n > 1 ? 's' : '';
-  setStatus(routed
+  setStatus((routed
     ? `${n} court${s}. Nearest by bike: ${fmt(courts[0].bike)}, ~${mins(courts[0].bikeTime)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
-    : `${n} court${s}. Bike router unavailable, so these are straight-line distances.`);
+    : `${n} court${s}. Bike router unavailable, so these are straight-line distances.`)
+    + (dataDate ? ` Court data: ${dataDate}.` : ''));
 }
 
 $('gps').onclick = () => {
