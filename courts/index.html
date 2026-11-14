@@ -25,11 +25,18 @@
   #list { list-style:none; margin:10px 14px 30px; padding:0; }
   #list li { background:var(--card); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; gap:10px; align-items:flex-start; cursor:pointer; }
   #list li.best { outline:2px solid var(--orange); }
+  #list li.active { background:#2a2018; }
   .rank { font-weight:700; color:var(--orange); min-width:1.6em; }
   .info { flex:1; }
   .name { font-weight:600; }
   .meta { color:var(--muted); font-size:.82rem; margin-top:2px; }
-  .dist { font-weight:700; white-space:nowrap; }
+  .dist { font-weight:700; white-space:nowrap; text-align:right; }
+  .dist small { display:block; font-weight:400; color:var(--muted); font-size:.75rem; }
+  .net { display:inline-block; font-size:.75rem; padding:2px 7px; border-radius:999px; margin-top:5px; }
+  .net.yes { background:#1f3d26; color:#8ce99a; }
+  .net.no { background:#3d1f1f; color:#ffa8a8; }
+  .net.unknown { background:#2a2a2a; color:var(--muted); }
+  .links { margin-top:5px; }
   .links a { color:var(--orange); font-size:.85rem; margin-right:12px; text-decoration:none; }
   .links a:hover { text-decoration:underline; }
   #list li:hover { background:#252525; }
@@ -54,7 +61,7 @@
 <body>
 <header>
   <h1>🏀 Court <span>Finder</span></h1>
-  <div class="sub">Nearest basketball courts, from OpenStreetMap data. Tip: you can also tap the map to set your spot.</div>
+  <div class="sub">Nearest basketball courts by bike, from OpenStreetMap. Tap a court to see the route. Tap the map to set your spot.</div>
 </header>
 
 <div class="controls">
@@ -73,69 +80,121 @@
 <ol id="list"></ol>
 
 <script>
-// ---------- 1. Map setup ----------
+// ---------- 1. Map setup: normal map + satellite toggle ----------
 const map = L.map('map').setView([52.06, 4.49], 13); // start view: roughly Zoetermeer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; OpenStreetMap contributors · Routing: FOSSGIS / OSRM'
 }).addTo(map);
+const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19, attribution: 'Imagery &copy; Esri'
+});
+L.control.layers({ 'Map': streets, 'Satellite': satellite }).addTo(map);
+
 const courtLayer = L.layerGroup().addTo(map);
-let homeMarker = null, home = null;
+let routeLine = null, homeMarker = null, home = null;
 
 const $ = id => document.getElementById(id);
 const setStatus = msg => $('status').textContent = msg;
 
-// ---------- 2. Distance: haversine formula (great-circle distance on a sphere) ----------
+// ---------- 2. Helpers ----------
+// fetch() with a time limit, so a dead server can't freeze the page forever
+async function fetchWithTimeout(url, opts = {}, ms = 8000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try { return await fetch(url, { ...opts, signal: ctrl.signal }); }
+  finally { clearTimeout(timer); }
+}
+
+// Haversine: straight-line distance on a sphere. Now only used to pre-filter
+// and as a fallback when the bike router is down.
 function haversine(lat1, lon1, lat2, lon2) {
-  const R = 6371000; // Earth radius in metres
-  const rad = d => d * Math.PI / 180;
+  const R = 6371000, rad = d => d * Math.PI / 180;
   const dLat = rad(lat2 - lat1), dLon = rad(lon2 - lon1);
   const a = Math.sin(dLat/2)**2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon/2)**2;
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 const fmt = m => m < 1000 ? Math.round(m) + ' m' : (m/1000).toFixed(1) + ' km';
+const mins = s => Math.max(1, Math.round(s / 60)) + ' min';
 
-// ---------- 3. Ask Overpass for basketball pitches around a point ----------
-// Regex ~"basketball" also catches multi-sport tags like "basketball;volleyball".
-// "out center" gives a centre point for courts mapped as areas (ways/relations).
+// ---------- 3. Courts from Overpass ----------
 const OVERPASS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.private.coffee/api/interpreter',
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
 ];
 async function fetchCourts(lat, lon, radius) {
-  const q = `[out:json][timeout:25];
+  const q = `[out:json][timeout:10];
     nwr["leisure"="pitch"]["sport"~"basketball"](around:${radius},${lat},${lon});
     out center tags;`;
   let lastErr;
-  for (const url of OVERPASS) {              // try mirrors until one answers
+  for (const url of OVERPASS) {
     try {
-      const res = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q),
-        headers:{ 'Content-Type':'application/x-www-form-urlencoded' } });
+      const res = await fetchWithTimeout(url, { method:'POST', body:'data=' + encodeURIComponent(q),
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' } }, 8000);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return (await res.json()).elements;
-    } catch (e) { lastErr = e; }
+    } catch (e) { lastErr = e.name === 'AbortError' ? new Error('server too slow') : e; }
   }
   throw lastErr;
 }
 
-// ---------- 4. Turn raw OSM elements into sorted courts ----------
 function toCourts(elements, lat, lon) {
   return elements.map(el => {
     const cLat = el.lat ?? el.center?.lat, cLon = el.lon ?? el.center?.lon;
     if (cLat == null) return null;
-    const t = el.tags || {};
-    return {
-      lat: cLat, lon: cLon, tags: t,
+    return { lat: cLat, lon: cLon, tags: el.tags || {},
       osm: `https://www.openstreetmap.org/${el.type}/${el.id}`,
-      dist: haversine(lat, lon, cLat, cLon)
-    };
-  }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+      air: haversine(lat, lon, cLat, cLon), bike: null, bikeTime: null };
+  }).filter(Boolean).sort((a, b) => a.air - b.air);
+}
+
+// ---------- 4. Bike distances: OSRM "table" service, ONE request for all courts ----------
+// FOSSGIS runs a bike-profile OSRM server. Its URL says "driving" but the
+// server under /routed-bike/ is built with the bike profile.
+// Coordinates go in as lon,lat (OSRM order!), first one = you (sources=0).
+const BIKE = 'https://routing.openstreetmap.de/routed-bike';
+const MAX_ROUTED = 25; // be polite to a free server: only route the 25 nearest
+async function addBikeDistances(courts) {
+  const subset = courts.slice(0, MAX_ROUTED);
+  const coords = [[home.lon, home.lat], ...subset.map(c => [c.lon, c.lat])]
+    .map(p => p[0].toFixed(6) + ',' + p[1].toFixed(6)).join(';');
+  const res = await fetchWithTimeout(`${BIKE}/table/v1/driving/${coords}?sources=0&annotations=distance,duration`, {}, 10000);
+  const data = await res.json();
+  if (data.code !== 'Ok') throw new Error(data.message || data.code);
+  subset.forEach((c, i) => {           // index 0 in the row is you → courts start at 1
+    c.bike = data.distances[0][i + 1];
+    c.bikeTime = data.durations[0][i + 1];
+  });
+  // Sort by bike distance; anything the router couldn't reach goes to the end
+  return courts.sort((a, b) => (a.bike ?? Infinity) - (b.bike ?? Infinity) || a.air - b.air);
+}
+
+// Draw the actual bike route to one court (OSRM "route" service)
+async function showRoute(c) {
+  try {
+    const res = await fetchWithTimeout(`${BIKE}/route/v1/driving/${home.lon},${home.lat};${c.lon},${c.lat}?overview=full&geometries=geojson`, {}, 10000);
+    const data = await res.json();
+    if (data.code !== 'Ok') throw new Error(data.code);
+    if (routeLine) routeLine.remove();
+    routeLine = L.geoJSON(data.routes[0].geometry, { style: { color:'#4dabf7', weight:5, opacity:.85 }, interactive: false }).addTo(map);
+    map.fitBounds(routeLine.getBounds(), { padding:[30, 30] });
+  } catch { map.setView([c.lat, c.lon], 17); } // router down → just zoom to the court
+}
+
+// ---------- 5. Net or no net (OSM tag hoops:nets = chord | chain | none) ----------
+function netBadge(t) {
+  const n = t['hoops:nets'];
+  if (n === 'chord') return '<span class="net yes">🕸️ Net (rope)</span>';
+  if (n === 'chain') return '<span class="net yes">⛓️ Net (chain)</span>';
+  if (n === 'none' || n === 'no') return '<span class="net no">❌ No net</span>';
+  return '<span class="net unknown">❔ Net unknown, check Street View</span>';
 }
 
 function describe(t) {
   const bits = [];
   if (t.surface) bits.push(t.surface.replace(/_/g, ' '));
   if (t.hoops) bits.push(t.hoops + ' hoop' + (t.hoops === '1' ? '' : 's'));
+  if (t['hoops:height'] === 'mini') bits.push('low hoops');
   if (t.lit === 'yes') bits.push('lit at night');
   if (t.indoor === 'yes' || t.covered === 'yes') bits.push('indoor/covered');
   if (t.access && t.access !== 'yes') bits.push('access: ' + t.access);
@@ -143,29 +202,41 @@ function describe(t) {
   return bits.join(' · ') || 'no extra details mapped';
 }
 
-// ---------- 5. Show results on map + list ----------
+// ---------- 6. Show results ----------
 function render(courts) {
   courtLayer.clearLayers();
+  if (routeLine) { routeLine.remove(); routeLine = null; }
   const list = $('list'); list.innerHTML = '';
   courts.forEach((c, i) => {
     const title = c.tags.name || 'Basketball court';
-    const walk = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=walking`;
+    const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=bicycling`;
+    const street = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${c.lat},${c.lon}`;
+    const distHtml = c.bike != null
+      ? `🚲 ${fmt(c.bike)}<small>${mins(c.bikeTime)} by bike</small>`
+      : `${fmt(c.air)}<small>straight line</small>`;
+
     const m = L.circleMarker([c.lat, c.lon], {
-      radius: i === 0 ? 10 : 7, color:'#e8590c', fillColor: i === 0 ? '#e8590c' : '#ffa94d', fillOpacity:.9, weight:2
-    }).addTo(courtLayer).bindPopup(`<b>${i+1}. ${title}</b><br>${fmt(c.dist)}<br><a href="${walk}" target="_blank">Walking route</a>`);
+      radius: i === 0 ? 10 : 7, color:'#e8590c', fillColor: i === 0 ? '#e8590c' : '#ffa94d', fillOpacity:.9, weight:2,
+      bubblingMouseEvents: false // clicking a court must not also count as clicking the map (= new home spot)
+    }).addTo(courtLayer).bindPopup(`<b>${i+1}. ${title}</b><br>${distHtml.replace(/<\/?small>/g, ' ')}<br>${netBadge(c.tags)}`);
 
     const li = document.createElement('li');
     if (i === 0) li.className = 'best';
     li.innerHTML = `<div class="rank">${i+1}</div>
       <div class="info"><div class="name">${title}</div>
         <div class="meta">${describe(c.tags)}</div>
-        <div class="links"><a href="${walk}" target="_blank">🚶 Route</a><a href="${c.osm}" target="_blank">OSM</a></div>
-      </div><div class="dist">${fmt(c.dist)}</div>`;
+        ${netBadge(c.tags)}
+        <div class="links"><a href="${gmaps}" target="_blank">🚲 Google Maps</a><a href="${street}" target="_blank">👀 Street View</a><a href="${c.osm}" target="_blank">OSM</a></div>
+      </div><div class="dist">${distHtml}</div>`;
     li.addEventListener('click', e => {
       if (e.target.tagName === 'A') return;
-      map.setView([c.lat, c.lon], 17); m.openPopup();
-      if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' }); // phone: jump back up to the map
+      document.querySelectorAll('#list li.active').forEach(x => x.classList.remove('active'));
+      li.classList.add('active');
+      m.openPopup();
+      showRoute(c);
+      if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    m.on('click', () => { li.click(); li.scrollIntoView({ block:'nearest', behavior:'smooth' }); });
     list.appendChild(li);
   });
   if (courts.length) {
@@ -174,23 +245,35 @@ function render(courts) {
   }
 }
 
-// ---------- 6. Main flow: set a location, search, render ----------
+// ---------- 7. Main flow ----------
+let searchId = 0; // ignore results from an older search if you click again quickly
 async function searchFrom(lat, lon, label) {
+  const id = ++searchId;
   home = { lat, lon };
   try { localStorage.setItem('courtHome', JSON.stringify(home)); } catch {}
   if (homeMarker) homeMarker.remove();
   homeMarker = L.marker([lat, lon]).addTo(map).bindPopup(label || 'You');
   const radius = +$('radius').value;
-  setStatus(`Searching within ${fmt(radius)}…`);
+  setStatus(`Searching courts within ${fmt(radius)}…`);
+  let courts;
   try {
-    const courts = toCourts(await fetchCourts(lat, lon, radius), lat, lon);
-    render(courts);
-    setStatus(courts.length
-      ? `${courts.length} court${courts.length > 1 ? 's' : ''} found. Nearest: ${fmt(courts[0].dist)} (straight line).`
-      : `No courts mapped within ${fmt(radius)}. Try a bigger radius.`);
+    courts = toCourts(await fetchCourts(lat, lon, radius), lat, lon);
   } catch (e) {
-    setStatus('Could not reach the OpenStreetMap servers (' + e.message + '). Try again in a minute.');
+    if (id === searchId) setStatus('Could not reach the OpenStreetMap servers (' + e.message + '). Try again in a minute.');
+    return;
   }
+  if (id !== searchId) return;
+  if (!courts.length) { render([]); return setStatus(`No courts mapped within ${fmt(radius)}. Try a bigger radius.`); }
+
+  setStatus(`${courts.length} court${courts.length > 1 ? 's' : ''} found. Working out bike routes…`);
+  let routed = true;
+  try { courts = await addBikeDistances(courts); } catch { routed = false; }
+  if (id !== searchId) return;
+  render(courts);
+  const n = courts.length, s = n > 1 ? 's' : '';
+  setStatus(routed
+    ? `${n} court${s}. Nearest by bike: ${fmt(courts[0].bike)}, ~${mins(courts[0].bikeTime)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
+    : `${n} court${s}. Bike router unavailable, so these are straight-line distances.`);
 }
 
 $('gps').onclick = () => {
@@ -203,13 +286,13 @@ $('gps').onclick = () => {
   );
 };
 
-// Geocoding: address → coordinates, via OpenStreetMap's Nominatim
+// Geocoding: address → coordinates (OpenStreetMap Nominatim)
 async function geocode() {
   const q = $('addr').value.trim();
   if (!q) return;
   setStatus('Looking up address…');
   try {
-    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+    const res = await fetchWithTimeout('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
     const hits = await res.json();
     if (!hits.length) return setStatus('Address not found. Try adding the town name.');
     searchFrom(+hits[0].lat, +hits[0].lon, hits[0].display_name.split(',').slice(0, 2).join(','));
@@ -221,7 +304,6 @@ $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') geocode(); }
 map.on('click', e => searchFrom(e.latlng.lat, e.latlng.lng, 'Chosen spot'));
 $('radius').onchange = () => { if (home) searchFrom(home.lat, home.lon); };
 
-// Reopen at your last spot, if the browser remembered it
 try {
   const saved = JSON.parse(localStorage.getItem('courtHome'));
   if (saved) searchFrom(saved.lat, saved.lon, 'Last spot');
