@@ -78,6 +78,10 @@
     <option value="car">🚗 Car</option>
     <option value="bike">🚲 Bike</option>
   </select>
+  <select id="sort" title="Sort courts by">
+    <option value="time">⏱ Fastest</option>
+    <option value="dist">📏 Shortest</option>
+  </select>
 </div>
 <div id="status"></div>
 <div id="map"></div>
@@ -216,8 +220,17 @@ async function addRouteDistances(courts, signal) {
     c.route = data.distances[0][i + 1];
     c.routeTime = data.durations[0][i + 1];
   });
-  // Sort by travel distance; anything the router couldn't reach goes to the end
-  return courts.sort((a, b) => (a.route ?? Infinity) - (b.route ?? Infinity) || a.air - b.air);
+  return sortCourts(courts);
+}
+
+// Fastest = fewest minutes; Shortest = fewest km. They differ: a longer road
+// with a higher speed limit can beat a short route through slow streets.
+// Courts the router couldn't reach go to the end, ordered by straight line.
+let sortBy = 'time';
+try { if (['time', 'dist'].includes(localStorage.getItem('courtSort'))) sortBy = localStorage.getItem('courtSort'); } catch {}
+function sortCourts(courts) {
+  const key = c => sortBy === 'time' ? c.routeTime : c.route;
+  return courts.sort((a, b) => (key(a) ?? Infinity) - (key(b) ?? Infinity) || a.air - b.air);
 }
 
 // Draw the actual route to one court (OSRM "route" service)
@@ -263,7 +276,9 @@ function render(courts) {
     const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=${M().gmaps}`;
     const street = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${c.lat},${c.lon}`;
     const distHtml = c.route != null
-      ? `${M().icon} ${fmt(c.route)}<small>${mins(c.routeTime)} ${M().word}</small>`
+      ? (sortBy === 'time'
+          ? `${M().icon} ${mins(c.routeTime)}<small>${fmt(c.route)} ${M().word}</small>`
+          : `${M().icon} ${fmt(c.route)}<small>${mins(c.routeTime)} ${M().word}</small>`)
       : `${fmt(c.air)}<small>straight line</small>`;
 
     const m = L.circleMarker([c.lat, c.lon], {
@@ -332,10 +347,17 @@ async function searchFrom(lat, lon, label) {
   try { courts = await addRouteDistances(courts, signal); } catch { routed = false; }
   if (id !== searchId) return;
   stopTicker();
+  lastResult = { courts, routed };
+  showResult();
+}
+
+let lastResult = null; // kept so changing the sort doesn't need a new search
+function showResult() {
+  const { courts, routed } = lastResult;
   render(courts);
-  const n = courts.length, s = n > 1 ? 's' : '';
+  const n = courts.length, s = n > 1 ? 's' : '', top = courts[0];
   setStatus((routed
-    ? `${n} court${s}. Nearest ${M().word}: ${fmt(courts[0].route)}, ~${mins(courts[0].routeTime)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
+    ? `${n} court${s}. ${sortBy === 'time' ? 'Fastest' : 'Shortest'} ${M().word}: ~${mins(top.routeTime)}, ${fmt(top.route)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
     : `${n} court${s}. Route planner unavailable, so these are straight-line distances.`)
     + (dataDate ? ` Court data: ${dataDate}.` : ''));
 }
@@ -368,6 +390,12 @@ $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') geocode(); }
 map.on('click', e => searchFrom(e.latlng.lat, e.latlng.lng, 'Chosen spot'));
 $('radius').onchange = () => { if (home) searchFrom(home.lat, home.lon); };
 $('mode').value = mode;
+$('sort').value = sortBy;
+$('sort').onchange = () => {
+  sortBy = $('sort').value;
+  try { localStorage.setItem('courtSort', sortBy); } catch {}
+  if (lastResult?.routed) { sortCourts(lastResult.courts); showResult(); } // instant, no new search
+};
 $('mode').onchange = () => {
   mode = $('mode').value;
   try { localStorage.setItem('courtMode', mode); } catch {}
