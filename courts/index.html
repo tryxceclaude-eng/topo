@@ -61,7 +61,7 @@
 <body>
 <header>
   <h1>🏀 Court <span>Finder</span></h1>
-  <div class="sub">Nearest basketball courts by bike, from OpenStreetMap. Tap a court to see the route. Tap the map to set your spot.</div>
+  <div class="sub">Nearest basketball courts by car or bike, from OpenStreetMap. Tap a court to see the route. Tap the map to set your spot.</div>
 </header>
 
 <div class="controls">
@@ -73,6 +73,10 @@
     <option value="3000" selected>3 km</option>
     <option value="5000">5 km</option>
     <option value="10000">10 km</option>
+  </select>
+  <select id="mode" title="How you travel">
+    <option value="car">🚗 Car</option>
+    <option value="bike">🚲 Bike</option>
   </select>
 </div>
 <div id="status"></div>
@@ -108,7 +112,7 @@ async function fetchWithTimeout(url, opts = {}, ms = 8000, outer = null) {
 }
 
 // Haversine: straight-line distance on a sphere. Now only used to pre-filter
-// and as a fallback when the bike router is down.
+// and as a fallback when the router is down.
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371000, rad = d => d * Math.PI / 180;
   const dLat = rad(lat2 - lat1), dLon = rad(lon2 - lon1);
@@ -185,35 +189,41 @@ async function getCourts(lat, lon, radius, signal) {
 function toCourts(raw, lat, lon, radius) {
   return raw.filter(c => c.lat != null).map(c => ({
     ...c, osm: 'https://www.openstreetmap.org/' + c.osm,
-    air: haversine(lat, lon, c.lat, c.lon), bike: null, bikeTime: null
+    air: haversine(lat, lon, c.lat, c.lon), route: null, routeTime: null
   })).filter(c => c.air <= radius).sort((a, b) => a.air - b.air);
 }
 
-// ---------- 4. Bike distances: OSRM "table" service, ONE request for all courts ----------
-// FOSSGIS runs a bike-profile OSRM server. Its URL says "driving" but the
-// server under /routed-bike/ is built with the bike profile.
+// ---------- 4. Travel distances: OSRM "table" service, ONE request for all courts ----------
+// FOSSGIS runs one OSRM server per way of travel. Every URL says "driving",
+// but the server under /routed-bike/ is built with the bike profile, etc.
 // Coordinates go in as lon,lat (OSRM order!), first one = you (sources=0).
-const BIKE = 'https://routing.openstreetmap.de/routed-bike';
+const MODES = {
+  car:  { url: 'https://routing.openstreetmap.de/routed-car',  icon: '🚗', word: 'by car',  gmaps: 'driving' },
+  bike: { url: 'https://routing.openstreetmap.de/routed-bike', icon: '🚲', word: 'by bike', gmaps: 'bicycling' }
+};
+let mode = 'car';
+try { if (MODES[localStorage.getItem('courtMode')]) mode = localStorage.getItem('courtMode'); } catch {}
+const M = () => MODES[mode];
 const MAX_ROUTED = 25; // be polite to a free server: only route the 25 nearest
-async function addBikeDistances(courts, signal) {
+async function addRouteDistances(courts, signal) {
   const subset = courts.slice(0, MAX_ROUTED);
   const coords = [[home.lon, home.lat], ...subset.map(c => [c.lon, c.lat])]
     .map(p => p[0].toFixed(6) + ',' + p[1].toFixed(6)).join(';');
-  const res = await fetchWithTimeout(`${BIKE}/table/v1/driving/${coords}?sources=0&annotations=distance,duration`, {}, 6000, signal);
+  const res = await fetchWithTimeout(`${M().url}/table/v1/driving/${coords}?sources=0&annotations=distance,duration`, {}, 6000, signal);
   const data = await res.json();
   if (data.code !== 'Ok') throw new Error(data.message || data.code);
   subset.forEach((c, i) => {           // index 0 in the row is you → courts start at 1
-    c.bike = data.distances[0][i + 1];
-    c.bikeTime = data.durations[0][i + 1];
+    c.route = data.distances[0][i + 1];
+    c.routeTime = data.durations[0][i + 1];
   });
-  // Sort by bike distance; anything the router couldn't reach goes to the end
-  return courts.sort((a, b) => (a.bike ?? Infinity) - (b.bike ?? Infinity) || a.air - b.air);
+  // Sort by travel distance; anything the router couldn't reach goes to the end
+  return courts.sort((a, b) => (a.route ?? Infinity) - (b.route ?? Infinity) || a.air - b.air);
 }
 
-// Draw the actual bike route to one court (OSRM "route" service)
+// Draw the actual route to one court (OSRM "route" service)
 async function showRoute(c) {
   try {
-    const res = await fetchWithTimeout(`${BIKE}/route/v1/driving/${home.lon},${home.lat};${c.lon},${c.lat}?overview=full&geometries=geojson`, {}, 10000);
+    const res = await fetchWithTimeout(`${M().url}/route/v1/driving/${home.lon},${home.lat};${c.lon},${c.lat}?overview=full&geometries=geojson`, {}, 10000);
     const data = await res.json();
     if (data.code !== 'Ok') throw new Error(data.code);
     if (routeLine) routeLine.remove();
@@ -250,10 +260,10 @@ function render(courts) {
   const list = $('list'); list.innerHTML = '';
   courts.forEach((c, i) => {
     const title = c.tags.name || 'Basketball court';
-    const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=bicycling`;
+    const gmaps = `https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${c.lat},${c.lon}&travelmode=${M().gmaps}`;
     const street = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${c.lat},${c.lon}`;
-    const distHtml = c.bike != null
-      ? `🚲 ${fmt(c.bike)}<small>${mins(c.bikeTime)} by bike</small>`
+    const distHtml = c.route != null
+      ? `${M().icon} ${fmt(c.route)}<small>${mins(c.routeTime)} ${M().word}</small>`
       : `${fmt(c.air)}<small>straight line</small>`;
 
     const m = L.circleMarker([c.lat, c.lon], {
@@ -267,7 +277,7 @@ function render(courts) {
       <div class="info"><div class="name">${title}</div>
         <div class="meta">${describe(c.tags)}</div>
         ${netBadge(c.tags)}
-        <div class="links"><a href="${gmaps}" target="_blank">🚲 Google Maps</a><a href="${street}" target="_blank">👀 Street View</a><a href="${c.osm}" target="_blank">OSM</a></div>
+        <div class="links"><a href="${gmaps}" target="_blank">${M().icon} Google Maps</a><a href="${street}" target="_blank">👀 Street View</a><a href="${c.osm}" target="_blank">OSM</a></div>
       </div><div class="dist">${distHtml}</div>`;
     li.addEventListener('click', e => {
       if (e.target.tagName === 'A') return;
@@ -317,16 +327,16 @@ async function searchFrom(lat, lon, label) {
   if (id !== searchId) return;
   if (!courts.length) { stopTicker(); render([]); return setStatus(`No courts mapped within ${fmt(radius)}. Try a bigger radius.`); }
 
-  startTicker(`${courts.length} court${courts.length > 1 ? 's' : ''} found. Working out bike routes…`);
+  startTicker(`${courts.length} court${courts.length > 1 ? 's' : ''} found. Working out routes ${M().word}…`);
   let routed = true;
-  try { courts = await addBikeDistances(courts, signal); } catch { routed = false; }
+  try { courts = await addRouteDistances(courts, signal); } catch { routed = false; }
   if (id !== searchId) return;
   stopTicker();
   render(courts);
   const n = courts.length, s = n > 1 ? 's' : '';
   setStatus((routed
-    ? `${n} court${s}. Nearest by bike: ${fmt(courts[0].bike)}, ~${mins(courts[0].bikeTime)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
-    : `${n} court${s}. Bike router unavailable, so these are straight-line distances.`)
+    ? `${n} court${s}. Nearest ${M().word}: ${fmt(courts[0].route)}, ~${mins(courts[0].routeTime)}.` + (n > MAX_ROUTED ? ` (Only the ${MAX_ROUTED} closest were routed.)` : '')
+    : `${n} court${s}. Route planner unavailable, so these are straight-line distances.`)
     + (dataDate ? ` Court data: ${dataDate}.` : ''));
 }
 
@@ -357,6 +367,12 @@ $('addr').addEventListener('keydown', e => { if (e.key === 'Enter') geocode(); }
 
 map.on('click', e => searchFrom(e.latlng.lat, e.latlng.lng, 'Chosen spot'));
 $('radius').onchange = () => { if (home) searchFrom(home.lat, home.lon); };
+$('mode').value = mode;
+$('mode').onchange = () => {
+  mode = $('mode').value;
+  try { localStorage.setItem('courtMode', mode); } catch {}
+  if (home) searchFrom(home.lat, home.lon);
+};
 
 try {
   const saved = JSON.parse(localStorage.getItem('courtHome'));
