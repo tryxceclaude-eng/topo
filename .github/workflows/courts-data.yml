@@ -1,0 +1,54 @@
+# Weekly: download the Netherlands from Geofabrik, pull out every basketball
+# court, save courts/courts.json. The Court Finder page reads that file, so it
+# never depends on the overloaded public Overpass servers.
+name: Update basketball courts
+
+on:
+  schedule:
+    - cron: "23 3 * * 1"   # Mondays 03:23 UTC
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+  push:
+    branches: [main]
+    paths:
+      - courts/build_courts.py
+      - .github/workflows/courts-data.yml
+
+permissions:
+  contents: write
+
+concurrency: courts-data
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install osmium
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q osmium-tool
+          pip install osmium
+
+      - name: Download the Netherlands (OpenStreetMap, via Geofabrik)
+        run: curl -fsSL --retry 3 -o nl.osm.pbf https://download.geofabrik.de/europe/netherlands-latest.osm.pbf
+
+      - name: Keep only sports pitches (plus the points they're drawn with)
+        run: osmium tags-filter nl.osm.pbf nwr/leisure=pitch -o pitches.osm.pbf
+
+      - name: Extract basketball courts
+        run: python courts/build_courts.py pitches.osm.pbf courts/courts.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add courts/courts.json
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "Update basketball courts data"
+          git push
