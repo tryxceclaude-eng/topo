@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<!-- Privacy: connect-src 'none' means this page cannot send data anywhere, even by accident.
+     No external scripts, fonts, images or analytics. Camera frames only ever go to <video> and MediaRecorder. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:,">
+<title>Mirror Light</title>
+<style>
+  :root { --light:#fff; --ring:12; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  [hidden] { display:none !important; }
+  html, body { height:100%; margin:0; overflow:hidden; background:var(--light); color:#fff;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; overscroll-behavior:none; }
+  #stage { position:fixed; inset:0; background:var(--light); }
+
+  /* The "ring" is simply the lit screen around the video. */
+  #frame { position:absolute; inset:calc(var(--ring) * 1vmin); border-radius:5vmin; overflow:hidden; background:#000; }
+  #v { width:100%; height:100%; object-fit:cover; transform-origin:center; display:block; }
+
+  #start { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; padding:24px; text-align:center; background:#0d0d0d; }
+  #start h1 { margin:0; font-size:1.4rem; }
+  #start p { margin:0; max-width:30em; color:#bbb; font-size:.92rem; line-height:1.4; }
+  #start .err { color:#ff8787; }
+  button { font:inherit; border:0; cursor:pointer; color:#fff; }
+  button:disabled { opacity:.4; cursor:default; }
+  .big { background:#e8590c; font-weight:700; font-size:1.05rem; padding:14px 26px; border-radius:12px; }
+  .pill { background:rgba(0,0,0,.68); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    padding:12px 18px; border-radius:999px; font-weight:600; font-size:.95rem; }
+
+  #dock { position:absolute; left:0; right:0; bottom:0; z-index:5; display:flex; justify-content:center; align-items:center;
+    gap:16px; padding:10px 14px calc(12px + env(safe-area-inset-bottom)); }
+  #btnRec { width:70px; height:70px; border-radius:50%; background:rgba(0,0,0,.45); border:4px solid #fff;
+    display:flex; align-items:center; justify-content:center; padding:0; }
+  #btnRec span { width:48px; height:48px; border-radius:50%; background:#e03131; transition:all .15s; }
+  #btnRec.on span { width:26px; height:26px; border-radius:6px; }
+
+  #badge { position:absolute; top:calc(10px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:5;
+    background:rgba(0,0,0,.7); padding:6px 14px; border-radius:999px; font-variant-numeric:tabular-nums; font-weight:700; }
+  #badge i { display:inline-block; width:9px; height:9px; border-radius:50%; background:#ff4d4d; margin-right:8px; animation:blink 1s infinite; }
+  @keyframes blink { 50% { opacity:.25; } }
+  #toast { position:absolute; top:calc(56px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:7;
+    background:rgba(0,0,0,.85); padding:8px 14px; border-radius:10px; font-size:.88rem; max-width:90vw; text-align:center; }
+
+  #sheet { position:absolute; left:10px; right:10px; bottom:calc(98px + env(safe-area-inset-bottom)); max-height:62vh; overflow:auto;
+    z-index:6; background:rgba(18,18,18,.95); border-radius:16px; padding:14px 16px; display:none; max-width:560px; margin:0 auto; }
+  #sheet.open { display:block; }
+  .row { display:block; margin:0 0 12px; font-size:.9rem; }
+  .row small { color:#999; margin-left:6px; }
+  .row input[type=range] { display:block; width:100%; margin-top:6px; accent-color:#e8590c; }
+  .check { display:flex; align-items:center; gap:10px; margin:0 0 12px; font-size:.92rem; }
+  .check input { width:20px; height:20px; accent-color:#e8590c; }
+  .note { color:#999; font-size:.8rem; line-height:1.4; margin:4px 0 12px; }
+  h3 { margin:14px 0 8px; font-size:1rem; }
+  .clip { background:#242424; border-radius:12px; padding:10px; margin-bottom:10px; }
+  .clip video { width:100%; max-height:240px; border-radius:8px; background:#000; display:block; }
+  .clip .meta { color:#aaa; font-size:.8rem; margin:6px 0; word-break:break-all; }
+  .clip .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  .clip .btns a, .clip .btns button { background:#e8590c; color:#fff; font-weight:600; font-size:.88rem; padding:9px 14px;
+    border-radius:8px; text-decoration:none; }
+  .clip .btns .ghost { background:#383838; }
+  .ghostbtn { background:#383838; padding:10px 14px; border-radius:8px; font-size:.9rem; }
+</style>
+</head>
+<body>
+<main id="stage">
+  <div id="frame">
+    <video id="v" playsinline muted autoplay></video>
+    <div id="start">
+      <h1>Mirror Light</h1>
+      <p>Front camera as a mirror, with the screen acting as a ring light. Record and save clips on this device.
+         Nothing is uploaded: the page has no network access at all, and clips exist only in this tab until you save them.</p>
+      <button id="btnStart" class="big">Start camera</button>
+      <p id="startMsg" class="err" hidden></p>
+    </div>
+  </div>
+
+  <div id="badge" hidden><i></i><span id="timer">0:00</span></div>
+  <div id="toast" hidden></div>
+
+  <div id="sheet" role="dialog" aria-label="Settings">
+    <label class="row">Ring thickness
+      <input type="range" id="rRing" min="0" max="28" step="1">
+    </label>
+    <label class="row">Light brightness
+      <input type="range" id="rBright" min="20" max="100" step="1">
+    </label>
+    <label class="row">Light color <small>warm to cool</small>
+      <input type="range" id="rWarm" min="0" max="100" step="1">
+    </label>
+    <label class="row" id="zoomRow"><span id="zoomLabel">Zoom</span>
+      <input type="range" id="rZoom" min="1" max="4" step="0.1" value="1">
+    </label>
+    <label class="check"><input type="checkbox" id="cMirror"> Mirror preview</label>
+    <label class="check"><input type="checkbox" id="cMic"> Record microphone</label>
+    <label class="check" id="torchRow" hidden><input type="checkbox" id="cTorch"> Torch (if the camera has one)</label>
+    <p class="note">A web page can't change screen brightness. Set it to maximum on the device for the strongest light.
+      Saved videos are not mirrored, like a normal camera recording, and don't include the ring.</p>
+    <button id="btnStop" class="ghostbtn">Turn camera off</button>
+    <h3>Clips</h3>
+    <div id="clips"><p class="note" id="noClips">No clips yet.</p></div>
+    <p class="note">Clips live in this tab's memory. Tap Save (or Share, then Save Video on iPhone) before you close or reload the page, or they are gone.</p>
+  </div>
+
+  <div id="dock">
+    <button id="btnSheet" class="pill">Settings</button>
+    <button id="btnRec" aria-label="Record" disabled><span></span></button>
+    <button id="btnFlip" class="pill" disabled>Flip</button>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var root = document.documentElement;
+  var v = $('v');
+
+  // ---------- light settings (stored on this device only) ----------
+  var KEY = 'mirrorlight:v1';
+  var S = { ring: 12, bright: 100, warm: 50 };
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || '{}'); for (var k in S) if (typeof saved[k] === 'number') S[k] = saved[k]; } catch (e) {}
+
+  function lightColor() {
+    var w = S.warm / 100, warm = [255, 176, 102], mid = [255, 255, 255], cool = [190, 218, 255], c, i;
+    if (w < 0.5) { var a = w / 0.5; c = warm.map(function (x, j) { return x + (mid[j] - x) * a; }); }
+    else { var b = (w - 0.5) / 0.5; c = mid.map(function (x, j) { return x + (cool[j] - x) * b; }); }
+    var br = S.bright / 100;
+    return 'rgb(' + c.map(function (x) { return Math.round(x * br); }).join(',') + ')';
+  }
+  function applyLight() {
+    var col = lightColor();
+    root.style.setProperty('--light', col);
+    root.style.setProperty('--ring', S.ring);
+    document.querySelector('meta[name=theme-color]').setAttribute('content', col);
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  }
+  $('rRing').value = S.ring; $('rBright').value = S.bright; $('rWarm').value = S.warm;
+  $('rRing').addEventListener('input', function (e) { S.ring = +e.target.value; applyLight(); });
+  $('rBright').addEventListener('input', function (e) { S.bright = +e.target.value; applyLight(); });
+  $('rWarm').addEventListener('input', function (e) { S.warm = +e.target.value; applyLight(); });
+  applyLight();
+
+  // ---------- small helpers ----------
+  var toastT;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 3500);
+  }
+  function stamp() {
+    var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+  }
+  function fmtSize(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+
+  // ---------- camera ----------
+  var stream = null, track = null, facing = 'user', micOn = false;
+  var mirror = null, hwZoom = false, zoomPrev = 1, wake = null;
+
+  function applyTransform() {
+    var z = hwZoom ? 1 : zoomPrev;
+    v.style.transform = 'scale(' + ((mirror ? -1 : 1) * z) + ',' + z + ')';
+  }
+  function camError(e) {
+    var n = e && e.name;
+    if (n === 'NotAllowedError' || n === 'SecurityError') return 'Camera blocked. Allow camera access for this site in your browser settings, then tap Start again.';
+    if (n === 'NotFoundError' || n === 'OverconstrainedError') return 'No camera found.';
+    if (n === 'NotReadableError') return 'The camera is in use by another app. Close it and try again.';
+    return 'Could not start the camera (' + (n || 'unknown error') + ').';
+  }
+  function stopCamera() {
+    if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+    stream = null; track = null; v.srcObject = null;
+    if (wake) { try { wake.release(); } catch (e) {} wake = null; }
+  }
+  function lockScreen() {
+    try { if ('wakeLock' in navigator) navigator.wakeLock.request('screen').then(function (w) { wake = w; }).catch(function () {}); } catch (e) {}
+  }
+  function setupCaps() {
+    var caps = {}, zr = $('rZoom');
+    try { caps = track.getCapabilities ? track.getCapabilities() : {}; } catch (e) {}
+    if (caps.zoom && caps.zoom.max > caps.zoom.min) {
+      hwZoom = true;
+      zr.min = caps.zoom.min; zr.max = caps.zoom.max; zr.step = caps.zoom.step || 0.1;
+      var cur = 0; try { cur = track.getSettings().zoom; } catch (e) {}
+      zr.value = cur || caps.zoom.min;
+      $('zoomLabel').textContent = 'Zoom';
+    } else {
+      hwZoom = false; zoomPrev = 1;
+      zr.min = 1; zr.max = 4; zr.step = 0.1; zr.value = 1;
+      $('zoomLabel').textContent = 'Zoom (preview only, not in the saved video)';
+    }
+    $('torchRow').hidden = !caps.torch;
+    $('cTorch').checked = false;
+  }
+
+  async function startCamera() {
+    if (recorder) return;
+    stopCamera();
+    $('startMsg').hidden = true;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showStartError('This browser has no camera access here. Open the page over https in Safari or Chrome.');
+      return;
+    }
+    var video = { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 } };
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: video, audio: micOn });
+    } catch (e) {
+      if (micOn) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: video, audio: false });
+          micOn = false; $('cMic').checked = false; toast('Microphone unavailable, recording without sound.');
+        } catch (e2) { showStartError(camError(e2)); return; }
+      } else { showStartError(camError(e)); return; }
+    }
+    track = stream.getVideoTracks()[0];
+    track.addEventListener('ended', function () { if (recorder) stopRecording(); });
+    v.srcObject = stream;
+    try { await v.play(); } catch (e) {}
+    var actual = facing;
+    try { actual = track.getSettings().facingMode || facing; } catch (e) {}
+    if (mirror === null) mirror = (actual === 'user');
+    $('cMirror').checked = mirror;
+    setupCaps(); applyTransform(); lockScreen();
+    $('start').hidden = true;
+    $('btnRec').disabled = false; $('btnFlip').disabled = false;
+  }
+  function showStartError(msg) {
+    $('start').hidden = false;
+    var m = $('startMsg'); m.textContent = msg; m.hidden = false;
+    $('btnRec').disabled = true; $('btnFlip').disabled = true;
+  }
+
+  $('btnStart').addEventListener('click', startCamera);
+  $('btnFlip').addEventListener('click', function () {
+    facing = facing === 'user' ? 'environment' : 'user'; mirror = null; startCamera();
+  });
+  $('btnStop').addEventListener('click', function () {
+    if (recorder) stopRecording();
+    stopCamera();
+    $('start').hidden = false; $('btnRec').disabled = true; $('btnFlip').disabled = true;
+    $('sheet').classList.remove('open');
+  });
+  $('cMirror').addEventListener('change', function (e) { mirror = e.target.checked; applyTransform(); });
+  $('cMic').addEventListener('change', function (e) { micOn = e.target.checked; if (stream) startCamera(); });
+  $('cTorch').addEventListener('change', function (e) {
+    if (track) track.applyConstraints({ advanced: [{ torch: e.target.checked }] }).catch(function () { toast('Torch not available.'); e.target.checked = false; });
+  });
+  $('rZoom').addEventListener('input', function (e) {
+    var z = parseFloat(e.target.value);
+    if (hwZoom) { if (track) track.applyConstraints({ advanced: [{ zoom: z }] }).catch(function () {}); }
+    else { zoomPrev = z; applyTransform(); }
+  });
+  $('btnSheet').addEventListener('click', function () { $('sheet').classList.toggle('open'); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible' || !stream) return;
+    lockScreen();
+    if ((!track || track.readyState === 'ended') && !recorder) startCamera();
+  });
+
+  // ---------- recording ----------
+  var recorder = null, chunks = [], t0 = 0, tick = null;
+
+  function pickMime() {
+    if (!window.MediaRecorder) return null;
+    var c = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    for (var i = 0; i < c.length; i++) if (MediaRecorder.isTypeSupported(c[i])) return c[i];
+    return '';
+  }
+  function fmtTime(ms) { var s = Math.floor(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+
+  function startRecording() {
+    if (!stream) return;
+    var mime = pickMime();
+    if (mime === null) { toast('This browser cannot record video.'); return; }
+    try {
+      var opts = { videoBitsPerSecond: 8000000 }; if (mime) opts.mimeType = mime;
+      recorder = new MediaRecorder(stream, opts);
+    } catch (e) {
+      try { recorder = new MediaRecorder(stream); } catch (e2) { recorder = null; toast('Recording failed to start.'); return; }
+    }
+    chunks = [];
+    var rec = recorder;
+    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+    rec.onstop = function () {
+      var type = rec.mimeType || mime || 'video/webm';
+      var blob = new Blob(chunks, { type: type }); chunks = [];
+      if (blob.size) addClip(blob); else toast('Recording was empty.');
+    };
+    rec.start();
+    t0 = Date.now();
+    $('badge').hidden = false; $('timer').textContent = '0:00';
+    tick = setInterval(function () { $('timer').textContent = fmtTime(Date.now() - t0); }, 250);
+    $('btnRec').classList.add('on'); $('btnRec').setAttribute('aria-label', 'Stop recording');
+    $('btnFlip').disabled = true; $('cMic').disabled = true; $('btnStop').disabled = true;
+    $('sheet').classList.remove('open');
+  }
+  function stopRecording() {
+    if (!recorder) return;
+    var r = recorder; recorder = null;
+    try { if (r.state !== 'inactive') r.stop(); } catch (e) {}
+    clearInterval(tick); $('badge').hidden = true;
+    $('btnRec').classList.remove('on'); $('btnRec').setAttribute('aria-label', 'Record');
+    $('btnFlip').disabled = !stream; $('cMic').disabled = false; $('btnStop').disabled = false;
+  }
+  $('btnRec').addEventListener('click', function () { if (recorder) stopRecording(); else startRecording(); });
+
+  // ---------- clips (in memory, saved by the user) ----------
+  var clips = [];
+  function addClip(blob) {
+    var ext = blob.type.indexOf('mp4') !== -1 ? 'mp4' : 'webm';
+    var name = 'mirror-' + stamp() + '.' + ext;
+    var file = null; try { file = new File([blob], name, { type: blob.type }); } catch (e) {}
+    clips.unshift({ url: URL.createObjectURL(blob), name: name, size: blob.size, file: file });
+    renderClips();
+    $('sheet').classList.add('open'); $('sheet').scrollTop = $('sheet').scrollHeight;
+    toast('Clip ready. Tap Save to keep it.');
+  }
+  function renderClips() {
+    var box = $('clips'); box.textContent = '';
+    if (!clips.length) { var p = document.createElement('p'); p.className = 'note'; p.textContent = 'No clips yet.'; box.appendChild(p); return; }
+    clips.forEach(function (c) {
+      var d = document.createElement('div'); d.className = 'clip';
+      var vid = document.createElement('video'); vid.src = c.url; vid.controls = true; vid.playsInline = true; vid.preload = 'metadata';
+      var meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = c.name + ' · ' + fmtSize(c.size);
+      var btns = document.createElement('div'); btns.className = 'btns';
+      var save = document.createElement('a'); save.href = c.url; save.download = c.name; save.textContent = 'Save';
+      btns.appendChild(save);
+      if (c.file && navigator.canShare && navigator.canShare({ files: [c.file] })) {
+        var sh = document.createElement('button'); sh.textContent = 'Share';
+        sh.addEventListener('click', function () { navigator.share({ files: [c.file] }).catch(function () {}); });
+        btns.appendChild(sh);
+      }
+      var del = document.createElement('button'); del.className = 'ghost'; del.textContent = 'Delete';
+      del.addEventListener('click', function () {
+        URL.revokeObjectURL(c.url); clips = clips.filter(function (x) { return x !== c; }); renderClips();
+      });
+      btns.appendChild(del);
+      d.appendChild(vid); d.appendChild(meta); d.appendChild(btns); box.appendChild(d);
+    });
+  }
+  window.addEventListener('beforeunload', function (e) {
+    if (clips.length || recorder) { e.preventDefault(); e.returnValue = ''; }
+  });
+})();
+</script>
+</body>
+</html>
